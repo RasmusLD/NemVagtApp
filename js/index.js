@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-/*var app = {
+var app = {
     // Application Constructor
     initialize: function() {
         this.bindEvents();
@@ -36,23 +36,20 @@
         app.receivedEvent('deviceready');
     },
     // Update DOM on a Received Event
-    receivedEvent: function(id) {
-        var parentElement = document.getElementById(id);
-        var listeningElement = parentElement.querySelector('.listening');
-        var receivedElement = parentElement.querySelector('.received');
-
-        listeningElement.setAttribute('style', 'display:none;');
-        receivedElement.setAttribute('style', 'display:block;');
-
-        console.log('Received Event: ' + id);
+    receivedEvent: function() {
+        phonegapReady();
     }
 };
-
+/*
 //brug af æøå
 æ = &aelig;
 ø = &oslash;
 å = &aring;
 */
+
+//this function is called once the 'deviceready' event has been fired
+function phonegapReady() {    
+
 $(document).ready(function(){
     
     //the #mCont dom element is saved here in runOnLoad
@@ -91,6 +88,7 @@ $(document).ready(function(){
         
         //added here for testing purposes... this might be the right place for it after all...
         hasSavedLogin();
+        checkConnection();
         
 //        //added here for testing purposes...
 //        showMyShifts();
@@ -134,7 +132,7 @@ $(document).ready(function(){
 //            body.append("<p>saved email: "+ loginInfo.usr +"</p>");
 //            body.append("<p>saved pswhash: "+ loginInfo.pswhash +"</p>");
 //            body.append("<p>saved psw: "+ loginInfo.psw +"</p>");
-            if(Window.navigator.onLine) { //if online, this will evaluate true, making the app attempt to log on
+            if(checkConnection) { //if online, this will evaluate true, making the app attempt to log on
                 //needed to attempt an automatic AJAX login.
                 $.ajax({ //this function has it's own AJAX call because it wasn't worth the time to standardize it and loginEvaluator expects dataType: "text" instead of JSON...
                     type: "POST",
@@ -254,7 +252,7 @@ $(document).ready(function(){
     //shows the "Mine Vagter" page
     function showMyShifts() {
         $(body).empty();
-        if(Window.navigator.onLine) {
+        if(checkConnection) {
             //actually show shifts here, we need to get the shifts from the server and then create a method that finds out how many shifts are there, what data they contain, then populate.
             //when creating shifts, dynamically add an event listener to every shift here... this is already done further down in the code...
             if(myShiftsFirstUpdate === true) { //checks to see if this is the first time we've opened "myShifts" this time we're using the program, if it is, we'll get JSON from the server
@@ -283,12 +281,10 @@ $(document).ready(function(){
                 });
             }else { //we already have a pretty recent version of the JSON, so get JSON from localStorage, as this is much faster than the internet.
                 //retrieves the booked shifts
-                var myBookedShifts = $.parseJSON(getFromStorage("savedBookedShifts"));
-                populateMyShifts(myBookedShifts);
+                populateMyShifts(ajaxSuccesEvaluator("savedBookedShifts", "Vagter", undefined));
             };
         }else { //this is reached if the device is offline
-            var myBookedShifts = $.parseJSON(getFromStorage("savedBookedShifts"));
-            populateMyShifts(myBookedShifts);
+            populateMyShifts(ajaxSuccesEvaluator("savedBookedShifts", "Vagter", undefined));
         };
 
 //        THE REST OF THIS METHOD IS DEPRECATED, BUT KEPT AROUND FOR NOW AS REFERENCE, TO MAKE SURE I STILL HAVE IT IF I WAS TO RUN INTO AN UNEXPECTED ERROR
@@ -646,17 +642,21 @@ $(document).ready(function(){
     //shows the "Brugerprofil" page
     function showUserProfile() {
         $(body).empty();
-        
-        //the url to POST to, so we can get our UserProfile JSON
-        var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_userprofile";
-        //the object containing the data/authenticator to POST, so we are allowed to retrieve the JSON
-        var toPost = {userid:getFromStorage("userId")};
-        //make the AJAX call and save it to the var, so we can call .done on it
-        var userProfileObj = postAJAXCall(url, toPost);
+        if(checkConnection) {
+            //the url to POST to, so we can get our UserProfile JSON
+            var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_userprofile";
+            //the object containing the data/authenticator to POST, so we are allowed to retrieve the JSON
+            var toPost = {userid:getFromStorage("userId")};
+            //make the AJAX call and save it to the var, so we can call .done on it
+            var userProfileObj = postAJAXCall(url, toPost);
 
-        userProfileObj.done(function(data) {
-            populateUserProfile(ajaxSuccesEvaluator("savedUserProfile", "Bruger Profilen", data));
-        });
+            userProfileObj.done(function(data) {
+                populateUserProfile(ajaxSuccesEvaluator("savedUserProfile", "Bruger Profilen", data));
+            });
+        }else { //this is reached if the device is offline
+            populateUserProfile(ajaxSuccesEvaluator("savedUserProfile", "Bruger Profilen", undefined));
+        };
+        
         
     };
     function populateUserProfile(data) {
@@ -969,7 +969,7 @@ $(document).ready(function(){
             //save the data to local storage, so it can be reused w/o having to make the AJAX call again
             saveToStorage(saveLocation , JSON.stringify(data));
             return data;
-        }else { //on error
+        }else { //if no connection/data === undefined
             //if we fail to get JSON, get it locally
             notificationModal("OBS, kunne ikke hente fra nettet", "Henter \""+ whereAreWe +"\" fra telefonens hukommelse, data kan v�re for�ldet.");
             //retrieves the UserProfile from localStorage
@@ -1174,6 +1174,29 @@ $(document).ready(function(){
             }
         });
     };
+    
+    function checkConnection() {
+        $("#UI_ELEMENT_TEST").append('Checker:');
+        var networkState = navigator.connection.type;
+        
+        var states = {};
+        states[Connection.UNKNOWN]  = 'Unknown connection';
+        states[Connection.ETHERNET] = 'Ethernet connection';
+        states[Connection.WIFI]     = 'WiFi connection';
+        states[Connection.CELL_2G]  = 'Cell 2G connection';
+        states[Connection.CELL_3G]  = 'Cell 3G connection';
+        states[Connection.CELL_4G]  = 'Cell 4G connection';
+        states[Connection.CELL]     = 'Cell generic connection';
+        states[Connection.NONE]     = 'No network connection';
+        
+        $("#UI_ELEMENT_TEST").append('Connection type: ' + states[networkState]);
+        
+        if(states[networkState] === 'No network connection') {
+            return false;
+        }else {
+            return true;
+        };
+    }
     
     //we need this to make sure html5 storage is available, it's essentially a formality in this app
     function supportsLocalStorage() {
@@ -1384,3 +1407,5 @@ $(document).ready(function(){
     };
     
 });
+
+};

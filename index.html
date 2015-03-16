@@ -54,7 +54,7 @@
         <script type="text/javascript" src="js/index.js"></script>
         <title>NemVagt</title>
     </head>
-    <body>
+    <body class="app">
         
         <div id="lCont" class="container-fluid pull-left">
             
@@ -63,6 +63,7 @@
         <div id="mCont" class="container-fluid pull-right">
             
         </div>
+        
         <div id="bCont" style="clear:both;" class="container-fluid"> <!--clear:both; is added here to make it actually do it, otherwise it refuses to clear:both;, it's most likely a BS issue, since even styling it in the index.css as !important doesn't make it clear:both;-->
             
         </div>
@@ -80,6 +81,10 @@
             
             
         </div>
-            
+        
+        <script type="text/javascript">
+            app.initialize();
+        </script>
+        
     </body>
 </html>
