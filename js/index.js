@@ -280,10 +280,10 @@ $(document).ready(function(){
                 });
             }else { //we already have a pretty recent version of the JSON, so get JSON from localStorage, as this is much faster than the internet.
                 //retrieves the booked shifts
-                populateMyShifts(ajaxSuccesEvaluator("savedBookedShifts", "Mine Vagter"));
+                populateMyShifts(JSON.parse(getFromStorage("savedBookedShifts")));
             };
         }else { //this is reached if the device is offline
-            populateMyShifts(ajaxSuccesEvaluator("savedBookedShifts", "Mine Vagter"));
+            populateMyShifts(JSON.parse(getFromStorage("savedBookedShifts")));
         };
 
 //        THE REST OF THIS METHOD IS DEPRECATED, BUT KEPT AROUND FOR NOW AS REFERENCE, TO MAKE SURE I STILL HAVE IT IF I WAS TO RUN INTO AN UNEXPECTED ERROR
@@ -653,7 +653,7 @@ $(document).ready(function(){
                 populateUserProfile(ajaxSuccesEvaluator("savedUserProfile", "Bruger Profilen", data));
             });
         }else { //this is reached if the device is offline
-            populateUserProfile(ajaxSuccesEvaluator("savedUserProfile", "Bruger Profilen"));
+            populateMyShifts(JSON.parse(getFromStorage("savedUserProfile")));
         };
         
         
