@@ -48,7 +48,7 @@ var app = {
 */
 
 //this function is called once the 'deviceready' event has been fired
-function phonegapReady() {    
+function phonegapReady() {
 
 $(document).ready(function(){
     
@@ -1201,8 +1201,10 @@ $(document).ready(function(){
     //we need this to make sure html5 storage is available, it's essentially a formality in this app
     function supportsLocalStorage() {
         try {
+            $(body).append('<p>localStorage available</p>');
             return 'localStorage' in window && window['localStorage'] !== null;
         } catch (e) {
+            $(body).append('<p>localStorage uavailable</p>'+ e.toString());
             return false;
         }
     };
