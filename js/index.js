@@ -276,14 +276,14 @@ $(document).ready(function(){
     //                    setTimeout(modalW.empty(),3000);
     //                    setTimeout(populateMyShifts(myBookedShifts),3100);
     //                }
-                    populateMyShifts(ajaxSuccesEvaluator("savedBookedShifts", "Vagter", data));
+                    populateMyShifts(ajaxSuccesEvaluator("savedBookedShifts", "Mine Vagter", data));
                 });
             }else { //we already have a pretty recent version of the JSON, so get JSON from localStorage, as this is much faster than the internet.
                 //retrieves the booked shifts
-                populateMyShifts(ajaxSuccesEvaluator("savedBookedShifts", "Vagter", undefined));
+                populateMyShifts(ajaxSuccesEvaluator("savedBookedShifts", "Mine Vagter"));
             };
         }else { //this is reached if the device is offline
-            populateMyShifts(ajaxSuccesEvaluator("savedBookedShifts", "Vagter", undefined));
+            populateMyShifts(ajaxSuccesEvaluator("savedBookedShifts", "Mine Vagter"));
         };
 
 //        THE REST OF THIS METHOD IS DEPRECATED, BUT KEPT AROUND FOR NOW AS REFERENCE, TO MAKE SURE I STILL HAVE IT IF I WAS TO RUN INTO AN UNEXPECTED ERROR
@@ -653,7 +653,7 @@ $(document).ready(function(){
                 populateUserProfile(ajaxSuccesEvaluator("savedUserProfile", "Bruger Profilen", data));
             });
         }else { //this is reached if the device is offline
-            populateUserProfile(ajaxSuccesEvaluator("savedUserProfile", "Bruger Profilen", undefined));
+            populateUserProfile(ajaxSuccesEvaluator("savedUserProfile", "Bruger Profilen"));
         };
         
         
