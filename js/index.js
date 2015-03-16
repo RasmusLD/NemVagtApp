@@ -156,7 +156,6 @@ $(document).ready(function(){
                     loginEvaluater(data, loginInfo.usr, domain);
                 });
             }else {
-                $(menu).empty(); //is called to make sure we don't make an additional menu for ANY reason
                 showMenu();
                 showMyShifts();
             };
@@ -216,7 +215,7 @@ $(document).ready(function(){
 //                    });
                 },
                 error: function() {
-                    $(body).append("<p>Something went wrong</p>");
+                    $(body).append("<p>Something went wrong in AjaxCall from showLogin()</p> <br>"+"<p>status: "+ error.status + "; readyState: " + error.readyState +"; statusText: "+ error.statusText +"; responseText:"+ error.responseText +";</p>");
                 }
                 }).done(function() {
                     loginEvaluater(returnedData, email, domain);
@@ -240,7 +239,7 @@ $(document).ready(function(){
             saveToStorage("email", $.parseJSON(userInfo).email);
             saveToStorage("userId", $.parseJSON(userInfo).id);
             saveToStorage("domain", domain);
-            $(menu).empty(); //is called to make sure we don't make an additional menu for ANY reason
+            
             showMenu();
             showMyShifts();
         }else {
@@ -920,6 +919,7 @@ $(document).ready(function(){
     
     //we need a menu, so that you can swap between profiles and navigate the page in general
     function showMenu() {
+        $(menu).empty();
         var styling = 'style="margin-left: 7px; padding: 5px; font-size:16px;"';
         //creates a menu we can see in all pages. Add .navbar-fixed-top if menu should stick to top of screen.
         $(menu).append('<div class="dropdown" id="menu">\
@@ -1176,7 +1176,7 @@ $(document).ready(function(){
     };
     
     function checkConnection() {
-        $("#UI_ELEMENT_TEST").append('Checker:');
+        $(body).append('Checker:');
         var networkState = navigator.connection.type;
         
         var states = {};
@@ -1189,11 +1189,11 @@ $(document).ready(function(){
         states[Connection.CELL]     = 'Cell generic connection';
         states[Connection.NONE]     = 'No network connection';
         
-        $("#UI_ELEMENT_TEST").append('Connection type: ' + states[networkState]);
-        
         if(states[networkState] === 'No network connection') {
+            $(body).append('Connection type: failed: ' + states[networkState]);
             return false;
         }else {
+            $(body).append('Connection type: succeded: ' + states[networkState]);
             return true;
         };
     }
