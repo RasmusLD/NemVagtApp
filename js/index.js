@@ -132,7 +132,7 @@ $(document).ready(function(){
 //            body.append("<p>saved email: "+ loginInfo.usr +"</p>");
 //            body.append("<p>saved pswhash: "+ loginInfo.pswhash +"</p>");
 //            body.append("<p>saved psw: "+ loginInfo.psw +"</p>");
-            if(checkConnection) { //if online, this will evaluate true, making the app attempt to log on
+            if(checkConnection()) { //if online, this will evaluate true, making the app attempt to log on
                 //needed to attempt an automatic AJAX login.
                 $.ajax({ //this function has it's own AJAX call because it wasn't worth the time to standardize it and loginEvaluator expects dataType: "text" instead of JSON...
                     type: "POST",
@@ -252,7 +252,7 @@ $(document).ready(function(){
     //shows the "Mine Vagter" page
     function showMyShifts() {
         $(body).empty();
-        if(checkConnection) {
+        if(checkConnection()) {
             //actually show shifts here, we need to get the shifts from the server and then create a method that finds out how many shifts are there, what data they contain, then populate.
             //when creating shifts, dynamically add an event listener to every shift here... this is already done further down in the code...
             if(myShiftsFirstUpdate === true) { //checks to see if this is the first time we've opened "myShifts" this time we're using the program, if it is, we'll get JSON from the server
@@ -642,7 +642,7 @@ $(document).ready(function(){
     //shows the "Brugerprofil" page
     function showUserProfile() {
         $(body).empty();
-        if(checkConnection) {
+        if(checkConnection()) {
             //the url to POST to, so we can get our UserProfile JSON
             var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_userprofile";
             //the object containing the data/authenticator to POST, so we are allowed to retrieve the JSON
