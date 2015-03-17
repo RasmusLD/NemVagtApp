@@ -280,10 +280,10 @@ $(document).ready(function(){
                 });
             }else { //we already have a pretty recent version of the JSON, so get JSON from localStorage, as this is much faster than the internet.
                 //retrieves the booked shifts
-                populateMyShifts(getFromStorageNoCon("savedBookedShifts", "Mine Vagter"));
+                populateMyShifts(ajaxSuccesEvaluator("savedBookedShifts", "Mine Vagter"));
             };
         }else { //this is reached if the device is offline
-            populateMyShifts(getFromStorageNoCon("savedBookedShifts", "Mine Vagter"));
+            populateMyShifts(ajaxSuccesEvaluator("savedBookedShifts", "Mine Vagter"));
         };
 
 //        THE REST OF THIS METHOD IS DEPRECATED, BUT KEPT AROUND FOR NOW AS REFERENCE, TO MAKE SURE I STILL HAVE IT IF I WAS TO RUN INTO AN UNEXPECTED ERROR
@@ -653,7 +653,7 @@ $(document).ready(function(){
                 populateUserProfile(ajaxSuccesEvaluator("savedUserProfile", "Bruger Profilen", data));
             });
         }else { //this is reached if the device is offline
-            populateMyShifts(getFromStorageNoCon("savedUserProfile", "Bruger Profilen"));
+            populateMyShifts(ajaxSuccesEvaluator("savedUserProfile", "Bruger Profilen"));
         };
         
         
@@ -976,19 +976,19 @@ $(document).ready(function(){
             var saved = $.parseJSON(getFromStorage(saveLocation));
 
             setTimeout(modalW.empty(),3000);
-            setTimeout(function() {return saved;}, 3100);
+            return saved;
         };
     };
-    //same as above, except for w/o internet connection
-    function getFromStorageNoCon(saveLocation, whereAreWe) {
-        //if we fail to get JSON, get it locally
-        notificationModal("OBS, kunne ikke hente fra nettet", "Henter \""+ whereAreWe +"\" fra telefonens hukommelse, data kan være forældet.");
-        //retrieves the UserProfile from localStorage
-        var saved = $.parseJSON(getFromStorage(saveLocation));
-
-        setTimeout(modalW.empty(),3000);
-        setTimeout(function() {return saved;}, 3100);
-    }
+//    //same as above, except for w/o internet connection
+//    function getFromStorageNoCon(saveLocation, whereAreWe) {
+//        //if we fail to get JSON, get it locally
+//        notificationModal("OBS, kunne ikke hente fra nettet", "Henter \""+ whereAreWe +"\" fra telefonens hukommelse, data kan være forældet.");
+//        //retrieves the UserProfile from localStorage
+//        var saved = $.parseJSON(getFromStorage(saveLocation));
+//        
+//        setTimeout(modalW.empty(),3000);
+//        return saved;
+//    }
     
     //updates "savedBookedShifts" & "savedPossibleShifts" in localStorage, when "opdater alt" in menu is pressed, then updates the page you were on
     function updateAllListsMenuHandler() {
