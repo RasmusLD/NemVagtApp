@@ -113,11 +113,13 @@ $(document).ready(function(){
     var jsonUpdateMyShiftsObj;
     function autoupdateMyShifts() {
         setInterval(function() {
-            var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_myshifts";
-            //also needs to post a pswHash?
-            var infoArr = {userid:getFromStorage("userId")}; //what to post, once I I need to POST a pswHash, do it here.
-            var ajaxReq = postAJAXCall(url, infoArr, false); //false sets the global option to false, meaning the request will be invisible to the ajaxStart/ajaxStop.
-            ajaxReq.done(saveToStorange("savedBookedShifts", JSON.stringify(this)));
+            if(checkConnection()) {
+                var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_myshifts";
+                //also needs to post a pswHash?
+                var infoArr = {userid:getFromStorage("userId")}; //what to post, once I I need to POST a pswHash, do it here.
+                var ajaxReq = postAJAXCall(url, infoArr, false); //false sets the global option to false, meaning the request will be invisible to the ajaxStart/ajaxStop.
+                ajaxReq.done(saveToStorange("savedBookedShifts", JSON.stringify(this)));
+            };
         }, 150000);
     };
     
@@ -491,7 +493,7 @@ $(document).ready(function(){
         //this var is also used by the back button, to evaluate if it should return you to showMyShifts or showPossibleShifts.
         var isBooked;
         
-        $(body).empty(); //omitted for testing purposes...
+        $(body).empty();
         
         //retrieves the booked shifts
         var myBookedShifts = $.parseJSON(getFromStorage("savedBookedShifts"));
@@ -546,6 +548,7 @@ $(document).ready(function(){
                 
                 //add the individual parts of the JSON to the append body, so that it can be viewed. Done this way to be easily modifiable...
                 $(body).append(title+date+startTime+endTime+city+address+roles+notes);
+                //sets isBooked to true, letting the function know that it's dealing with a bookedShift as opposed to a possibleShift
                 isBooked = true;
             };
         };
@@ -860,8 +863,8 @@ $(document).ready(function(){
         //prevent the default(synchronous) POST, is already done in isRequiredFieldEmpty
         //$(this).preventDefault();
         
-        //if all required fields are filled
-        if(canSubmit) {
+        //if all required fields are filled and we have an internet connection
+        if(canSubmit && checkConnection()) {
             //retrieve the domain from localStorage
             var domain = getFromStorage("domain");
             
@@ -1185,8 +1188,9 @@ $(document).ready(function(){
         });
     };
     
+    //is used to check the connection state/type, plugs into the browser
     function checkConnection() {
-        $(body).append('Checker:');
+        //$(body).append('Checker:');
         var networkState = navigator.connection.type;
         
         var states = {};
@@ -1200,10 +1204,10 @@ $(document).ready(function(){
         states[Connection.NONE]     = 'No network connection';
         
         if(states[networkState] === 'No network connection') {
-            $(body).append('Connection type: failed: ' + states[networkState]);
+            //$(body).append('Connection type: failed: ' + states[networkState]);
             return false;
         }else {
-            $(body).append('Connection type: succeded: ' + states[networkState]);
+            //$(body).append('Connection type: succeded: ' + states[networkState]);
             return true;
         };
     }
@@ -1211,10 +1215,10 @@ $(document).ready(function(){
     //we need this to make sure html5 storage is available, it's essentially a formality in this app
     function supportsLocalStorage() {
         try {
-            $(body).append('<p>localStorage available</p>');
+            //$(body).append('<p>localStorage available</p>');
             return 'localStorage' in window && window['localStorage'] !== null;
         } catch (e) {
-            $(body).append('<p>localStorage uavailable</p>'+ e.toString());
+            //$(body).append('<p>localStorage uavailable</p>'+ e.toString());
             return false;
         }
     };
