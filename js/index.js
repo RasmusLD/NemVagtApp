@@ -488,6 +488,7 @@ $(document).ready(function(){
             dataType: "JSON",
             data: infoArr,
             success: function(data) {
+                $("#UI_ELEMENT_TEST").append("<p>ajaxCall success was reached:<br>data.length: "+ data.length +"<br>data.toString: "+ data.toString() +"</p>");
                 return data;
             },
             error: function() {
@@ -497,6 +498,7 @@ $(document).ready(function(){
         
         ajaxCall.done(function(data) {
             $("#UI_ELEMENT_TEST").append("<p>ajaxCall.done was reached</p>");
+            $("#UI_ELEMENT_TEST").append("<p>data.toString: "+ data.toString() +"</p>");
             for(var i = 0; i < data.length; i++) {
                 $("#UI_ELEMENT_TEST").append("<p>ajaxCall.done for loop iteration nr: "+ i +"</p>");
                 var object = data[i];
