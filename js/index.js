@@ -839,7 +839,7 @@ $(document).ready(function(){
                 var valueOfObject = $("#"+ object["fieldname"]).val();
                 if(valueOfObject === "" || valueOfObject === null || valueOfObject === undefined) {
                     //if something that should be filled out isn't, notify user and display helptext (only tells of/displays help for, the first instance of incorrectly filled form element)
-                    showModalViewAccept("Manglende udfyldning", "Feltet \""+ object["showname"] +"\" skal være udfyldt.<br>Hjælp til udfyldning:<br>"+ object["helptext"] +"<br><br>Felter der skal være udfyldt og ikke er det, er nu highlighted");
+                    showModalViewAccept("Manglende udfyldning", "Feltet \""+ object["showname"] +"\" skal v&aelig;re udfyldt.<br>Hj&aelig;lp til udfyldning:<br>"+ object["helptext"] +"<br><br>Felter der skal v&aelig;re udfyldt og ikke er det, er nu highlighted");
                     //highlights all incorrectly filled form elements, making it easy for the user to find them...
                     $("#"+ object["fieldname"]).addClass("myHighlight");
                     //removes the highlight once the user manipulates the form element
@@ -990,9 +990,9 @@ $(document).ready(function(){
             
             //if there's something to retrive notify user, if there's nothing to retrieve, tell the user that...
             if(saved !== undefined && saved !== "" && saved !== null) {
-                notificationModal("OBS, kunne ikke hente fra nettet", "<p>Henter \""+ whereAreWe +"\" fra telefonens hukommelse, data kan være forældet.</p>");
+                notificationModal("OBS, kunne ikke hente fra nettet", "<p>Henter \""+ whereAreWe +"\" fra telefonens hukommelse, data kan v&aelig;re for&aelig;ldet.</p>");
             }else {
-                notificationModal("OBS, kunne ikke hente fra nettet", "<p>Der er ingen data for \""+ whereAreWe +"\" gemt på din telefon, hvis du har brug for at få det vist skal der bruges et netværk.</p>");
+                notificationModal("OBS, kunne ikke hente fra nettet", "<p>Der er ingen data for \""+ whereAreWe +"\" gemt på din telefon, hvis du har brug for at få det vist skal der bruges et netv&aelig;rk.</p>");
             };
             //removes the modal window after X 1/1000 of a second has passed.
             setTimeout(function() {
