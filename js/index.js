@@ -974,11 +974,17 @@ $(document).ready(function(){
             return data;
         }else { //if no connection/data === undefined
             //if we fail to get JSON, get it locally
-            notificationModal("OBS, kunne ikke hente fra nettet", "<p>Henter \""+ whereAreWe +"\" fra telefonens hukommelse, data kan være forældet.</p>");
+            
             //retrieves the UserProfile from localStorage
             var saved = $.parseJSON(getFromStorage(saveLocation));
-
-            setTimeout(modalW.empty(),3000);
+            //if there's something to retrive notify user, if there's nothing to retrieve, tell the user that...
+            if(saved !== undefined && saved !== "" && saved !== null) {
+                notificationModal("OBS, kunne ikke hente fra nettet", "<p>Henter \""+ whereAreWe +"\" fra telefonens hukommelse, data kan være forældet.</p>");
+            }else {
+                notificationModal("OBS, kunne ikke hente fra nettet", "<p>Der er ingen data for \""+ whereAreWe +"\" gemt på din telefon, hvis du har brug for at få det vist skal der bruges et netværk.</p>");
+            };
+            
+            setTimeout(modalW.empty(), 3000);
             return saved;
         };
     };
@@ -1394,7 +1400,7 @@ $(document).ready(function(){
             $("#myModal").on("hidden.bs.modal", function() {
                 modalW.empty();
             });
-        }, 1000);
+        }, 10);
         
     };
     
