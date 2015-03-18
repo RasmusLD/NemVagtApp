@@ -836,8 +836,14 @@ $(document).ready(function(){
             if(object["required"] === "1") {
                 var valueOfObject = $("#"+ object["fieldname"]).val();
                 if(valueOfObject === "" || valueOfObject === null || valueOfObject === undefined) {
+                    //if something that should be filled out isn't, notify user and display helptext (only tells of/displays help for, the first instance of incorrectly filled form element)
                     showModalViewAccept("Manglende udfyldning", "Feltet \""+ object["showname"] +"\" skal være udfyldt.<br>Hjælp til udfyldning:<br>"+ object["helptext"] +"<br><br>Felter der skal være udfyldt og ikke er det, er nu highlighted");
+                    //highlights all incorrectly filled form elements, making it easy for the user to find them...
                     $("#"+ object["fieldname"]).addClass("myHighlight");
+                    //removes the highlight once the user manipulates the form element
+                    $(".myHighlight").on("focus", function() {
+                        $(this).removeClass("myHighlight");
+                    });
                     return false;
                 };
             };
