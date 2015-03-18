@@ -474,11 +474,27 @@ $(document).ready(function(){
         
         $(body).append('<h1 class="page-header">Ledige Vagter</h1>');
         
-        var toPost = {userid:getFromStorage("userId")};
-        
         var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_myshiftplan";
         
-        var ajaxCall = postAJAXCall(url, toPost);
+        var infoArr = {};
+        
+        infoArr.pswhash = getFromStorage("pswHash");
+        
+        infoArr.userid = getFromStorage("userId");
+        
+        var ajaxCall = $.ajax({
+            type: "POST",
+            url: url,
+            dataType: "JSON",
+            data: infoArr,
+            success: function(data) {
+                return data;
+            },
+            error: function() {
+                $(body).append("<p>Something went wrong in postAJAXCall</p>"+"<p>status: "+ error.status + "; readyState: " + error.readyState +"; statusText: "+ error.statusText +"; responseText:"+ error.responseText +";</p>");
+            }
+        });
+        
         ajaxCall.done(function(data) {
             for(var i = 0; i < data.length; i++) {
                 var object = data[i];
@@ -1197,11 +1213,10 @@ $(document).ready(function(){
         if(isGlobal !== false) {
             isGlobal = true;
         };
+        
         if(infoArr === undefined || infoArr === null) {
             infoArr = {};
         };
-        
-        var infoArr = infoArr;
         
         infoArr.pswhash = getFromStorage("pswHash");
         
