@@ -491,12 +491,14 @@ $(document).ready(function(){
                 return data;
             },
             error: function() {
-                $(body).append("<p>Something went wrong in postAJAXCall</p>"+"<p>status: "+ error.status + "; readyState: " + error.readyState +"; statusText: "+ error.statusText +"; responseText:"+ error.responseText +";</p>");
+                $("#UI_ELEMENT_TEST").append("<p>Something went wrong in postAJAXCall</p>"+"<p>status: "+ error.status + "; readyState: " + error.readyState +"; statusText: "+ error.statusText +"; responseText:"+ error.responseText +";</p>");
             }
         });
         
         ajaxCall.done(function(data) {
+            $("#UI_ELEMENT_TEST").append("<p>ajaxCall.done was reached</p>");
             for(var i = 0; i < data.length; i++) {
+                $("#UI_ELEMENT_TEST").append("<p>ajaxCall.done for loop iteration nr: "+ i +"</p>");
                 var object = data[i];
                 for(var prop in object) {
                     $("#UI_ELEMENT_TEST").append("<p>"+ prop +": "+ object[prop] +"</p>");
