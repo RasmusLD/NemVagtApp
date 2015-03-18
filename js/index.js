@@ -226,7 +226,7 @@ $(document).ready(function(){
                 //$(body).empty();
                 //$(body).append("<h3>Husk at udfylde \"Forenings dom&aelig;ne\"</h3>");
                 //setTimeout(showLogin, 4000);
-                notificationModal("Manglende udfyldning", "Husk at udfylde \"Forenings dom&aelig;ne\"");
+                notificationModal("Manglende udfyldning", "<p>Husk at udfylde \"Forenings dom&aelig;ne\"</p>");
             };
         });
     };
@@ -246,7 +246,7 @@ $(document).ready(function(){
             showMyShifts();
         }else {
             localStorage.clear();
-            notificationModal("Forkert udfyldning", "Noget var udfyldt forkert!");
+            notificationModal("Forkert udfyldning", "<p>Noget var udfyldt forkert!</p>");
         };
     };
     
@@ -974,7 +974,7 @@ $(document).ready(function(){
             return data;
         }else { //if no connection/data === undefined
             //if we fail to get JSON, get it locally
-            notificationModal("OBS, kunne ikke hente fra nettet", "Henter \""+ whereAreWe +"\" fra telefonens hukommelse, data kan være forældet.");
+            notificationModal("OBS, kunne ikke hente fra nettet", "<p>Henter \""+ whereAreWe +"\" fra telefonens hukommelse, data kan være forældet.</p>");
             //retrieves the UserProfile from localStorage
             var saved = $.parseJSON(getFromStorage(saveLocation));
 
@@ -1368,30 +1368,34 @@ $(document).ready(function(){
         });
     };
     
-    //modal used by ajaxWatch, to notify user of update while ongoing, it takes two strings, which it inputs into the html
+    //modal used by ajaxWatch, to notify user fx. of update while ongoing, it takes two strings, a title and some content, which it inputs into the html
     function notificationModal(title, content) {
-        $("#UI_ELEMENT_TEST").append('<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">\
-          <div class="modal-dialog">\
-            <div class="modal-content">\
-              <div class="modal-header">\
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\
-                <h4 class="modal-title" id="myModalLabel">'+ title +'</h4>\
+        setTimeout(function() {
+            
+            $(modalW).append('<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">\
+              <div class="modal-dialog">\
+                <div class="modal-content">\
+                  <div class="modal-header">\
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\
+                    <h4 class="modal-title" id="myModalLabel">'+ title +'</h4>\
+                  </div>\
+                  <div class="modal-body">\
+                    '+ content +'\
+                  </div>\
+                </div>\
               </div>\
-              <div class="modal-body">\
-                '+ content +'\
-              </div>\
-            </div>\
-          </div>\
-        </div>');
+            </div>');
+
+            //configures the modal, to be visible and not dismiss upon "click" of background
+            var options = {show: true, backdrop: 'static'};
+            $("#myModal").modal(options);
+
+            //adds listener that cleans up after the modal when the window is closed, this is needed to not have several windows at once
+            $("#myModal").on("hidden.bs.modal", function() {
+                modalW.empty();
+            });
+        }, 1000);
         
-        //configures the modal, to be visible and not dismiss upon "click" of background
-        var options = {show: true, backdrop: 'static'};
-        $("#myModal").modal(options);
-        
-        //adds listener that cleans up after the modal when the window is closed, this is needed to not have several windows at once
-        $("#myModal").on("hidden.bs.modal", function() {
-            $("#UI_ELEMENT_TEST").empty();
-        });
     };
     
     //handles the toggle button, used instead of standard checkboxes
