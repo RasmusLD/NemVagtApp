@@ -193,34 +193,39 @@ $(document).ready(function(){
             //localStorage.removeItem("pswHash"); //removes the given key from localStorage...
             event.preventDefault();
             
-            var form = $("#loginForm");
-            var email = $('input[name=usr]').val();
-            var domain = $('input[name=domain]').val();
-            var returnedData;
-            if(domain !== "") {
-                $.ajax({ //this function has it's own AJAX call because it wasn't worth the time to standardize it and loginEvaluator expects dataType: "text" instead of JSON...
-                type: form.attr("method"),
-                url: "https://"+ domain + ".nemvagt.dk/ajax/login",
-                dataType: "text",
-                data: form.serialize() + "&remember=1",
-                success: function(data) {
-                    returnedData = data;
-                    //only here for testing purposes
-//                    $.each($.parseJSON(data), function(index, value) {
-//                        $(body).append("<p>"+ index +": "+ value +"</p>");
-//                    });
-                },
-                error: function() {
-                    $(body).append("<p>Something went wrong in AjaxCall from showLogin()</p> <br>"+"<p>status: "+ error.status + "; readyState: " + error.readyState +"; statusText: "+ error.statusText +"; responseText:"+ error.responseText +";</p>");
-                }
-                }).done(function() {
-                    loginEvaluater(returnedData, email, domain);
-                });
+            //only try to login if we have an internet connection, notify user if there is no connection
+            if(checkConnection()) {
+                var form = $("#loginForm");
+                var email = $('input[name=usr]').val();
+                var domain = $('input[name=domain]').val();
+                var returnedData;
+                if(domain !== "") {
+                    $.ajax({ //this function has it's own AJAX call because it wasn't worth the time to standardize it and loginEvaluator expects dataType: "text" instead of JSON...
+                    type: form.attr("method"),
+                    url: "https://"+ domain + ".nemvagt.dk/ajax/login",
+                    dataType: "text",
+                    data: form.serialize() + "&remember=1",
+                    success: function(data) {
+                        returnedData = data;
+                        //only here for testing purposes
+    //                    $.each($.parseJSON(data), function(index, value) {
+    //                        $(body).append("<p>"+ index +": "+ value +"</p>");
+    //                    });
+                    },
+                    error: function() {
+                        $(body).append("<p>Something went wrong in AjaxCall from showLogin()</p> <br>"+"<p>status: "+ error.status + "; readyState: " + error.readyState +"; statusText: "+ error.statusText +"; responseText:"+ error.responseText +";</p>");
+                    }
+                    }).done(function() {
+                        loginEvaluater(returnedData, email, domain);
+                    });
+                }else {
+                    //$(body).empty();
+                    //$(body).append("<h3>Husk at udfylde \"Forenings domæne\"</h3>");
+                    //setTimeout(showLogin, 4000);
+                    notificationModal("Manglende udfyldning", "<p>Husk at udfylde \"Forenings domæne\"</p>");
+                };
             }else {
-                //$(body).empty();
-                //$(body).append("<h3>Husk at udfylde \"Forenings domæne\"</h3>");
-                //setTimeout(showLogin, 4000);
-                notificationModal("Manglende udfyldning", "<p>Husk at udfylde \"Forenings domæne\"</p>");
+                notificationModal("Ingen internet forbindelse", "<p>Der er ingen forbindelse til internettet og du har ikke et gemt login på telefonen,<br>opret forbindelse til internettet for at logge ind.</p>");
             };
         });
     };
