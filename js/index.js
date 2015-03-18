@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+ 
 var app = {
     // Application Constructor
     initialize: function() {
@@ -173,7 +174,7 @@ $(document).ready(function(){
         $(body).append('<h1 class="page-header">NemVagt Login</h1>');
         //the submit btn should be set to .disabled, unless all required fields are filled with data.
         $(body).append('<form id=loginForm role="form" method="post" action="" >\
-    <label for="domain">Forenings DomÊne</label>\
+    <label for="domain">Forenings Dom√¶ne</label>\
 <div class="input-group form-group">\
     <span class="input-group-addon">'+ 'https://' +'</span>\
     <input value="mobiludvikling" type="url" name="domain" class="form-control" placeholder="festival">\
@@ -222,12 +223,12 @@ $(document).ready(function(){
                     });
                 }else {
                     //$(body).empty();
-                    //$(body).append("<h3>Husk at udfylde \"Forenings domÊne\"</h3>");
+                    //$(body).append("<h3>Husk at udfylde \"Forenings dom√¶ne\"</h3>");
                     //setTimeout(showLogin, 4000);
-                    notificationModal("Manglende udfyldning", "<p>Husk at udfylde \"Forenings domÊne\"</p>");
+                    notificationModal("Manglende udfyldning", "<p>Husk at udfylde \"Forenings dom√¶ne\"</p>");
                 };
             }else {
-                notificationModal("Ingen internet forbindelse", "<p>Der er ingen forbindelse til internettet og du har ikke et gemt login pÂ telefonen,<br>opret forbindelse til internettet for at logge ind.</p>");
+                notificationModal("Ingen internet forbindelse", "<p>Der er ingen forbindelse til internettet og du har ikke et gemt login p√• telefonen,<br>opret forbindelse til internettet for at logge ind.</p>");
             };
         });
     };
@@ -274,7 +275,7 @@ $(document).ready(function(){
     //                }else { //on error
     //                    //if we fail to get JSON, get it locally
     //                    //$(body).append("<p>Something went wrong with myShift first AJAX call</p>");
-    //                    notificationModal("OBS, kunne ikke hente fra nettet", "Henter \"Vagter\" fra telefonens hukommelse, data kan vÊre forÊldet.");
+    //                    notificationModal("OBS, kunne ikke hente fra nettet", "Henter \"Vagter\" fra telefonens hukommelse, data kan v√¶re for√¶ldet.");
     //                    var myBookedShifts = $.parseJSON(getFromStorage("savedBookedShifts"));
     //                    setTimeout(modalW.empty(),3000);
     //                    setTimeout(populateMyShifts(myBookedShifts),3100);
@@ -311,7 +312,7 @@ $(document).ready(function(){
 //        }).done(function(data) {
 //            
 //            //a title, so that people know where they are
-//            $(body).append('<h1 class="page-header">Mine Vagter fra '+/* inds√¶t organisations navn +*/'</h1>');
+//            $(body).append('<h1 class="page-header">Mine Vagter fra '+/* inds√É¬¶t organisations navn +*/'</h1>');
 //            
 //            //we need this to iterate through the array of JSON objects
 //            for (var i = 0; i < data.length; i++) {
@@ -343,7 +344,7 @@ $(document).ready(function(){
 //                //adds a button to unbook the shift to the shift, if the option is provided
 //                var unbookBtn = '';
 //                if(object["allowdelete"] === true) {
-//                    unbookBtn = '<button class="btn pull-right margBotBtn unbookBtn">Afmeld Vagt</button>'; //kendte/havde Mark mÂske et wastebasket/trashcan icon?
+//                    unbookBtn = '<button class="btn pull-right margBotBtn unbookBtn">Afmeld Vagt</button>'; //kendte/havde Mark m√•ske et wastebasket/trashcan icon?
 //                    //a listener is added after it has been appended to body (if object[allowdelete] is true)
 //                };
 //                
@@ -436,7 +437,7 @@ $(document).ready(function(){
             //adds a button to unbook the shift to the shift, if the option is provided
             var unbookBtn = '';
             if(object["allowdelete"] === true) {
-                unbookBtn = '<button class="btn btn-danger pull-right margBotBtn unbookBtn" style="margin-right: -1vmin;">Afmeld Vagt</button>'; //kendte/havde Mark mÂske et wastebasket/trashcan icon?
+                unbookBtn = '<button class="btn btn-danger pull-right margBotBtn unbookBtn" style="margin-right: -1vmin;">Afmeld Vagt</button>'; //kendte/havde Mark m√•ske et wastebasket/trashcan icon?
                 //a listener is added after it has been appended to body
             };
 
@@ -733,7 +734,7 @@ $(document).ready(function(){
             };
         };
         //adds a submit button to the UserProfile form, done outside the "for loop" it will always be at the end of the form
-        profileFields += '<button type="submit" class="btn btn-success btn-lg" id="saveUserProfileBtn">Gem Êndringer</button>';
+        profileFields += '<button type="submit" class="btn btn-success btn-lg" id="saveUserProfileBtn">Gem √¶ndringer</button>';
         //closes the UserProfile form, done here outside the "for loop", since we don't know how long the form will be
         profileFields += '</form>';
         //appends the UserProfile form to the body, so it can be viewed
@@ -877,7 +878,7 @@ $(document).ready(function(){
                 var valueOfObject = $("#"+ object["fieldname"]).val();
                 if(valueOfObject === "" || valueOfObject === null || valueOfObject === undefined) {
                     //if something that should be filled out isn't, notify user and display helptext (only tells of/displays help for, the first instance of incorrectly filled form element)
-                    showModalViewAccept("Manglende udfyldning", "Feltet \""+ object["showname"] +"\" skal vÊre udfyldt.<br>HjÊlp til udfyldning:<br>"+ object["helptext"] +"<br><br>Felter der skal vÊre udfyldt og ikke er det, er nu highlighted");
+                    showModalViewAccept("Manglende udfyldning", "Feltet \""+ object["showname"] +"\" skal v√¶re udfyldt.<br>Hj√¶lp til udfyldning:<br>"+ object["helptext"] +"<br><br>Felter der skal v√¶re udfyldt og ikke er det, er nu highlighted");
                     //highlights all incorrectly filled form elements, making it easy for the user to find them...
                     $("#"+ object["fieldname"]).addClass("myHighlight");
                     //removes the highlight once the user manipulates the form element
@@ -1034,9 +1035,9 @@ $(document).ready(function(){
             
             //if there's something to retrive notify user, if there's nothing to retrieve, tell the user that...
             if(saved !== undefined && saved !== "" && saved !== null) {
-                notificationModal("OBS, kunne ikke hente fra nettet", "<p>Henter \""+ whereAreWe +"\" fra telefonens hukommelse, data kan vÊre forÊldet.</p>");
+                notificationModal("OBS, kunne ikke hente fra nettet", "<p>Henter \""+ whereAreWe +"\" fra telefonens hukommelse, data kan v√¶re for√¶ldet.</p>");
             }else {
-                notificationModal("OBS, kunne ikke hente fra nettet", "<p>Der er ingen data for \""+ whereAreWe +"\" gemt pÂ din telefon, hvis du har brug for at fÂ det vist skal der bruges et netvÊrk.</p>");
+                notificationModal("OBS, kunne ikke hente fra nettet", "<p>Der er ingen data for \""+ whereAreWe +"\" gemt p√• din telefon, hvis du har brug for at f√• det vist skal der bruges et netv√¶rk.</p>");
             };
             //removes the modal window after X 1/1000 of a second has passed.
             setTimeout(function() {
