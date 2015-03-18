@@ -282,7 +282,9 @@ $(document).ready(function(){
                 });
             }else { //we already have a pretty recent version of the JSON, so get JSON from localStorage, as this is much faster than the internet.
                 //retrieves the booked shifts
-                populateMyShifts(ajaxSuccesEvaluator("savedBookedShifts", "Mine Vagter"));
+                populateMyShifts(getFromStorage(JSON.parse("savedBookedShifts")));
+                //we used to use this, but the ajaxSuccesEvaluator will notify that the data is being collected from memory, which it shouldn't...
+                //populateMyShifts(ajaxSuccesEvaluator("savedBookedShifts", "Mine Vagter"));
             };
         }else { //this is reached if the device is offline
             populateMyShifts(ajaxSuccesEvaluator("savedBookedShifts", "Mine Vagter"));
@@ -902,8 +904,10 @@ $(document).ready(function(){
                     //refresh from storage
                     populateUserProfile(JSON.parse(getFromStorage("savedUserProfile")));
                     
-                    //timeout is there to make sure the previous modal, from ajaxWatch has time to "un-animate"
-                    setTimeout(function() {showModalViewAccept("Fejl", "Bruger Profilen blev ikke opdateret");}, 100);
+                    //timeout is there to make sure the previous modal, from ajaxWatch has time to "un-animate", as it seems that if I dont do that, the "remove this modal view when a modal view becomes hidden" triggers from the other window being removed...
+                    setTimeout(function() {
+                        showModalViewAccept("Fejl", "Bruger Profilen blev ikke opdateret");
+                    }, 100);
                 };
             });
         };
@@ -983,27 +987,21 @@ $(document).ready(function(){
             
             //retrieves the UserProfile from localStorage
             var saved = $.parseJSON(getFromStorage(saveLocation));
+            
             //if there's something to retrive notify user, if there's nothing to retrieve, tell the user that...
             if(saved !== undefined && saved !== "" && saved !== null) {
                 notificationModal("OBS, kunne ikke hente fra nettet", "<p>Henter \""+ whereAreWe +"\" fra telefonens hukommelse, data kan være forældet.</p>");
             }else {
                 notificationModal("OBS, kunne ikke hente fra nettet", "<p>Der er ingen data for \""+ whereAreWe +"\" gemt på din telefon, hvis du har brug for at få det vist skal der bruges et netværk.</p>");
             };
+            //removes the modal window after X 1/1000 of a second has passed.
+            setTimeout(function() {
+                modalW.empty();
+            }, 3000);
             
-            setTimeout(modalW.empty(), 3000);
             return saved;
         };
     };
-//    //same as above, except for w/o internet connection
-//    function getFromStorageNoCon(saveLocation, whereAreWe) {
-//        //if we fail to get JSON, get it locally
-//        notificationModal("OBS, kunne ikke hente fra nettet", "Henter \""+ whereAreWe +"\" fra telefonens hukommelse, data kan være forældet.");
-//        //retrieves the UserProfile from localStorage
-//        var saved = $.parseJSON(getFromStorage(saveLocation));
-//        
-//        setTimeout(modalW.empty(),3000);
-//        return saved;
-//    }
     
     //updates "savedBookedShifts" & "savedPossibleShifts" in localStorage, when "opdater alt" in menu is pressed, then updates the page you were on
     function updateAllListsMenuHandler() {
@@ -1382,32 +1380,28 @@ $(document).ready(function(){
     
     //modal used by ajaxWatch, to notify user fx. of update while ongoing, it takes two strings, a title and some content, which it inputs into the html
     function notificationModal(title, content) {
-        setTimeout(function() {
-            
-            $(modalW).append('<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">\
-              <div class="modal-dialog">\
-                <div class="modal-content">\
-                  <div class="modal-header">\
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\
-                    <h4 class="modal-title" id="myModalLabel">'+ title +'</h4>\
-                  </div>\
-                  <div class="modal-body">\
-                    '+ content +'\
-                  </div>\
-                </div>\
+        $(modalW).append('<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">\
+          <div class="modal-dialog">\
+            <div class="modal-content">\
+              <div class="modal-header">\
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\
+                <h4 class="modal-title" id="myModalLabel">'+ title +'</h4>\
               </div>\
-            </div>');
+              <div class="modal-body">\
+                '+ content +'\
+              </div>\
+            </div>\
+          </div>\
+        </div>');
 
-            //configures the modal, to be visible and not dismiss upon "click" of background
-            var options = {show: true, backdrop: 'static'};
-            $("#myModal").modal(options);
+        //configures the modal, to be visible and not dismiss upon "click" of background
+        var options = {show: true, backdrop: 'static'};
+        $("#myModal").modal(options);
 
-            //adds listener that cleans up after the modal when the window is closed, this is needed to not have several windows at once
-            $("#myModal").on("hidden.bs.modal", function() {
-                modalW.empty();
-            });
-        }, 10);
-        
+        //adds listener that cleans up after the modal when the window is closed, this is needed to not have several windows at once
+        $("#myModal").on("hidden.bs.modal", function() {
+            modalW.empty();
+        });
     };
     
     //handles the toggle button, used instead of standard checkboxes
