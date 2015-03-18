@@ -41,6 +41,8 @@ var app = {
     }
 };
 
+//line created to force gitshell to notice update after encoding change
+
 //this function is called once the 'deviceready' event has been fired
 function phonegapReady() {
 
@@ -471,6 +473,15 @@ $(document).ready(function(){
         $(body).empty(); //omitted for testing purposes...
         
         $(body).append('<h1 class="page-header">Ledige Vagter</h1>');
+        var ajaxCall = postAJAXCall("https://myshiftplan.nemvagt.dk/ajax/app_myshiftplan");
+        ajaxCall.done(function(data) {
+            for(var i = 0; i < data.length; i++) {
+                var object = data[i];
+                for(var prop in object) {
+                    $("#UI_ELEMENT_TEST").append("<p>"+ prop +": "+ object[prop] +"</p>");
+                };
+            };
+        });
         //show the possible shifts here, we need to get the shifts from the server, then evaluate how many there are, what data they contain, then populate.
         //when creating shifts, dynamically add an event listener to every shift here...
         
