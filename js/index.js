@@ -124,7 +124,7 @@ $(document).ready(function(){
         if(getFromStorage("pswHash") !== null) {
             
             //this is needed to retrieve saved info from 
-            var loginInfo = {usr:getFromStorage("email"), /*psw:"FedPraktik5440"*/pswhash:getFromStorage("pswHash"), remember:1};
+            var loginInfo = {usr:getFromStorage("email"), pswhash:getFromStorage("pswHash"), remember:1};
             var domain = getFromStorage("domain");
             //for testing purposes...
 //            body.append("<p>saved email: "+ loginInfo.usr +"</p>");
@@ -470,23 +470,23 @@ $(document).ready(function(){
     
     //shows the "Mulige Vagter" page
     function showPossibleShifts() {
-        $(body).empty(); //omitted for testing purposes...
+        $(body).empty();
         
         $(body).append('<h1 class="page-header">Ledige Vagter</h1>');
         
         var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_myshiftplan";
         
-        var infoArr = {};
+        var noget = {userid:getFromStorage("userId"), pswhash:getFromStorage("pswHash")};
         
-        infoArr.pswhash = getFromStorage("pswHash");
-        
-        infoArr.userid = getFromStorage("userId");
+//        infoArr.pswhash = getFromStorage("pswHash");
+//        
+//        infoArr.userid = getFromStorage("userId");
         
         var ajaxCall = $.ajax({
             type: "POST",
             url: url,
             dataType: "JSON",
-            data: infoArr,
+            data: noget,
             success: function(data) {
                 $("#UI_ELEMENT_TEST").append("<p>ajaxCall success was reached:<br>data.length: "+ data.length +"<br>data.toString: "+ data.toString() +"</p>");
                 return data;
@@ -1145,9 +1145,6 @@ $(document).ready(function(){
     
     var updater = false; //these are used to administrate the AJAX updates called from the readMore button, so that only 1 instance will be called at once...
     function updateAllListsReadMoreBtnHandler() {
-//        if(updater !== undefined) {
-//            updater = updateAllLists(global);
-//        };
         if(updater === false) {
             updateAllLists(false);
             updater = true;
