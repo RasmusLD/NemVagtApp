@@ -658,7 +658,7 @@ $(document).ready(function(){
                 populateUserProfile(ajaxSuccesEvaluator("savedUserProfile", "Bruger Profilen", data));
             });
         }else { //this is reached if the device is offline
-            populateMyShifts(ajaxSuccesEvaluator("savedUserProfile", "Bruger Profilen"));
+            populateUserProfile(ajaxSuccesEvaluator("savedUserProfile", "Bruger Profilen"));
         };
         
         
