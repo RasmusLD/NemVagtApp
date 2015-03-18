@@ -1370,7 +1370,7 @@ $(document).ready(function(){
     
     //modal used by ajaxWatch, to notify user of update while ongoing, it takes two strings, which it inputs into the html
     function notificationModal(title, content) {
-        $(modalW).append('<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">\
+        $("#UI_ELEMENT_TEST").append('<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">\
           <div class="modal-dialog">\
             <div class="modal-content">\
               <div class="modal-header">\
@@ -1390,7 +1390,7 @@ $(document).ready(function(){
         
         //adds listener that cleans up after the modal when the window is closed, this is needed to not have several windows at once
         $("#myModal").on("hidden.bs.modal", function() {
-            modalW.empty();
+            $("#UI_ELEMENT_TEST").empty();
         });
     };
     
