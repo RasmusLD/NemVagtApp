@@ -40,12 +40,6 @@ var app = {
         phonegapReady();
     }
 };
-/*
-//brug af Ã¦Ã¸Ã¥
-Ã¦ = &aelig;
-Ã¸ = &oslash;
-Ã¥ = &aring;
-*/
 
 //this function is called once the 'deviceready' event has been fired
 function phonegapReady() {
@@ -177,7 +171,7 @@ $(document).ready(function(){
         $(body).append('<h1 class="page-header">NemVagt Login</h1>');
         //the submit btn should be set to .disabled, unless all required fields are filled with data.
         $(body).append('<form id=loginForm role="form" method="post" action="" >\
-    <label for="domain">Forenings Dom&aelig;ne</label>\
+    <label for="domain">Forenings Domæne</label>\
 <div class="input-group form-group">\
     <span class="input-group-addon">'+ 'https://' +'</span>\
     <input value="mobiludvikling" type="url" name="domain" class="form-control" placeholder="festival">\
@@ -224,9 +218,9 @@ $(document).ready(function(){
                 });
             }else {
                 //$(body).empty();
-                //$(body).append("<h3>Husk at udfylde \"Forenings dom&aelig;ne\"</h3>");
+                //$(body).append("<h3>Husk at udfylde \"Forenings domæne\"</h3>");
                 //setTimeout(showLogin, 4000);
-                notificationModal("Manglende udfyldning", "<p>Husk at udfylde \"Forenings dom&aelig;ne\"</p>");
+                notificationModal("Manglende udfyldning", "<p>Husk at udfylde \"Forenings domæne\"</p>");
             };
         });
     };
@@ -698,7 +692,7 @@ $(document).ready(function(){
             };
         };
         //adds a submit button to the UserProfile form, done outside the "for loop" it will always be at the end of the form
-        profileFields += '<button type="submit" class="btn btn-success btn-lg" id="saveUserProfileBtn">Gem &aelig;ndringer</button>';
+        profileFields += '<button type="submit" class="btn btn-success btn-lg" id="saveUserProfileBtn">Gem ændringer</button>';
         //closes the UserProfile form, done here outside the "for loop", since we don't know how long the form will be
         profileFields += '</form>';
         //appends the UserProfile form to the body, so it can be viewed
@@ -831,6 +825,9 @@ $(document).ready(function(){
     function isRequiredFieldEmpty(event) {
         //prevent the default(synchronous) POST
         event.preventDefault();
+        
+        //what we will return, will be true unless an element is incorrectly filled in...
+        var toBeReturned = true;
         //retrieves the saved user profile, so we can check if any required fields are empty...
         var data = JSON.parse(getFromStorage("savedUserProfile"));
         for(var i = 0; i < data.length; i++) {
@@ -839,32 +836,38 @@ $(document).ready(function(){
                 var valueOfObject = $("#"+ object["fieldname"]).val();
                 if(valueOfObject === "" || valueOfObject === null || valueOfObject === undefined) {
                     //if something that should be filled out isn't, notify user and display helptext (only tells of/displays help for, the first instance of incorrectly filled form element)
-                    showModalViewAccept("Manglende udfyldning", "Feltet \""+ object["showname"] +"\" skal v&aelig;re udfyldt.<br>Hj&aelig;lp til udfyldning:<br>"+ object["helptext"] +"<br><br>Felter der skal v&aelig;re udfyldt og ikke er det, er nu highlighted");
+                    showModalViewAccept("Manglende udfyldning", "Feltet \""+ object["showname"] +"\" skal være udfyldt.<br>Hjælp til udfyldning:<br>"+ object["helptext"] +"<br><br>Felter der skal være udfyldt og ikke er det, er nu highlighted");
                     //highlights all incorrectly filled form elements, making it easy for the user to find them...
                     $("#"+ object["fieldname"]).addClass("myHighlight");
                     //removes the highlight once the user manipulates the form element
                     $(".myHighlight").on("focus", function() {
                         $(this).removeClass("myHighlight");
                     });
-                    return false;
-                };
-            };
-            //done to post an unchecked checkbox's value as 0, problem is that this means that the value of the field is now 0 and the checkbox is checked,
-            //which means FURTHER unchecking/checking is irrelevant (which could be an issue since it's an ajax post, to avoid this, refresh the page after posting,
-            //something we'd most likely want to do anyway...)
-            if(object["ftype"] === "CHECKBOX" || object["ftype"] === "CAMPING") {
-                var theElement = $("#"+ object["fieldname"]);
-                //if the checkbox isn't checked, this checks it and the value is set to 0
-                if(theElement.prop("checked")!==true) {
-                    theElement.prop("checked", true);
-                    theElement.attr("value", "0");
-                }else{
-                    //makes sure the value is 1, if the checkbox is checked
-                    theElement.attr("value", "1");
+                    toBeReturned = false;
                 };
             };
         };
-        return true;
+        //after we're done going through the elements, if everything was filled out correctly, handle the checkboxes
+        if(toBeReturned) {
+            for(var i = 0; i < data.length; i++) {
+                var object = data[i];
+                //done to post an unchecked checkbox's value as 0, problem is that this means that the value of the field is now 0 and the checkbox is checked,
+                //which means FURTHER unchecking/checking is irrelevant (which could be an issue since it's an ajax post, to avoid this, refresh the page after posting,
+                //something we'd most likely want to do anyway...)
+                if(object["ftype"] === "CHECKBOX" || object["ftype"] === "CAMPING") {
+                    var theElement = $("#"+ object["fieldname"]);
+                    //if the checkbox isn't checked, this checks it and the value is set to 0
+                    if(theElement.prop("checked")!==true) {
+                        theElement.prop("checked", true);
+                        theElement.attr("value", "0");
+                    }else{
+                        //makes sure the value is 1, if the checkbox is checked
+                        theElement.attr("value", "1");
+                    };
+                };
+            };
+        };
+        return toBeReturned;
     };
     //if can submit===true, make an ajax submission, else, notify user
     function submitUserProfile(canSubmit) {
@@ -990,9 +993,9 @@ $(document).ready(function(){
             
             //if there's something to retrive notify user, if there's nothing to retrieve, tell the user that...
             if(saved !== undefined && saved !== "" && saved !== null) {
-                notificationModal("OBS, kunne ikke hente fra nettet", "<p>Henter \""+ whereAreWe +"\" fra telefonens hukommelse, data kan v&aelig;re for&aelig;ldet.</p>");
+                notificationModal("OBS, kunne ikke hente fra nettet", "<p>Henter \""+ whereAreWe +"\" fra telefonens hukommelse, data kan være forældet.</p>");
             }else {
-                notificationModal("OBS, kunne ikke hente fra nettet", "<p>Der er ingen data for \""+ whereAreWe +"\" gemt på din telefon, hvis du har brug for at få det vist skal der bruges et netv&aelig;rk.</p>");
+                notificationModal("OBS, kunne ikke hente fra nettet", "<p>Der er ingen data for \""+ whereAreWe +"\" gemt på din telefon, hvis du har brug for at få det vist skal der bruges et netværk.</p>");
             };
             //removes the modal window after X 1/1000 of a second has passed.
             setTimeout(function() {
