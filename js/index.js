@@ -282,7 +282,7 @@ $(document).ready(function(){
                 });
             }else { //we already have a pretty recent version of the JSON, so get JSON from localStorage, as this is much faster than the internet.
                 //retrieves the booked shifts
-                populateMyShifts(getFromStorage(JSON.parse("savedBookedShifts")));
+                populateMyShifts(JSON.parse(getFromStorage("savedBookedShifts")));
                 //we used to use this, but the ajaxSuccesEvaluator will notify that the data is being collected from memory, which it shouldn't...
                 //populateMyShifts(ajaxSuccesEvaluator("savedBookedShifts", "Mine Vagter"));
             };
