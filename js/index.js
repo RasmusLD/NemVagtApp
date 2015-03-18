@@ -473,7 +473,12 @@ $(document).ready(function(){
         $(body).empty(); //omitted for testing purposes...
         
         $(body).append('<h1 class="page-header">Ledige Vagter</h1>');
-        var ajaxCall = postAJAXCall("https://mobiludvikling.nemvagt.dk/ajax/app_myshiftplan");
+        
+        var toPost = {userid:getFromStorage("userId")};
+        
+        var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_myshiftplan";
+        
+        var ajaxCall = postAJAXCall(url, toPost);
         ajaxCall.done(function(data) {
             for(var i = 0; i < data.length; i++) {
                 var object = data[i];
