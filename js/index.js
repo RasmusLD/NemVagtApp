@@ -457,7 +457,7 @@ $(document).ready(function(){
             $(body).append('<div class="container shift" style="border: solid black 1px; margin-bottom: 5vmin;">\
                 <div>\
                     '+ title +'\
-                    <button id="'+ object["id"] +'" style="margin-bottom: 1vmin; margin-right: -1vmin; margin-top: 3vmin;" type="button" class="btn readMoreBtn pull-right">Vis mere</button>\
+                    <button id="'+ object["id"] +'" style="margin-bottom: 1vmin; margin-right: -1vmin; margin-top: 3vmin;" type="button" class="btn bookedDetailsBtn btn-default readMoreBtn pull-right">Vis mere</button>\
                     <h4 style="clear:left;" class="pull-left">'+ getWeekday(object["startdate"]) +' '+ getDate(object["startdate"]) +' <!--'+
                         'Kl: '+ object["starttime"].substring(0,5) +' til '+ object["endtime"].substring(0,5)  +'--></h4>\
                 </div>\
@@ -587,7 +587,7 @@ $(document).ready(function(){
             $(body).append('<div class="container shift" style="border: solid black 1px; margin-bottom: 5vmin;">\
                 <div>\
                     '+ title +'\
-                    <button id="'+ object["id"] +'" style="margin-bottom: 1vmin; margin-right: -1vmin; margin-top: 3vmin;" type="button" class="btn readMoreBtn bookedDetailsBtn pull-right">Vis mere</button>\
+                    <button id="'+ object["id"] +'" style="margin-bottom: 1vmin; margin-right: -1vmin; margin-top: 3vmin;" type="button" class="btn readMoreBtn btn-default pull-right">Vis mere</button>\
                     <h4 style="clear:left;" class="pull-left">'+ getWeekday(object["startdate"]) +' '+ getDate(object["startdate"]) +' <!--'+
                         'Kl: '+ object["starttime"].substring(0,5) +' til '+ object["endtime"].substring(0,5)  +'--></h4>\
                 </div>\
@@ -694,7 +694,7 @@ $(document).ready(function(){
         };
         
         //adds a back button to the page, so that people can easily get back. OBS would be nice to navigate to the shift they were just viewing, but I'm not sure how to do this...
-        $(body).append('<button class="btn backBtn pull-left margBotBtn">Tilbage</button>');
+        $(body).append('<button class="btn backBtn btn-default pull-left margBotBtn">Tilbage</button>');
         //adds a listener/function to the back button
 //        $(".backBtn").on("click", backBtnFunc(isBooked, theShift));
         $(".backBtn").on("click", function() {
