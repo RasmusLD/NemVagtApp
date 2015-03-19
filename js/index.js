@@ -664,7 +664,7 @@ $(document).ready(function(){
                     if(property === "title" && object[property] !== "" && object[property] !== null) { //if title isn't === "" or null, var title = title from the JSON
                         title += "<p>"+ "Titel" +": "+ object[property] +"</p>";
                     }else if(property === "notes" && object[property] !== "" && object[property] !== null) { //if notes aren't null or "", var notes = notes from JSON
-                        notes += "<label for=\"notesField\">"+ "Noter fra administrator" +":</label> <div id=\"notesField\" style=\"padding:2vmin; margin-bottom:3vmin; border:solid black 1px\"><p>"+ object[property] +"</p></div>";
+                        notes += "<label for=\"notesField\">"+ "Noter fra administrator" +":</label> <div id=\"notesField\" class=\"shift\" style=\"padding:2vmin; margin-bottom:3vmin; border:solid black 1px\"><p>"+ object[property] +"</p></div>";
                     }else if(property === "startdate" && object[property] !== null) { //if startdate is not null, var date = a formatted startdate
                         date += "<p>"+ "Dato" +": "+ getWeekday(object[property]) +" "+ getDate(object[property] +"</p>");
                     }else if(property === "starttime" && object[property] !== null) { //if starttime is not null, var startTime = a formatted startime
@@ -1088,7 +1088,7 @@ $(document).ready(function(){
     //if we get the data locally, we notify the user.
     //Requires a string location where we want to save the data, a string telling us where we are and the data from the ajax call.
     function ajaxSuccesEvaluator(saveLocation, whereAreWe, data) {
-        if(data!==undefined){ //if succcess was reached in the postAJAXCall function, "data" is returned...
+        if(data !== undefined){ //if succcess was reached in the postAJAXCall function, "data" is returned...
             //save the data to local storage, so it can be reused w/o having to make the AJAX call again
             saveToStorage(saveLocation , JSON.stringify(data));
             return data;
