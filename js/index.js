@@ -1386,8 +1386,8 @@ $(document).ready(function(){
                 Er du sikker?\
               </div>\
               <div class="modal-footer">\
-                <button type="button" class="btn btn-lg" data-dismiss="modal">Nej</button>\
-                <button id="modalYesBtn" type="button" class="btn btn-lg">Ja</button>\
+                <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Nej</button>\
+                <button id="modalYesBtn" type="button" class="btn btn-default btn-lg">Ja</button>\
               </div>\
             </div>\
           </div>\
@@ -1431,7 +1431,7 @@ $(document).ready(function(){
                 '+ content +'\
               </div>\
               <div class="modal-footer">\
-                <button id="modalOkayBtn" type="button" class="btn btn-lg">Okay</button>\
+                <button id="modalOkayBtn" type="button" class="btn btn-default btn-lg">Okay</button>\
               </div>\
             </div>\
           </div>\
