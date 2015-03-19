@@ -587,7 +587,7 @@ $(document).ready(function(){
             $(body).append('<div class="container shift" style="border: solid black 1px; margin-bottom: 5vmin;">\
                 <div>\
                     '+ title +'\
-                    <button id="'+ object["id"] +'" style="margin-bottom: 1vmin; margin-right: -1vmin; margin-top: 3vmin;" type="button" class="btn readMoreBtn pull-right">Vis mere</button>\
+                    <button id="'+ object["id"] +'" style="margin-bottom: 1vmin; margin-right: -1vmin; margin-top: 3vmin;" type="button" class="btn readMoreBtn bookedDetailsBtn pull-right">Vis mere</button>\
                     <h4 style="clear:left;" class="pull-left">'+ getWeekday(object["startdate"]) +' '+ getDate(object["startdate"]) +' <!--'+
                         'Kl: '+ object["starttime"].substring(0,5) +' til '+ object["endtime"].substring(0,5)  +'--></h4>\
                 </div>\
@@ -619,7 +619,7 @@ $(document).ready(function(){
         var theShift = $(this).attr("id");
         
         //the type of shift, booked or possible, true === a booked shift; false === a possibleShift
-        var shiftType = $(this).hasClass("unbookBtn");
+        var shiftType = $(this).hasClass("bookedDetailsBtn");
         
         //has the admin allowed the user to delete the booked shift? if not, the button option to do so wont be shown...
         var allowDelete;
