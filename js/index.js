@@ -483,7 +483,7 @@ $(document).ready(function(){
     };
     
     //shows the "Mulige Vagter" page
-    function showPossibleShifts() {
+    function showPossibleShiftsXXX() {
         $(body).empty();
         
         $(body).append('<h1 class="page-header">Ledige vagter</h1>');
@@ -527,7 +527,7 @@ $(document).ready(function(){
         //re-use code from showMyShifts()/populateMyShifts to create html, add listeners and append to body
     };
     //the real showPossibleShifts
-    function showPossibleShiftsXXX() {
+    function showPossibleShifts() {
         $(body).empty();
         if(checkConnection()) {
             //actually show possible shifts here shifts here, we need to get the shifts from the server and then create a method that finds out how many shifts are there, what data they contain, then populate.
@@ -657,7 +657,7 @@ $(document).ready(function(){
             if(object.id === theShift) {
                 //evaluates if the admin has allowed deletion, is needed to know whether it's okay to delete outside the scope of this for loop
                 allowDelete = object["allowdelete"];
-
+                
                 //iterate through the object and get all properties that aren't null, then add them to the details string above, so we can add them all in the "$(body).append" below
                 for (var property in object) {
                     //the properties we want is: title, day, date, starttime, endtime, roles(form/dropdown/radio), address, city, notes
@@ -685,7 +685,7 @@ $(document).ready(function(){
                 }else {
                     $(body).append('<h1 class="page-header">Detaljer for vagten:</h1>');
                 };
-
+                
                 //add the individual parts of the JSON to the append body, so that it can be viewed. Done this way to be easily modifiable...
                 $(body).append(title+date+startTime+endTime+city+address+roles+notes);
                 //sets isBooked to true, letting the function know that it's dealing with a bookedShift as opposed to a possibleShift
