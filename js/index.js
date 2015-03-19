@@ -840,6 +840,8 @@ $(document).ready(function(){
             type = 'tel';
         }else if(object["ftype"] === "DATE") {
             type = 'date';
+        }else if(object["fieldname"] === "zipcode") {
+            type = 'number';
         };
         
         //returns the formatted form.
