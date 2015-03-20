@@ -540,8 +540,8 @@ $(document).ready(function(){
                 
                 //adds a title to the shift, if one is provided
                 var title = '';
-                if(object["shifttitle"] !== undefined && object["shifttitle"] !== null && object["shifttitle"] !== "") {
-                    title = '<h4 class="pull-left">'+ object["shifttitle"] +'</h4>';
+                if(object["appshifttitle"] !== undefined && object["appshifttitle"] !== null && object["appshifttitle"] !== "") {
+                    title = '<h4 class="pull-left">'+ object["appshifttitle"] +'</h4>';
                 };
                 
                 //breaks up the "start" attribute of the object, as this contains both the start date AND the start time
@@ -824,14 +824,14 @@ $(document).ready(function(){
                     shiftEndTime = '<p>Sluttid: '+ endTime +'</p>';
                 };
                 //if title isn't === "" or null, var title = title from the JSON
-                if(object["shifttitle"] !== undefined && object["shifttitle"] !== "" && object["shifttitle"] !== null) {
-                    title = "<p>"+ "Titel" +": "+ object["shifttitle"] +"</p>";
+                if(object["appshifttitle"] !== undefined && object["appshifttitle"] !== "" && object["appshifttitle"] !== null) {
+                    title = "<p>"+ "Titel" +": "+ object["appshifttitle"] +"</p>";
                 };
                 
                 //page-header
                 //appends the title of the shift to the body, that way, the user knows where they are... if the title is ==="" it outputs "vagten" instead...
-                if(object["shifttitle"] !== "" && object["shifttitle"] !== undefined && object["shifttitle"] !== null) {
-                    $(body).append('<h1 class="page-header">Detaljer for '+ object["shifttitle"] +':</h1>');
+                if(object["appshifttitle"] !== "" && object["appshifttitle"] !== undefined && object["appshifttitle"] !== null) {
+                    $(body).append('<h1 class="page-header">Detaljer for '+ object["appshifttitle"] +':</h1>');
                 }else {
                     $(body).append('<h1 class="page-header">Detaljer for vagten:</h1>');
                 };
