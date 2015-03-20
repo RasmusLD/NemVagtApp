@@ -534,7 +534,7 @@ $(document).ready(function(){
                 
                 //adds a title to the shift, if one is provided
                 var title = '';
-                if(object["shifttitle"] !== "") {
+                if(object["shifttitle"] !== undefined && object["shifttitle"] !== null && object["shifttitle"] !== "") {
                     title = '<h4 class="pull-left">'+ object["shifttitle"] +'</h4>';
                 };
                 
@@ -559,14 +559,14 @@ $(document).ready(function(){
                 
                 //adds a button to show details for the shift, only do so if there is any notes...
                 var readMoreBtn = '';
-                if(object["shiftnotes"] !== '') {
+                if(object["shiftnotes"] !== '' && object["shiftnotes"] !== null && object["shiftnotes"] !== undefined) {
                     readMoreBtn = '<button id="'+ object["id"] +'" style="margin-bottom: 1vmin; margin-right: -1vmin; margin-top: 3vmin;" type="button" class="btn btn-default readMoreBtn pull-right">Vis mere</button>';
                 };
                 //a listener is added after it has been appended to body
                 
                 //gives the shift a color type, if it has one
                 var shiftColor = '';
-                if(object["color"] !== null) {
+                if(object["color"] !== null && object["color"] !== undefined) {
                     shiftColor = '<div style="clear: both; margin-left: -4.1vmin; heigth: 5px; width: 110%; border-top-right-radius: 4px; border-top-left-radius: 4px; background-color:'+ object["color"] +';"><br></div>';
                 };
                 
@@ -759,10 +759,10 @@ $(document).ready(function(){
             //assign the current object containing JSON to "var object", so that I only need to write it once
             var object = theShifts[i];
             
-            // TEST
-            for(var prop in object) {
-                $("#UI_ELEMENT_TEST").append("<p>"+ prop +": "+ object[prop] +"</p>");
-            };
+//            // TEST
+//            for(var prop in object) {
+//                $("#UI_ELEMENT_TEST").append("<p>"+ prop +": "+ object[prop] +"</p>");
+//            };
             
             //breaks up the "start" attribute of the object, as this contains both the start date AND the start time
             var startArr = object["start"].split("T");
@@ -804,8 +804,8 @@ $(document).ready(function(){
                     notes = "<label for=\"notesField\">"+ "Noter fra administrator" +":</label> <div id=\"notesField\" class=\"shift\" style=\"padding:2vmin; margin-bottom:3vmin; border:solid black 1px\"><p>"+ object["shiftnotes"] +"</p></div>";
                 };
                 //gives the shift a color type, if it has one
-                if(object["color"] !== undefined && object["color"] !== null && object["label"] !== undefined && object["label"] !== null) { //fix the html, the html below comes for populatePossbibleShifts
-                    shiftColor = '<p>Vagt type: '+ object["label"] +'</p><div style="clear: both; heigth: 5px; width: 100%; border-radius: 5px; background-color:'+ object["color"] +';"><br></div>';
+                if(object["color"] !== undefined && object["color"] !== null && object["label"] !== undefined && object["label"] !== null) {
+                    shiftColor = '<p>Vagt type: '+ object["label"] +'</p><div style="clear: both; margin-top: -2vmin; heigth: 5px; width: 100%; border-radius: 5px; background-color:'+ object["color"] +';"><p><br></p></div>';
                 };
                 //gives the shift a day/date
                 //if startDate is not null or undefined, var date = a formatted startdate
