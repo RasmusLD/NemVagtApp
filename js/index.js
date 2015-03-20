@@ -524,6 +524,12 @@ $(document).ready(function(){
             //assign the current object containing JSON to the object var, so that I only need to write it once
             var object = possibleShifts[i];
             
+            // TEST
+            $("#UI_ELEMENT_TEST").append("<p>"+ possibleShifts.length +"</p>");
+            for(var prop in object) {
+                $("#UI_ELEMENT_TEST").append("<p>"+ prop +": "+ object[prop] +"</p>");
+            };
+            
             //if visible, go ahead and show the shift (it shouldn't be necessary to do this, but Mark wanted to make sure no shift would be shown if visible isn't true, I shouldn't receive such a shift, but better safe than sorry, so he asked for this conditional...
             if(object["visible"]) {
                 //checks to see if there is a role, then adds them to the var roller, which is added to the $(body).append() below.
@@ -824,7 +830,7 @@ $(document).ready(function(){
                 
                 //page-header
                 //appends the title of the shift to the body, that way, the user knows where they are... if the title is ==="" it outputs "vagten" instead...
-                if(object["title"] !== "") {
+                if(object["shifttitle"] !== "" && object["shifttitle"] !== undefined && object["shifttitle"] !== null) {
                     $(body).append('<h1 class="page-header">Detaljer for '+ object["shifttitle"] +':</h1>');
                 }else {
                     $(body).append('<h1 class="page-header">Detaljer for vagten:</h1>');
@@ -844,7 +850,7 @@ $(document).ready(function(){
         
         //makes sure whether or not you can take the shift, if you can, show a bookBtn
         if(freeSpaces > 0) { //button should also submit info from your choice of roles, if present...
-            $(body).append('<button class="btn btn-success pull-right margBotBtn" type="button">Tag vagt</button>');
+            $(body).append('<button class="btn bookBtn btn-success pull-right margBotBtn" type="button">Tag vagt</button>');
             $("#bookBtn").on("click", showModalView);
         };
     };
