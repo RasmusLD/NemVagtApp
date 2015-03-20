@@ -588,7 +588,7 @@ $(document).ready(function(){
         };
         
         //adds a listener to the readMore button, so that people can open details
-        //$(".readMoreBtn").on("click", showPossibleShiftDetails);
+        $(".readMoreBtn").on("click", showPossibleShiftDetails);
         //adds a listener to the readMore button, so that it updates all the JSON while people are busy reading about a shifts details... This is on a X(30) second timer
         $(".readMoreBtn").on("click", updateAllListsReadMoreBtnHandler);
         //adds a listener to the unbookShift buttons, so what they can open the modal dialog window, allowing them to unbook the shift
@@ -758,7 +758,12 @@ $(document).ready(function(){
         for (var i = 0; i < theShifts.length; i++) {
             //assign the current object containing JSON to "var object", so that I only need to write it once
             var object = theShifts[i];
-
+            
+            // TEST
+            for(var prop in object) {
+                $("#UI_ELEMENT_TEST").append("<p>"+ prop +": "+ object[prop] +"</p>");
+            };
+            
             //breaks up the "start" attribute of the object, as this contains both the start date AND the start time
             var startArr = object["start"].split("T");
             var startDate = startArr[0];
@@ -780,9 +785,9 @@ $(document).ready(function(){
             var freeSpacesFormatted = '';
             
             // OBS, WE MAY WANT THESE THREE PIECES OF INFORMATION, BUT WE AREN'T RECEIVING THEM PT
-            var roles = '';
-            var city = '';
-            var address = '';
+            //var roles = '';
+            //var city = '';
+            //var address = '';
 
             //Checks to see if the id of the shift, from the JSON is equal to the id of the shift we want
             if(object.id === theShift) {
