@@ -530,7 +530,7 @@ $(document).ready(function(){
                 var roller = '';
                 if(object["roles"]!== undefined) { //right now, roles isn't passed to me at all. Speak to Mark about this... Also, maybe it should be a radial input when dealing with possible shifts
                     roller = '"<p>Roller: '+ object["roles"] +'</p>"';
-                }
+                };
                 
                 //adds a title to the shift, if one is provided
                 var title = '';
@@ -600,7 +600,7 @@ $(document).ready(function(){
         };
     };
     
-    //iterates through a collection of shifts and populates a requested detail
+    //iterates through a collection of shifts, evaluates which one we want and populates a detail window
     function showMyShiftDetails() {
         
         //gets the id from the button, the button's id is equal to the id of the shift in the JSON...
@@ -642,11 +642,11 @@ $(document).ready(function(){
             var address = '';
 
             //Checks to see if the id of the shift, from the JSON is equal to the id of the shift we want
-            if(object.id === theShift) {
+            if(object["id"] === theShift) {
                 //evaluates if the admin has allowed deletion, is needed to know whether it's okay to delete outside the scope of this for loop
                 allowDelete = object["allowdelete"];
 
-                //iterate through the object and get all properties that aren't null, then add them to the details string above, so we can add them all in the "$(body).append" below
+                /*//iterate through the object and get all properties that we want, then add them to the details string above, so we can add them all in the "$(body).append" below
                 for (var property in object) {
                     //the properties we want is: title, day, date, starttime, endtime, roles(form/dropdown/radio), address, city, notes
                     if(property === "title" && object[property] !== "" && object[property] !== null) { //if title isn't === "" or null, var title = title from the JSON
@@ -666,10 +666,37 @@ $(document).ready(function(){
                     }else if(property === "city" && object[property] !== null) { //if city is not null, var city = city from JSON
                         city += "<p>"+ "By" +": "+ object[property] +"</p>";
                     };
+                };*/
+                
+                //the properties we want is: title, day, date, starttime, endtime, roles(form/dropdown/radio), address, city, notes
+                if(object["title"] !== undefined && object["title"] !== "" && object["title"] !== null) { //if there is a title and itisn't === "" or null, var title = title from the JSON
+                    title = "<p>"+ "Titel" +": "+ object["title"] +"</p>";
                 };
+                if(object["notes"] !== undefined && object["notes"] !== "" && object["notes"] !== null) { //if notes exist and aren't null or "", var notes = notes from JSON
+                    notes = "<label for=\"notesField\">"+ "Noter fra administrator" +":</label> <div id=\"notesField\" class=\"shift\" style=\"padding:2vmin; margin-bottom:3vmin; border:solid black 1px\"><p>"+ object["notes"] +"</p></div>";
+                };
+                if(object["startdate"] !== undefined && object["startdate"] !== "" && object["startdate"] !== null) { //if startdate exists, is not null or "", var date = a formatted startdate
+                    date = "<p>"+ "Dato" +": "+ getWeekday(object["startdate"]) +" "+ getDate(object["startdate"]) +"</p>";
+                };
+                if(object["starttime"] !== undefined && object["starttime"] !== "" && object["starttime"] !== null) { //if starttime exists, is not null or "", var startTime = a formatted startime
+                    startTime = "<p>"+ "Starttid" +": "+ object["starttime"].substring(0,5) +"</p>";
+                };
+                if(object["endtime"] !== undefined && object["endtime"] !== "" && object["endtime"] !== null) { //if endtime exists, is not null or "", var endTime = a formatted endtime
+                    endTime = "<p>"+ "Sluttid" +": "+ object["endtime"].substring(0,5) +"</p>";
+                };
+                if(object["roles"] !== undefined && object["endtime"] !== "" && object["endtime"] !== null) { //if roles exists, is not null or "", var roles = roles from JSON //right now, I apparently don't receive roles...
+                    roles = "<p>"+ "Rolle" +": "+ object["endtime"] +"</p>";
+                };
+                if(object["address"] !== undefined && object["address"] !== "" && object["address"] !== null) { //if address exists, is not null or "", var address = adress from JSON
+                    address = "<p>"+ "Adresse" +": "+ object["address"] +"</p>";
+                };
+                if(object["city"] !== undefined && object["city"] !== "" && object["city"] !== null) { //if city exists, is not null or "", var city = city from JSON
+                    city = "<p>"+ "By" +": "+ object["city"] +"</p>";
+                };
+                
                 //appends the title of the shift to the body, that way, the user knows where they are... if the title is ==="" it outputs "vagten" instead...
-                if(object.title !== "") {
-                    $(body).append('<h1 class="page-header">Detaljer for '+ object.title +':</h1>');
+                if(object["title"] !== "") {
+                    $(body).append('<h1 class="page-header">Detaljer for '+ object["title"] +':</h1>');
                 }else {
                     $(body).append('<h1 class="page-header">Detaljer for vagten:</h1>');
                 };
@@ -717,121 +744,104 @@ $(document).ready(function(){
         //};
     };
     //evaluates what kind of detail to show, then iterates through a collection of shifts and populates a requested detail
-    function showDetails() {
+    function showPossibleShiftDetails() {
         
         //gets the id from the button, the button's id is equal to the id of the shift in the JSON...
         var theShift = $(this).attr("id");
         
-        //the type of shift, booked or possible, true === a booked shift; false === a possibleShift
-        var shiftType = $(this).hasClass("bookedDetailsBtn");
-        
-        //has the admin allowed the user to delete the booked shift? if not, the button option to do so wont be shown...
-        var allowDelete;
-        
-        //is set to true if the shift is already booked, false if the shift hasn't been booked by the user yet...
-        //this var is also used by the back button, to evaluate if it should return you to showMyShifts or showPossibleShifts.
-        //var isBooked; may not need this anymore
-        
         $(body).empty();
         
-        //if the shiftType is true, it's a bookedShift
-        if(shiftType) {
-            //retrieves the booked shifts
-            var theShifts = $.parseJSON(getFromStorage("savedBookedShifts"));
-        }else {
-            //retrieves the possibleshifts shifts
-            var theShifts = $.parseJSON(getFromStorage("savedPossibleShifts"));
-        };
+        //retrieves the JSON from localStorage
+        var theShifts = $.parseJSON(getFromStorage("savedPossibleShifts"));
+        
         //iterates through shifts already booked by the user
         for (var i = 0; i < theShifts.length; i++) {
             //assign the current object containing JSON to "var object", so that I only need to write it once
             var object = theShifts[i];
 
-            //strings that will contain some of the values retrieved from the shift's JSON, making it easy to arrange them when appending them to the body later on
+            //breaks up the "start" attribute of the object, as this contains both the start date AND the start time
+            var startArr = object["start"].split("T");
+            var startDate = startArr[0];
+            var startTime = startArr[1].substring(0,5);
+            //breaks up the "end" attribute of the object, as this contains both the end date AND the end time
+            var endArr = object["end"].split("T");
+            //var endDate = endArr[0]; //currently, we don't output the endDate, so this var isn't currently needed...
+            var endTime = endArr[1].substring(0,5);
+            
+            //calculation of how many freeSpaces we have in the shift is saved here, calc is done below.
+            var freeSpaces;
+            
+            //strings that will contain some of the values retrieved from the shift's JSON formatted for html, making it easy to arrange them when appending them to the body later on
             var date = '';
             var notes = '';
             var title = '';
-            var startTime = '';
-            var endTime = '';
+            var shiftColor = '';
+            var shiftTimeInterval = '';
+            var freeSpacesFormatted = '';
+            
+            // OBS, WE MAY WANT THESE THREE PIECES OF INFORMATION, BUT WE AREN'T RECEIVING THEM PT
             var roles = '';
             var city = '';
             var address = '';
 
             //Checks to see if the id of the shift, from the JSON is equal to the id of the shift we want
             if(object.id === theShift) {
-                //evaluates if the admin has allowed deletion, is needed to know whether it's okay to delete outside the scope of this for loop
-                allowDelete = object["allowdelete"];
                 
-                //iterate through the object and get all properties that aren't null, then add them to the details string above, so we can add them all in the "$(body).append" below
-                for (var property in object) {
-                    //the properties we want is: title, day, date, starttime, endtime, roles(form/dropdown/radio), address, city, notes
-                    if(property === "title" && object[property] !== "" && object[property] !== null) { //if title isn't === "" or null, var title = title from the JSON
-                        title += "<p>"+ "Titel" +": "+ object[property] +"</p>";
-                    }else if(property === "notes" && object[property] !== "" && object[property] !== null) { //if notes aren't null or "", var notes = notes from JSON
-                        notes += "<label for=\"notesField\">"+ "Noter fra administrator" +":</label> <div id=\"notesField\" class=\"shift\" style=\"padding:2vmin; margin-bottom:3vmin; border:solid black 1px\"><p>"+ object[property] +"</p></div>";
-                    }else if(property === "startdate" && object[property] !== null) { //if startdate is not null, var date = a formatted startdate
-                        date += "<p>"+ "Dato" +": "+ getWeekday(object[property]) +" "+ getDate(object[property] +"</p>");
-                    }else if(property === "starttime" && object[property] !== null) { //if starttime is not null, var startTime = a formatted startime
-                        startTime += "<p>"+ "Starttid" +": "+ object[property].substring(0,5) +"</p>";
-                    }else if(property === "endtime" && object[property] !== null) { //if endtime is not null, var endTime = a formatted endtime
-                        endTime += "<p>"+ "Sluttid" +": "+ object[property].substring(0,5) +"</p>";
-                    }else if(property === "roles" && object[property] !== null) { //if roles is not null, var roles = roles from JSON //right now, I apparently don't receive roles...
-                        roles += "<p>"+ "Rolle" +": "+ object[property] +"</p>";
-                    }else if(property === "address" && object[property] !== null) { //if address is not null, var address = adress from JSON
-                        address += "<p>"+ "Adresse" +": "+ object[property] +"</p>";
-                    }else if(property === "city" && object[property] !== null) { //if city is not null, var city = city from JSON
-                        city += "<p>"+ "By" +": "+ object[property] +"</p>";
-                    };
+                //calculate the number of free spaces in the shift
+                freeSpaces = parseInt(object["maxmembers"])-parseInt(object["taken"]);
+                //if there are any free spaces, show how many there are
+                if(freeSpaces > 0) {
+                    freeSpacesFormatted = "<p>Der er "+ freeSpaces +" ledige pladser på vagten</p>";
                 };
+                //if notes aren't null or "", var notes = notes from JSON
+                if(object["shiftnotes"] !== undefined && object["shiftnotes"] !== "" && object["shiftnotes"] !== null) {
+                    notes = "<label for=\"notesField\">"+ "Noter fra administrator" +":</label> <div id=\"notesField\" class=\"shift\" style=\"padding:2vmin; margin-bottom:3vmin; border:solid black 1px\"><p>"+ object["shiftnotes"] +"</p></div>";
+                };
+                //gives the shift a color type, if it has one
+                if(object["color"] !== undefined && object["color"] !== null) { //fix the html, the html below comes for populatePossbibleShifts
+                    shiftColor = '<p>Vagt type: '+ /*object["navnet på vagt typen. f.x guld, skal hentes her"]*/ +'</p><div style="clear: both; heigth: 5px; width: 100%; border-radius: 5px; background-color:'+ object["color"] +';"><br></div>';
+                };
+                //gives the shift a day/date
+                //if startDate is not null or undefined, var date = a formatted startdate
+                if(startDate !== undefined && startDate !== null) {
+                    date = "<p>"+ "Dato" +": "+ getWeekday(startDate) +" "+ getDate(startDate) +"</p>";
+                };
+                //gives the shift a start time and an end time
+                if(startTime !== undefined && startTime !== null && endTime !== undefined && endTime !== null) {
+                    shiftTimeInterval = '<p>Kl: '+ startTime +' til '+ endTime +'</p>';
+                };
+                //if title isn't === "" or null, var title = title from the JSON
+                if(object["shifttitle"] !== undefined && object["shifttitle"] !== "" && object["shifttitle"] !== null) {
+                    title = "<p>"+ "Titel" +": "+ object["shifttitle"] +"</p>";
+                };
+                
+                //page-header
                 //appends the title of the shift to the body, that way, the user knows where they are... if the title is ==="" it outputs "vagten" instead...
-                if(object.title !== "") {
-                    $(body).append('<h1 class="page-header">Detaljer for '+ object.title +':</h1>');
+                if(object["title"] !== "") {
+                    $(body).append('<h1 class="page-header">Detaljer for '+ object["title"] +':</h1>');
                 }else {
                     $(body).append('<h1 class="page-header">Detaljer for vagten:</h1>');
                 };
                 
                 //add the individual parts of the JSON to the append body, so that it can be viewed. Done this way to be easily modifiable...
-                $(body).append(title+date+startTime+endTime+city+address+roles+notes);
-                //sets isBooked to true, letting the function know that it's dealing with a bookedShift as opposed to a possibleShift
-                //isBooked = true; may not need this anymore
+                $(body).append(shiftColor+title+date+shiftTimeInterval+freeSpacesFormatted+notes);
             };
         };
         
         //adds a back button to the page, so that people can easily get back. OBS would be nice to navigate to the shift they were just viewing, but I'm not sure how to do this...
         $(body).append('<button class="btn backBtn btn-default pull-left margBotBtn">Tilbage</button>');
         //adds a listener/function to the back button
-//        $(".backBtn").on("click", backBtnFunc(isBooked, theShift));
         $(".backBtn").on("click", function() {
-            if(shiftType) {
-//                backBtnHandler().done(function() {
-//                        $(body).append('<a href="#"'+ theShift +'>Link til Vagten</a>');
-//                    });
-//                showMyShifts().done(function() { //I WAS TRYING TO MAKE IT NAVIGATE TO THE TARGET SHIFT, BUT IT PROVED ORNERY, IT MIGHT BE A PHONEGAP ISSUE ACCORDING TO SOME ON THE WEB
-//                    //$(body).scrollTop($("#"+ theShift).scrollTop());
-//                    //window.scroll(0, 500);
-//                $(body).append('<a href="#"'+ theShift +'>Link til Vagten</a>');
-//                $("#"+ theShift).trigger("click"); //once the link above is added, make this work...
-//                    //http://www.javascriptmvc.com/docs/jQuery.event.pause.html - trouble with using hreft/anchor onclick/pause is that the element on which the anchor would be located is removed before resume() would be called...
-//                });
-                //window.location='#'+theShift; //virker IKKE
-//                var evt = document.createEvent("Event");
-//                evt.initEvent("click", true, true);
-//                $('#'+theShift).get(0).dispatchEvent(evt);
-                showMyShifts();
-            }else {
                 showPossibleShifts();
-            };
         });
         
-        if(shiftType === true && allowDelete === true) {
-            $(body).append('<button id="bookBtn" class="btn btn-danger pull-right margBotBtn" type="button">Afmeld vagt</button>');
-            $("#bookBtn").on("click", showModalView);
-            
-        }else if(shiftType === false) { //button should also submit info from your choice of roles, if present...
+        //makes sure whether or not you can take the shift, if you can, show a bookBtn
+        if(freeSpaces > 0) { //button should also submit info from your choice of roles, if present...
             $(body).append('<button class="btn btn-success pull-right margBotBtn" type="button">Tag vagt</button>');
             $("#bookBtn").on("click", showModalView);
         };
     };
+    
 //    function backBtnFunc(isBooked, theShift) {
 //        if(isBooked) {
 //            showMyShifts().done(function() { //I WAS TRYING TO MAKE IT NAVIGATE TO THE TARGET SHIFT, BUT IT PROVED ORNERY, IT MIGHT BE A PHONEGAP ISSUE ACCORDING TO SOME ON THE WEB
