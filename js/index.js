@@ -566,7 +566,7 @@ $(document).ready(function(){
                 //adds a button to show details for the shift, only do so if there is any notes...
                 var readMoreBtn = '';
                 if(object["shiftnotes"] !== '' && object["shiftnotes"] !== null && object["shiftnotes"] !== undefined) {
-                    readMoreBtn = '<button id="'+ object["id"] +'" style="margin-bottom: 1vmin; margin-right: overflow: hidden; -1vmin; margin-top: 3vmin;" type="button" class="btn btn-default readMoreBtn pull-right">Vis mere</button>';
+                    readMoreBtn = '<button id="'+ object["id"] +'" style="margin-bottom: 1vmin; margin-right: -1vmin; margin-top: 3vmin;" type="button" class="btn btn-default readMoreBtn pull-right">Vis mere</button>';
                 };
                 //a listener is added after it has been appended to body
                 
@@ -576,7 +576,7 @@ $(document).ready(function(){
                     shiftColor = '<div style="clear: both; margin-left: -4.1vmin; heigth: 5px; width: 110%; border-top-right-radius: 4px; border-top-left-radius: 4px; background-color:'+ object["color"] +';"><br></div>';
                 };
                 
-                $(body).append('<div class="container shift" style="border: solid black 1px; margin-bottom: 5vmin;">\
+                $(body).append('<div class="container shift" style="overflow: hidden; border: solid black 1px; margin-bottom: 5vmin;">\
                 '+ shiftColor +'\
                     <div>\
                         '+ title +'\
