@@ -1109,44 +1109,51 @@ $(document).ready(function(){
         //$(this).preventDefault();
         
         //if all required fields are filled and we have an internet connection
-        if(canSubmit && checkConnection()) {
-            //retrieve the domain from localStorage
-            var domain = getFromStorage("domain");
-            
-            //make the form into a string, so I can POST is as such, in accordance with my agreement with Mark
-            var form = $("#userProfileForm").serialize();
-            
-            var formattedPswHash = getFromStorage("pswHash");
-            
-            var userid = getFromStorage("userId");
-            
-            var ajaxQuery = $.ajax({
-                type: "POST",
-                url: "https://"+ domain + ".nemvagt.dk/ajax/app_saveuserprofile",
-                dataType: "text",
-                data: form +"&pswhash="+ formattedPswHash +"&userid="+ userid
-            });
-            //after the submit, refesh the page, it's needed because of how we handle checkbox submission (see: isRequiredFieldEmpty)
-            ajaxQuery.done(function(data) {
-                //receives an answer from the server a json formatted string with succes:true/false
-                var json = JSON.parse(data);
-                if(json["succes"]) { //if succes===true
-                    //refresh
-                    showUserProfile();
-                }else { //if succes was anything but true
-                    //clean up
-                    modalW.empty();
-                    body.empty();
-                    
-                    //refresh from storage
-                    populateUserProfile(JSON.parse(getFromStorage("savedUserProfile")));
-                    
-                    //timeout is there to make sure the previous modal, from ajaxWatch has time to "un-animate", as it seems that if I dont do that, the "remove this modal view when a modal view becomes hidden" triggers from the other window being removed...
-                    setTimeout(function() {
-                        showModalViewAccept("Fejl", "Bruger Profilen blev ikke opdateret");
-                    }, 100);
-                };
-            });
+        if(canSubmit) {
+            if(checkConnection()) {
+                //retrieve the domain from localStorage
+                var domain = getFromStorage("domain");
+
+                //make the form into a string, so I can POST is as such, in accordance with my agreement with Mark
+                var form = $("#userProfileForm").serialize();
+
+                var formattedPswHash = getFromStorage("pswHash");
+
+                var userid = getFromStorage("userId");
+
+                var ajaxQuery = $.ajax({
+                    type: "POST",
+                    url: "https://"+ domain + ".nemvagt.dk/ajax/app_saveuserprofile",
+                    dataType: "text",
+                    data: form +"&pswhash="+ formattedPswHash +"&userid="+ userid
+                });
+                //after the submit, refesh the page, it's needed because of how we handle checkbox submission (see: isRequiredFieldEmpty)
+                ajaxQuery.done(function(data) {
+                    //receives an answer from the server a json formatted string with succes:true/false
+                    var json = JSON.parse(data);
+                    if(json["succes"]) { //if succes===true
+                        //refresh
+                        showUserProfile();
+                    }else { //if succes was anything but true
+                        //clean up
+                        modalW.empty();
+                        body.empty();
+
+                        //refresh from storage
+                        populateUserProfile(JSON.parse(getFromStorage("savedUserProfile")));
+
+                        //timeout is there to make sure the previous modal, from ajaxWatch has time to "un-animate", as it seems that if I dont do that, the "remove this modal view when a modal view becomes hidden" triggers from the other window being removed...
+                        setTimeout(function() {
+                            showModalViewAccept("Fejl", "Bruger Profilen blev ikke opdateret");
+                        }, 100);
+                    };
+                });
+            }else {
+                //timeout is there to make sure the previous modal, from ajaxWatch has time to "un-animate", as it seems that if I dont do that, the "remove this modal view when a modal view becomes hidden" triggers from the other window being removed...
+                setTimeout(function() {
+                    showModalViewAccept("Manglende netværksforbindelse", "Der er ingen netværksforbindelse og det er derfor ikke muligt at opdatere din profil.");
+                }, 100);
+            };
         };
     };
     
