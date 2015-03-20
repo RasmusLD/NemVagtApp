@@ -781,7 +781,8 @@ $(document).ready(function(){
             var notes = '';
             var title = '';
             var shiftColor = '';
-            var shiftTimeInterval = '';
+            var shiftStartTime = '';
+            var shiftEndTime = "";
             var freeSpacesFormatted = '';
             
             // OBS, WE MAY WANT THESE THREE PIECES OF INFORMATION, BUT WE AREN'T RECEIVING THEM PT
@@ -803,8 +804,8 @@ $(document).ready(function(){
                     notes = "<label for=\"notesField\">"+ "Noter fra administrator" +":</label> <div id=\"notesField\" class=\"shift\" style=\"padding:2vmin; margin-bottom:3vmin; border:solid black 1px\"><p>"+ object["shiftnotes"] +"</p></div>";
                 };
                 //gives the shift a color type, if it has one
-                if(object["color"] !== undefined && object["color"] !== null) { //fix the html, the html below comes for populatePossbibleShifts
-                    shiftColor = '<p>Vagt type: '+ /*object["navnet på vagt typen. f.x guld, skal hentes her"]*/ +'</p><div style="clear: both; heigth: 5px; width: 100%; border-radius: 5px; background-color:'+ object["color"] +';"><br></div>';
+                if(object["color"] !== undefined && object["color"] !== null && object["label"] !== undefined && object["label"] !== null) { //fix the html, the html below comes for populatePossbibleShifts
+                    shiftColor = '<p>Vagt type: '+ object["label"] +'</p><div style="clear: both; heigth: 5px; width: 100%; border-radius: 5px; background-color:'+ object["color"] +';"><br></div>';
                 };
                 //gives the shift a day/date
                 //if startDate is not null or undefined, var date = a formatted startdate
@@ -813,7 +814,8 @@ $(document).ready(function(){
                 };
                 //gives the shift a start time and an end time
                 if(startTime !== undefined && startTime !== null && endTime !== undefined && endTime !== null) {
-                    shiftTimeInterval = '<p>Kl: '+ startTime +' til '+ endTime +'</p>';
+                    shiftStartTime = '<p>Starttid: '+ startTime +'</p>';
+                    shiftEndTime = '<p>Sluttid: '+ endTime +'</p>';
                 };
                 //if title isn't === "" or null, var title = title from the JSON
                 if(object["shifttitle"] !== undefined && object["shifttitle"] !== "" && object["shifttitle"] !== null) {
@@ -823,13 +825,13 @@ $(document).ready(function(){
                 //page-header
                 //appends the title of the shift to the body, that way, the user knows where they are... if the title is ==="" it outputs "vagten" instead...
                 if(object["title"] !== "") {
-                    $(body).append('<h1 class="page-header">Detaljer for '+ object["title"] +':</h1>');
+                    $(body).append('<h1 class="page-header">Detaljer for '+ object["shifttitle"] +':</h1>');
                 }else {
                     $(body).append('<h1 class="page-header">Detaljer for vagten:</h1>');
                 };
                 
                 //add the individual parts of the JSON to the append body, so that it can be viewed. Done this way to be easily modifiable...
-                $(body).append(shiftColor+title+date+shiftTimeInterval+freeSpacesFormatted+notes);
+                $(body).append(shiftColor+title+date+shiftStartTime+shiftEndTime+freeSpacesFormatted+notes);
             };
         };
         
