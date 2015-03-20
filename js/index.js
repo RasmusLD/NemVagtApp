@@ -524,11 +524,11 @@ $(document).ready(function(){
             //assign the current object containing JSON to the object var, so that I only need to write it once
             var object = possibleShifts[i];
             
-            // TEST
-            $("#UI_ELEMENT_TEST").append("<p>"+ possibleShifts.length +"</p>");
-            for(var prop in object) {
-                $("#UI_ELEMENT_TEST").append("<p>"+ prop +": "+ object[prop] +"</p>");
-            };
+//            // TEST
+//            $("#UI_ELEMENT_TEST").append("<p>"+ possibleShifts.length +"</p>");
+//            for(var prop in object) {
+//                $("#UI_ELEMENT_TEST").append("<p>"+ prop +": "+ object[prop] +"</p>");
+//            };
             
             //if visible, go ahead and show the shift (it shouldn't be necessary to do this, but Mark wanted to make sure no shift would be shown if visible isn't true, I shouldn't receive such a shift, but better safe than sorry, so he asked for this conditional...
             if(object["visible"]) {
@@ -559,7 +559,7 @@ $(document).ready(function(){
                 //adds a button to book the shift, to the shift
                 var bookBtn = '';
                 if(freeSpaces > 0) {
-                    bookBtn = '<button class="btn btn-success pull-right margBotBtn bookBtn" style="margin-right: -1vmin;">Tilmeld vagt</button>';
+                    bookBtn = '<button class="btn btn-success pull-right margBotBtn bookBtn" style="margin-right: -1vmin;">Tag vagt</button>';
                 };
                 //a listener is added after it has been appended to body
                 
@@ -851,7 +851,7 @@ $(document).ready(function(){
         //makes sure whether or not you can take the shift, if you can, show a bookBtn
         if(freeSpaces > 0) { //button should also submit info from your choice of roles, if present...
             $(body).append('<button class="btn bookBtn btn-success pull-right margBotBtn" type="button">Tag vagt</button>');
-            $("#bookBtn").on("click", showModalView);
+            $(".bookBtn").on("click", showModalView);
         };
     };
     
