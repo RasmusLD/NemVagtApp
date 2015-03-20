@@ -566,7 +566,7 @@ $(document).ready(function(){
                 //adds a button to show details for the shift, only do so if there is any notes...
                 var readMoreBtn = '';
                 if(object["shiftnotes"] !== '' && object["shiftnotes"] !== null && object["shiftnotes"] !== undefined) {
-                    readMoreBtn = '<button id="'+ object["id"] +'" style="margin-bottom: 1vmin; margin-right: -1vmin; margin-top: 3vmin;" type="button" class="btn btn-default readMoreBtn pull-right">Vis mere</button>';
+                    readMoreBtn = '<button id="'+ object["id"] +'" style="margin-bottom: 1vmin; margin-right: overflow: hidden; -1vmin; margin-top: 3vmin;" type="button" class="btn btn-default readMoreBtn pull-right">Vis mere</button>';
                 };
                 //a listener is added after it has been appended to body
                 
