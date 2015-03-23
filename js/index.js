@@ -454,10 +454,10 @@ $(document).ready(function(){
                 //a listener is added after it has been appended to body
             };
 
-            $(body).append('<div class="container shift" style="border: solid black 1px; margin-bottom: 5vmin;">\
+            $(body).append('<div id="'+ object["id"] +'" class="container shift" style="border: solid black 1px; margin-bottom: 5vmin;">\
                 <div>\
                     '+ title +'\
-                    <button id="'+ object["id"] +'" style="margin-bottom: 1vmin; margin-right: -1vmin; margin-top: 3vmin;" type="button" class="btn bookedDetailsBtn btn-default readMoreBtn pull-right">Vis mere</button>\
+                    <button style="margin-bottom: 1vmin; margin-right: -1vmin; margin-top: 3vmin;" type="button" class="btn bookedDetailsBtn btn-default readMoreBtn pull-right">Vis mere</button>\
                     <h4 style="clear:left;" class="pull-left">'+ getWeekday(object["startdate"]) +' '+ getDate(object["startdate"]) +' <!--'+
                         'Kl: '+ object["starttime"].substring(0,5) +' til '+ object["endtime"].substring(0,5)  +'--></h4>\
                 </div>\
@@ -612,7 +612,7 @@ $(document).ready(function(){
     function showMyShiftDetails() {
         
         //gets the id from the button, the button's id is equal to the id of the shift in the JSON...
-        var theShift = $(this).attr("id");
+        var theShift = $(this).closest(".container").attr("id");
         
         //the type of shift, booked or possible, true === a booked shift; false === a possibleShift
         //var shiftType = $(this).hasClass("bookedDetailsBtn");
@@ -710,7 +710,7 @@ $(document).ready(function(){
                 };
 
                 //add the individual parts of the JSON to the append body, so that it can be viewed. Done this way to be easily modifiable...
-                $(body).append(title+date+startTime+endTime+city+address+roles+notes);
+                $(body).append('<div class>'+title+date+startTime+endTime+city+address+roles+notes); //wrap div .container and gove it object["id"] as id, important for book/unbook to work
                 //sets isBooked to true, letting the function know that it's dealing with a bookedShift as opposed to a possibleShift
                 //isBooked = true; may not need this anymore
             };
@@ -1606,7 +1606,7 @@ $(document).ready(function(){
         if(checkConnection()) {
             //get the shift id, so we can post it
             //get the id of the button (this?), the afmeld vagt btn's id, is the id of the shift...
-            var theId = $(this).attr("id");
+            var theId = $(this).closest(".container").attr("id");
             var infoArr = {shiftid:theId};
             
             //create the url, to post to
@@ -1615,13 +1615,19 @@ $(document).ready(function(){
             var ajaxCall = postAJAXCall(url, infoArr);
             ajaxCall.done(function(data) {
                 //data will be true/false, as success/failure
-                if(data) {
-                    showModalViewAccept("Succes", "Du er nu afmeldt vagten");
-                    //calls deleteShiftFromLocalStorage, which takes an id(what to delete) and a saveLocation(where to delete it from AND the context of the call, fx unbookShift)
-                    deleteShiftFromLocalStorage(theId, "savedBookedShifts");
-                }else {
-                    showModalViewAccept("Fejl", "Det var ikke muligt at afmelde dig vagten.");
+//                if(data["succes"]) {
+//                    showModalViewAccept("Succes", "Du er nu afmeldt vagten");
+//                    //calls deleteShiftFromLocalStorage, which takes an id(what to delete) and a saveLocation(where to delete it from AND the context of the call, fx unbookShift)
+//                    deleteShiftFromLocalStorage(theId, "savedBookedShifts");
+//                }else {
+//                    showModalViewAccept("Fejl", "Det var ikke muligt at afmelde dig vagten.");
+//                };
+                //TEST
+                var derp = 'TEST Output:<br>';
+                for(var prop in data) {
+                    derp += '<p>'+ prop +': '+ data[prop] +'</p><br>';
                 };
+                $("#UI_ELEMENT_TEST").append(derp);
             });
         }else {
             //notify user of missing conenction
@@ -1638,8 +1644,10 @@ $(document).ready(function(){
         delete retrievedJSON[id];
         saveToStorage(saveLocation, JSON.stringify(retrievedJSON));
         if(saveLocation === "savedBookedShifts") {
+            body.empty();
             populateMyShifts(retrievedJSON);
         }else if(saveLocation === "savedPossibleShifts") {
+            body.empty();
             populatePossibleShifts(retrievedJSON);
         };
     };
