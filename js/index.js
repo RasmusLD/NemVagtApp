@@ -553,6 +553,7 @@ $(document).ready(function(){
                 //var endDate = endArr[0]; //currently, we don't output the endDate, so this var isn't currently needed...
                 var endTime = endArr[1].substring(0,5);
                 
+                //there is no check on this as the values should/will always be included and we NEED the calculation later on, so not having it isn't an option anyway...
                 //calculates how many freeSpaces we have in the shift
                 var freeSpaces = parseInt(object["maxmembers"])-parseInt(object["taken"]);
                 
@@ -765,10 +766,10 @@ $(document).ready(function(){
             //assign the current object containing JSON to "var object", so that I only need to write it once
             var object = theShifts[i];
             
-            // TEST
-            for(var prop in object) {
-                $("#UI_ELEMENT_TEST").append("<p>"+ prop +": "+ object[prop] +"</p>");
-            };
+//            // TEST
+//            for(var prop in object) {
+//                $("#UI_ELEMENT_TEST").append("<p>"+ prop +": "+ object[prop] +"</p>");
+//            };
             
             //breaks up the "start" attribute of the object, as this contains both the start date AND the start time
             var startArr = object["start"].split("T");
