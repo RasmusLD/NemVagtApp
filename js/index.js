@@ -238,10 +238,10 @@ $(document).ready(function(){
                     //$(body).empty();
                     //$(body).append("<h3>Husk at udfylde \"Forenings domæne\"</h3>");
                     //setTimeout(showLogin, 4000);
-                    notificationModal("Manglende udfyldning", "<p>Husk at udfylde \"Forenings domæne\"</p>");
+                    showModalViewAccept("Manglende udfyldning", "<p>Husk at udfylde \"Forenings domæne\"</p>");
                 };
             }else {
-                notificationModal("Ingen internet forbindelse", "<p>Der er ingen forbindelse til internettet og du har ikke et gemt login på telefonen,<br>opret forbindelse til internettet for at logge ind.</p>");
+                showModalViewAccept("Ingen internet forbindelse", "<p>Der er ingen forbindelse til internettet og du har ikke et gemt login på telefonen,<br>opret forbindelse til internettet for at logge ind.</p>");
             };
         });
     };
@@ -261,7 +261,7 @@ $(document).ready(function(){
             showMyShifts();
         }else {
             localStorage.clear();
-            notificationModal("Forkert udfyldning", "<p>Noget var udfyldt forkert!</p>");
+            showModalViewAccept("Forkert udfyldning", "<p>Noget var udfyldt forkert!</p>");
         };
     };
     
@@ -742,8 +742,8 @@ $(document).ready(function(){
         });
         
         if(/*shiftType === true &&*/ allowDelete === true) {
-            $(body).append('<button id="bookBtn" class="btn btn-danger pull-right margBotBtn" type="button">Afmeld vagt</button>');
-            $("#bookBtn").on("click", showModalView);
+            $(body).append('<button id="'+ theShift +'" class="btn btn-danger bookBtn pull-right margBotBtn" type="button">Afmeld vagt</button>');
+            $(".bookBtn").on("click", showModalView);
             
         };//else if(shiftType === false) { //button should also submit info from your choice of roles, if present...
             //$(body).append('<button class="btn btn-success pull-right margBotBtn" type="button">Tag vagt</button>');
@@ -1536,7 +1536,7 @@ $(document).ready(function(){
         $(".modal-title").html(title);
         if(title==="Afmeld vagt") { //this derives from the text on the button, could maybe be done better?
             $("#modalYesBtn").on("click", unbookShift);
-        }else if(title==="Tilmeld Vagt") { //this derives from the text on the button, could maybe be done better?
+        }else if(title==="Tilmeld vagt") { //this derives from the text on the button, could maybe be done better?
             $("#modalYesBtn").on("click", bookShift);
         };
         //makes the "yes" button close the modal window
@@ -1555,7 +1555,7 @@ $(document).ready(function(){
             modalW.empty();
         });
     };
-    
+    //is used to create a notification modal, which is easy to close and doesn't close on its own, people simply press on "ok" or the backdrop
     function showModalViewAccept(title, content) {
         $(modalW).append('<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">\
           <div class="modal-dialog">\
@@ -1601,11 +1601,46 @@ $(document).ready(function(){
 //    };
     //unbooks a shift, may be called from the modal windows opened through both Details and showMyShifts
     function unbookShift() {
-        //$("body").append("<p>unbookShift was called</p>");
+        modalW.empty();
+        if(checkConnection()) {
+            //get the shift id, so we can post it
+            //get the id of the button (this?), the afmeld vagt btn's id, is the id of the shift...
+            var theId = $(this).attr("id");
+            var infoArr = {shiftid:theId};
+            
+            //create the url, to post to
+            var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_dropshift";
+            
+            var ajaxCall = postAJAXCall(url, infoArr);
+            ajaxCall.done(function(data) {
+                //data will be true/false, as success/failure
+                if(data) {
+                    showModalViewAccept("Succes", "Du er nu afmeldt vagten");
+                    //calls deleteShiftFromLocalStorage, which takes an id(what to delete) and a saveLocation(where to delete it from AND the context of the call, fx unbookShift)
+                    deleteShiftFromLocalStorage(theId, "savedBookedShifts");
+                }else {
+                    showModalViewAccept("Fejl", "Det var ikke muligt at afmelde dig vagten.");
+                };
+            });
+        }else {
+            //notify user of missing conenction
+            showModalViewAccept("Ingen internet forbindelse", "Der er ingen forbindelse til internettet, det er derfor ikke muligt af afmelde dig vagten.<br>Opret forbindelse til internettet og prøv igen.");
+        };
     };
     //books a shift, may be called from the modal windows opened through both Details and showPossibleShifts
     function bookShift() {
         //$("body").append("<p>bookShift was called</p>");
+    };
+    //a function which is called from unbookShift and bookShift, it deletes a shift from appropriate list in localStorage and calls the appropriate "populate" method with the new data
+    function deleteShiftFromLocalStorage(id, saveLocation) {
+        var retrievedJSON = JSON.parse(getFromStorage(saveLocation));
+        delete retrievedJSON[id];
+        saveToStorage(saveLocation, JSON.stringify(retrievedJSON));
+        if(saveLocation === "savedBookedShifts") {
+            populateMyShifts(retrievedJSON);
+        }else if(saveLocation === "savedPossibleShifts") {
+            populatePossibleShifts(retrievedJSON);
+        };
     };
     
     //keeps track of whether or not there is an active ajax request, and notifies the user if there is one...
