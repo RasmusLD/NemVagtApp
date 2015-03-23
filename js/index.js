@@ -1621,11 +1621,16 @@ $(document).ready(function(){
             ajaxCall.done(function(data) {
                 //data will be true/false, as success/failure
                 if(data["succes"]) {
-                    showModalViewAccept("Succes", "Du er nu afmeldt vagten");
-                    //calls deleteShiftFromLocalStorage, which takes an id(what to delete) and a saveLocation(where to delete it from AND the context of the call, fx unbookShift)
-                    deleteShiftFromLocalStorage(theId, "savedBookedShifts");
+                    setTimeout(function() {
+                        showModalViewAccept("Succes", "Du er nu afmeldt vagten");
+                        
+                        //calls deleteShiftFromLocalStorage, which takes an id(what to delete) and a saveLocation(where to delete it from AND the context of the call, fx unbookShift)
+                        deleteShiftFromLocalStorage(theId, "savedBookedShifts");
+                    }, 100);
                 }else {
-                    showModalViewAccept("Fejl", "Det var ikke muligt at afmelde dig vagten.");
+                    setTimeout(function() {
+                        showModalViewAccept("Fejl", "Det var ikke muligt at afmelde dig vagten.");
+                    }, 100);
                 };
                 //TEST
                 var derp = 'TEST Output:<br>';
