@@ -1298,7 +1298,7 @@ $(document).ready(function(){
             saveToStorage("savedPossibleShifts", JSON.stringify(data));
         }).done(function() {
             if(myShiftsDone && userProfileDone || whereAmI === 2) {
-                showPossibleShifts;
+                updateAllListsMenuHandlerUpdateEvaluator(whereAmI);
             }else {
                 possibleShiftsDone = true;
             };
@@ -1308,12 +1308,12 @@ $(document).ready(function(){
         var urlUserProfile = "https://"+ domain +".nemvagt.dk/ajax/app_myshifts";
         //update myShifts
         var userProfileAJAXObj = postAJAXCall(urlUserProfile, toPost);
-        userProfileAJAXObj.done(function(data) {
+        userProfileAJAXObj//.done(function(data) {
             //saveToStorage("savedBookedShifts", JSON.stringify(data)); //NOT IMPLEMENTED YET
             //$("#UI_ELEMENT_TEST").append("saved myShifts from updateAllBtn"); //TEST
-        }).done(function() {
-            //$("#UI_ELEMENT_TEST").append("myShiftsDone === true"); //TEST
-            //Looks at the status of the other ajax queries, if they're done or if we were on this page when we started the update, evaluate what to update, then do so.
+        //})
+        .done(function() {
+        //Looks at the status of the other ajax queries, if they're done or if we were on this page when we started the update, evaluate what to update, then do so.
             if(possibleShiftsDone && myShiftsDone || whereAmI === 3) {
                 //$("#UI_ELEMENT_TEST").append("Updated JSON by-way of \"opdater alt\" button, in the menu"); //TEST
                 //evaluates what to update, then does so.
@@ -1329,10 +1329,10 @@ $(document).ready(function(){
     function updateAllListsMenuHandlerUpdateEvaluator(whereAmI) {
         switch (whereAmI) {
                     case 1:
-                        showMyShifts;
+                        showMyShifts();
                         break;
                     case 2:
-                        //update possibleShifts
+                        showPossibleShifts();
                         break;
                     case 3:
                         showUserProfile();
