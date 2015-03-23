@@ -765,10 +765,10 @@ $(document).ready(function(){
             //assign the current object containing JSON to "var object", so that I only need to write it once
             var object = theShifts[i];
             
-//            // TEST
-//            for(var prop in object) {
-//                $("#UI_ELEMENT_TEST").append("<p>"+ prop +": "+ object[prop] +"</p>");
-//            };
+            // TEST
+            for(var prop in object) {
+                $("#UI_ELEMENT_TEST").append("<p>"+ prop +": "+ object[prop] +"</p>");
+            };
             
             //breaks up the "start" attribute of the object, as this contains both the start date AND the start time
             var startArr = object["start"].split("T");
