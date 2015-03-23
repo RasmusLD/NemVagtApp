@@ -1620,19 +1620,20 @@ $(document).ready(function(){
             var ajaxCall = postAJAXCall(url, infoArr);
             ajaxCall.done(function(data) {
                 //data will be true/false, as success/failure
-//                if(data["succes"]) {
-//                    showModalViewAccept("Succes", "Du er nu afmeldt vagten");
-//                    //calls deleteShiftFromLocalStorage, which takes an id(what to delete) and a saveLocation(where to delete it from AND the context of the call, fx unbookShift)
-//                    deleteShiftFromLocalStorage(theId, "savedBookedShifts");
-//                }else {
-//                    showModalViewAccept("Fejl", "Det var ikke muligt at afmelde dig vagten.");
-//                };
+                if(data["succes"]) {
+                    showModalViewAccept("Succes", "Du er nu afmeldt vagten");
+                    //calls deleteShiftFromLocalStorage, which takes an id(what to delete) and a saveLocation(where to delete it from AND the context of the call, fx unbookShift)
+                    deleteShiftFromLocalStorage(theId, "savedBookedShifts");
+                }else {
+                    showModalViewAccept("Fejl", "Det var ikke muligt at afmelde dig vagten.");
+                };
                 //TEST
                 var derp = 'TEST Output:<br>';
                 for(var prop in data) {
                     derp += '<p>'+ prop +': '+ data[prop] +'</p><br>';
                 };
                 $("#UI_ELEMENT_TEST").append(derp);
+                //TEST END
             });
         }else {
             //notify user of missing conenction
@@ -1644,17 +1645,31 @@ $(document).ready(function(){
         //$("body").append("<p>bookShift was called</p>");
     };
     //a function which is called from unbookShift and bookShift, it deletes a shift from appropriate list in localStorage and calls the appropriate "populate" method with the new data
-    function deleteShiftFromLocalStorage(id, saveLocation) {
-        var retrievedJSON = JSON.parse(getFromStorage(saveLocation));
-        delete retrievedJSON[id];
-        saveToStorage(saveLocation, JSON.stringify(retrievedJSON));
+    function deleteShiftFromLocalStorage(id, saveLocation) { //pretty sure the way I delete is wrong...
+//        var retrievedJSON = JSON.parse(getFromStorage(saveLocation));
+//        delete retrievedJSON[id];
+//        saveToStorage(saveLocation, JSON.stringify(retrievedJSON));
+//        if(saveLocation === "savedBookedShifts") {
+//            body.empty();
+//            populateMyShifts(retrievedJSON);
+//        }else if(saveLocation === "savedPossibleShifts") {
+//            body.empty();
+//            populatePossibleShifts(retrievedJSON);
+//        };
+        // FOR NOW - START
+        setTimeout(function() {
+            modalW.empty();
+        }, 1000);
         if(saveLocation === "savedBookedShifts") {
-            body.empty();
-            populateMyShifts(retrievedJSON);
+            setTimeout(function() {
+                showMyShifts();
+            }, 3000);
         }else if(saveLocation === "savedPossibleShifts") {
-            body.empty();
-            populatePossibleShifts(retrievedJSON);
+            setTimeout(function() {
+                showPossibleShifts();
+            }, 3000);
         };
+        // FOR NOW - END
     };
     
     //keeps track of whether or not there is an active ajax request, and notifies the user if there is one...
