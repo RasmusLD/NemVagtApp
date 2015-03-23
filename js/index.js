@@ -470,11 +470,12 @@ $(document).ready(function(){
             
         };
         //adds a listener to the readMore button, so that people can open details
-        $(".readMoreBtn").on("click", showMyShiftDetails);
+        //$(".readMoreBtn").on("click", showMyShiftDetails); //ONLY REMOVED FOR TEST
         //adds a listener to the readMore button, so that it updates all the JSON while people are busy reading about a shifts details... THIS MEANS SEVERAL AJAX CALLS MAY BE MADE IN A VERY SHORT TIME, ONCE AFTER THE OTHER, IT MIGHT BE PRUDENT TO FIND A SOLUTION FOR THIS
-        $(".readMoreBtn").on("click", updateAllListsReadMoreBtnHandler);
+        //$(".readMoreBtn").on("click", updateAllListsReadMoreBtnHandler); //ONLY REMOVED FOR TEST
         //adds a listener to the unbookShift buttons, so what they can open the modal dialog window, allowing them to unbook the shift
-        $(".container").closest(".container").find(".unbookBtn").on("click", showModalView);
+        //$(".container").closest(".container").find(".unbookBtn").on("click", showModalView); //ONLY REMOVED FOR TEST
+        $(".readMoreBtn").on("click", unbookShift); // TEST
         
         //starts an autoupdate timer for the myShifts JSON.
         if(jsonUpdateMyShiftsObj === undefined) {
