@@ -1256,7 +1256,7 @@ $(document).ready(function(){
         //keeps track of whether or not the AJAX call is done
         var myShiftsDone = false;
         //keeps track of whether or not the AJAX call is done
-        var possibleShiftsDone = true; //should be changed to false once the possible shifts part has been implemented
+        var possibleShiftsDone = false;
         //keeps track of whether or not the AJAX call is done
         var userProfileDone = false;
         
@@ -1291,18 +1291,18 @@ $(document).ready(function(){
         });
         
         //tells possibleShiftsAJAXObj where to POST to
-//        var urlPossibleShifts = "https://"+ domain +".nemvagt.dk/ajax/app_XXX"; //change XXX to the address needed for POST'ing to possibleShifts
-//        //update possibleShifts
-//        var possibleShiftsAJAXObj = postAJAXCall(urlPossibleShifts, toPost);
-//        possibleShiftsAJAXObj.done(function(data) {
-//            saveToStorage("savedPossibleShifts", JSON.stringify(data));
-//        }).done(function() {
-//            myShiftsDone = true;
-//            if(possibleShiftsDone && userProfileDone || whereAmI === 2) {
-//                showPossibleShifts;
-//                $("#UI_ELEMENT_TEST").append("Updated JSON by-way of \"opdater alt\" button, in the menu");
-//            }
-//        });
+        var urlPossibleShifts = "https://"+ domain +".nemvagt.dk/ajax/app_myshiftplan"; //change XXX to the address needed for POST'ing to possibleShifts
+        //update possibleShifts
+        var possibleShiftsAJAXObj = postAJAXCall(urlPossibleShifts, toPost);
+        possibleShiftsAJAXObj.done(function(data) {
+            saveToStorage("savedPossibleShifts", JSON.stringify(data));
+        }).done(function() {
+            if(myShiftsDone && userProfileDone || whereAmI === 2) {
+                showPossibleShifts;
+            }else {
+                possibleShiftsDone = true;
+            };
+        });
         
         //tells myShiftsAJAXObj where to POST to
         var urlUserProfile = "https://"+ domain +".nemvagt.dk/ajax/app_myshifts";
