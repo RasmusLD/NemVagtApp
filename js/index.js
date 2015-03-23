@@ -574,7 +574,7 @@ $(document).ready(function(){
                 //gives the shift a color type, if it has one
                 var shiftColor = '';
                 if(object["color"] !== null && object["color"] !== undefined) {
-                    shiftColor = '<div style="clear: both; margin-left: -4.1vmin; heigth: 5px; width: 110%; border-top-right-radius: 4px; border-top-left-radius: 4px; background-color:'+ object["color"] +';"><br></div>';
+                    shiftColor = '<div style="clear: both; margin-left: -10vmin; heigth: 5px; width: 130%; background-color:'+ object["color"] +';"><br></div>';
                 };
                 
                 $(body).append('<div class="container shift" style="overflow: hidden; border: solid black 1px; margin-bottom: 5vmin;">\
