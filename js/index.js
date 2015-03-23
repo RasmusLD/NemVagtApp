@@ -468,6 +468,7 @@ $(document).ready(function(){
                 </div>\
             </div>');
             
+            $("#UI_ELEMENT_TEST").append('object id: '+ object["id"]); // TEST
         };
         //adds a listener to the readMore button, so that people can open details
         //$(".readMoreBtn").on("click", showMyShiftDetails); //ONLY REMOVED FOR TEST
@@ -1606,9 +1607,9 @@ $(document).ready(function(){
         if(checkConnection()) {
             //get the shift id, so we can post it
             //get the id of the button (this?), the afmeld vagt btn's id, is the id of the shift...
-            var theId = $(this).closest(".container").attr("id");
+            var theId = $(this).closest(".container").find(".container").attr("id");
             var infoArr = {shiftid:theId};
-            
+            $("#UI_ELEMENT_TEST").append("<p>"+ theId +"</p>");
             //create the url, to post to
             var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_dropshift";
             
