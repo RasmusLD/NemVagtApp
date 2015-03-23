@@ -435,6 +435,10 @@ $(document).ready(function(){
             //assign the current object containing JSON to the object var, so that I only need to write it once
             var object = myBookedShifts[i];
             
+            for(var prop in object) {
+                $("#UI_ELEMENT_TEST").append("<p>"+ prop +" :"+ object[prop] +"</p>"); // TEST
+            };
+            
             //checks to see if there is a role, then adds them to the var roller, which is added to the $(body).append() below.
             var roller = '';
             if(object["roles"]!== undefined) { //right now, roles isn't passed to me at all. Speak to Mark about this...
