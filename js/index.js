@@ -49,6 +49,7 @@ function phonegapReady() {
 
 $(document).ready(function(){
     
+    //we're listening for iPhone because windows phones have a backBtn but don't support device.platform...
     if(device.platform !== "iPhone") {
         document.addEventListener("backbutton", onBackKeyDown, false);
     };
