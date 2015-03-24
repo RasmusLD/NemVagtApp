@@ -98,14 +98,6 @@ $(document).ready(function(){
         
     });
     
-    //for testing purposes...
-//    $("#testAJAXBtn").on("click", hasSavedLogin);
-//    $("#testCleanMem").on("click", cleanStorage);
-//    $("#testCleanBody").on("click", cleanBody);
-//    function cleanBody() {
-//        body.empty();
-//    };
-    
     //object to save the autoupdate of the myShifts to, autoupdateMyShifts is added to the variable at the end of the populateMyShifts method if it is still undefined
     var jsonUpdateMyShiftsObj;
     function autoupdateMyShifts() {
@@ -305,124 +297,125 @@ $(document).ready(function(){
             populateMyShifts(ajaxSuccesEvaluator("savedBookedShifts", "Mine vagter"));
         };
 
-//        THE REST OF THIS METHOD IS DEPRECATED, BUT KEPT AROUND FOR NOW AS REFERENCE, TO MAKE SURE I STILL HAVE IT IF I WAS TO RUN INTO AN UNEXPECTED ERROR
-//        
-//        var toPost = {userid:getFromStorage("userId")};
-//        var domain = getFromStorage("domain");
-//        //get the shifts that the person has already voluntered for
-//        $.ajax({
-//            type: "POST",
-//            url: "https://"+ domain +".nemvagt.dk/ajax/app_myshifts",
-//            dataType: "JSON",
-//            data: toPost,
-//            success: function(data) {
-//               //save the shifts to local storage, so they can be reused w/o having to make the AJAX call again
-//               saveToStorage("savedBookedShifts", JSON.stringify(data));
-//            },
-//            error: function() {
-//                $(body).append("<p>Something went wrong with myShift AJAX call</p>");
-//            }
-//        }).done(function(data) {
-//            
-//            //a title, so that people know where they are
-//            $(body).append('<h1 class="page-header">Mine vagter fra '+/* indæƒÂ¦t organisations navn +*/'</h1>');
-//            
-//            //we need this to iterate through the array of JSON objects
-//            for (var i = 0; i < data.length; i++) {
-//                //assign the current object containing JSON to the object var, so that I only need to write it once
-//                var object = data[i];
-//                
-////                //a string that will contain all the details to be added
-////                var details = '';
-////                //iterate through the object and get all properties that aren't null, then add them to the details string above, so we can add them all in the "$(body).append" below
-////                for (var property in object) {
-////                    if(object[property] !== null){
-////                        details += "<p>"+ property +": "+ object[property] +"</p>";
-////                    };
-////                };
-////                $(body).append(details);
-//                
-//                //checks to see if there is a role, then adds them to the var roller, which is added to the $(body).append() below.
-//                var roller = '';
-//                if(object["roles"]!== undefined) { //right now, roles isn't passed to me at all. Speak to Mark about this...
-//                    roller = '"<p>Roller: '+ object["roles"] +'</p>"';
-//                }
-//                
-//                //adds a title to the shift, if one is provided
-//                var title = '';
-//                if(object["title"] !== "") {
-//                    title = '<h4 class="pull-left">'+ object.title +'</h4>';
-//                };
-//                
-//                //adds a button to unbook the shift to the shift, if the option is provided
-//                var unbookBtn = '';
-//                if(object["allowdelete"] === true) {
-//                    unbookBtn = '<button class="btn pull-right margBotBtn unbookBtn">Afmeld vagt</button>'; //kendte/havde Mark måske et wastebasket/trashcan icon?
-//                    //a listener is added after it has been appended to body (if object[allowdelete] is true)
-//                };
-//                
-//                $(body).append('<div class="container shift" style="border: solid black 1px; margin-bottom: 5vmin;">\
-//                    <div>\
-//                        '+ title +'\
-//                        <button id="'+ object["id"] +'" style="margin-bottom: 1vmin; margin-right: -1vmin; margin-top: 3vmin;" type="button" class="btn readMoreBtn pull-right">Vis mere</button>\
-//                        <h4 style="clear:left;" class="pull-left">'+ getWeekday(object["startdate"]) +' '+ getDate(object["startdate"]) +' <!--'+
-//                            'Kl: '+ object["starttime"].substring(0,5) +' til '+ object["endtime"].substring(0,5)  +'--></h4>\
-//                    </div>\
-//                    <div style="clear: both;">\
-//                        <p>Kl: '+ object["starttime"].substring(0,5) +' til '+ object["endtime"].substring(0,5) +'</p>\
-//                        '+ unbookBtn +'\
-//                        '+ roller +'\
-//                    </div>\
-//                </div>');
-//                
-//                //code for collapsible shifts...
-//                /*$(body).append('<div class="container" style="border: solid black 1px; margin-bottom: 5vmin;">\
-//                    <div>\
-//                        <h4 style="float: left;">'+ object["startdate"].substring(8,10) +'/'+ object["startdate"].substring(5,7) +' - '+ object["startdate"].substring(0,4) +'</h4>\
-//                        <button id="collapseShiftBtn'+ i +'" style="float: right; margin-bottom: 1vmin; margin-top: 1vmin;" type="button" class="btn collapseBtn" data-toggle="collapse" data-target="#collapseShift'+ i +'">+</button>\
-//                    </div>\
-//                    <div id="collapseShift'+ i +'" class="collapse" style="clear: both;">\
-//                        '+ details +'\
-//                    </div>\
-//                </div>');*/
-//            };
+        /*
+        //THE REST OF THIS METHOD IS DEPRECATED, BUT KEPT AROUND FOR NOW AS REFERENCE, TO MAKE SURE I STILL HAVE IT IF I WAS TO RUN INTO AN UNEXPECTED ERROR
+        //IT ALSO CONTAINS CODE FOR COLLAPSIPLE SHIFTS AT THE END
+        var toPost = {userid:getFromStorage("userId")};
+        var domain = getFromStorage("domain");
+        //get the shifts that the person has already voluntered for
+        $.ajax({
+            type: "POST",
+            url: "https://"+ domain +".nemvagt.dk/ajax/app_myshifts",
+            dataType: "JSON",
+            data: toPost,
+            success: function(data) {
+               //save the shifts to local storage, so they can be reused w/o having to make the AJAX call again
+               saveToStorage("savedBookedShifts", JSON.stringify(data));
+            },
+            error: function() {
+                $(body).append("<p>Something went wrong with myShift AJAX call</p>");
+            }
+        }).done(function(data) {
             
-//        $(".readMoreBtn").on("click", showDetails);
-//
-//        //adds a listener to the unbookShift buttons
-//        $(".container").closest(".container").find(".unbookBtn").on("click", showModalView);
-//
-//        //testing, related to jumping to a specific shift after pressing return from details...
-////            $(body).append('<a href="#mCont">Link til mCont</a>'); //virker
-////            $("scrollToTest").on("click", function() {
-////               window.scrollTo(0, 0); //scrollTo doesn't seem to work in phonegap...
-////                
-////            });
-//
-//        //code for collapsible shifts...
-//        /*//can show all the returned JSON, for testing purposes...
-//        $(body).append("<p>JSON output from myShifts:</p>");
-//        for (var i = 0; i < data.length; i++) {
-//            var object = data[i];
-//            for (var property in object) {
-//                $(body).append("<p>"+ property +" : "+ object[property] +"</p>");
-//            }
-//        };
-//
-//        //allows the collapseBtn to see if its collapse if shown/hidden and change its own html accordingly
-//        $('div.collapse').on('shown.bs.collapse', function () {
-//            //we need this to change the html of the btn
-//            $(this).closest("div.container").find("button").html("&minus;");
-//        }).on('hidden.bs.collapse', function () {
-//            //we need this to change the html of the btn
-//            $(this).closest("div.container").find("button").html("+");
-//        })".collapse({toggle: true})" this function is needed, ONLY if they should be .collapse-in initially, w/o this function, it will always collapse-in first time it's clicked,
-//          since it seems the class's collapsible functionaluty isn't applied until needed, so the button wont change to reflect that it's open either, unless this method is called...;
-//        });*/
-//        if(jsonUpdateMyShiftsObj === undefined) { //starts an autoupdate timer for the myShifts JSON.
-//            jsonUpdateMyShiftsObj = autoupdateMyShifts();
-//        };
-//    });
+            //a title, so that people know where they are
+            $(body).append('<h1 class="page-header">Mine vagter fra '+ indæƒÂ¦t organisations navn +'</h1>');
+            
+            //we need this to iterate through the array of JSON objects
+            for (var i = 0; i < data.length; i++) {
+                //assign the current object containing JSON to the object var, so that I only need to write it once
+                var object = data[i];
+                
+//                //a string that will contain all the details to be added
+//                var details = '';
+//                //iterate through the object and get all properties that aren't null, then add them to the details string above, so we can add them all in the "$(body).append" below
+//                for (var property in object) {
+//                    if(object[property] !== null){
+//                        details += "<p>"+ property +": "+ object[property] +"</p>";
+//                    };
+//                };
+//                $(body).append(details);
+                
+                //checks to see if there is a role, then adds them to the var roller, which is added to the $(body).append() below.
+                var roller = '';
+                if(object["roles"]!== undefined) { //right now, roles isn't passed to me at all. Speak to Mark about this...
+                    roller = '"<p>Roller: '+ object["roles"] +'</p>"';
+                }
+                
+                //adds a title to the shift, if one is provided
+                var title = '';
+                if(object["title"] !== "") {
+                    title = '<h4 class="pull-left">'+ object.title +'</h4>';
+                };
+                
+                //adds a button to unbook the shift to the shift, if the option is provided
+                var unbookBtn = '';
+                if(object["allowdelete"] === true) {
+                    unbookBtn = '<button class="btn pull-right margBotBtn unbookBtn">Afmeld vagt</button>'; //kendte/havde Mark måske et wastebasket/trashcan icon?
+                    //a listener is added after it has been appended to body (if object[allowdelete] is true)
+                };
+                
+                $(body).append('<div class="container shift" style="border: solid black 1px; margin-bottom: 5vmin;">\
+                    <div>\
+                        '+ title +'\
+                        <button id="'+ object["id"] +'" style="margin-bottom: 1vmin; margin-right: -1vmin; margin-top: 3vmin;" type="button" class="btn readMoreBtn pull-right">Vis mere</button>\
+                        <h4 style="clear:left;" class="pull-left">'+ getWeekday(object["startdate"]) +' '+ getDate(object["startdate"]) +' <!--'+
+                            'Kl: '+ object["starttime"].substring(0,5) +' til '+ object["endtime"].substring(0,5)  +'--></h4>\
+                    </div>\
+                    <div style="clear: both;">\
+                        <p>Kl: '+ object["starttime"].substring(0,5) +' til '+ object["endtime"].substring(0,5) +'</p>\
+                        '+ unbookBtn +'\
+                        '+ roller +'\
+                    </div>\
+                </div>');
+                
+                //code for collapsible shifts...
+                $(body).append('<div class="container" style="border: solid black 1px; margin-bottom: 5vmin;">\
+                    <div>\
+                        <h4 style="float: left;">'+ object["startdate"].substring(8,10) +'/'+ object["startdate"].substring(5,7) +' - '+ object["startdate"].substring(0,4) +'</h4>\
+                        <button id="collapseShiftBtn'+ i +'" style="float: right; margin-bottom: 1vmin; margin-top: 1vmin;" type="button" class="btn collapseBtn" data-toggle="collapse" data-target="#collapseShift'+ i +'">+</button>\
+                    </div>\
+                    <div id="collapseShift'+ i +'" class="collapse" style="clear: both;">\
+                        '+ details +'\
+                    </div>\
+                </div>');
+            };
+            
+        $(".readMoreBtn").on("click", showDetails);
+
+        //adds a listener to the unbookShift buttons
+        $(".container").closest(".container").find(".unbookBtn").on("click", showModalView);
+
+        //testing, related to jumping to a specific shift after pressing return from details...
+//            $(body).append('<a href="#mCont">Link til mCont</a>'); //virker
+//            $("scrollToTest").on("click", function() {
+//               window.scrollTo(0, 0); //scrollTo doesn't seem to work in phonegap...
+//                
+//            });
+
+        //code for collapsible shifts...
+        //can show all the returned JSON, for testing purposes...
+        $(body).append("<p>JSON output from myShifts:</p>");
+        for (var i = 0; i < data.length; i++) {
+            var object = data[i];
+            for (var property in object) {
+                $(body).append("<p>"+ property +" : "+ object[property] +"</p>");
+            }
+        };
+
+        //allows the collapseBtn to see if its collapse if shown/hidden and change its own html accordingly
+        $('div.collapse').on('shown.bs.collapse', function () {
+            //we need this to change the html of the btn
+            $(this).closest("div.container").find("button").html("&minus;");
+        }).on('hidden.bs.collapse', function () {
+            //we need this to change the html of the btn
+            $(this).closest("div.container").find("button").html("+");
+        })".collapse({toggle: true})" this function is needed, ONLY if they should be .collapse-in initially, w/o this function, it will always collapse-in first time it's clicked,
+          since it seems the class's collapsible functionaluty isn't applied until needed, so the button wont change to reflect that it's open either, unless this method is called...;
+        });
+        if(jsonUpdateMyShiftsObj === undefined) { //starts an autoupdate timer for the myShifts JSON.
+            jsonUpdateMyShiftsObj = autoupdateMyShifts();
+        };
+    });*/
     };
     //is used twice by showMyShifts to actually populate the DOM, the parameter is a JSON array with shifts...
     function populateMyShifts(myBookedShifts) {
@@ -566,7 +559,7 @@ $(document).ready(function(){
                 //adds a button to show details for the shift, only do so if there is any notes...
                 var readMoreBtn = '';
                 if(object["shiftnotes"] !== '' && object["shiftnotes"] !== null && object["shiftnotes"] !== undefined) {
-                    readMoreBtn = '<button id="'+ object["id"] +'" style="margin-bottom: 1vmin; margin-right: -1vmin; margin-top: 3vmin;" type="button" class="btn btn-default readMoreBtn pull-right">Vis mere</button>';
+                    readMoreBtn = '<button style="margin-bottom: 1vmin; margin-right: -1vmin; margin-top: 3vmin;" type="button" class="btn btn-default readMoreBtn pull-right">Vis mere</button>';
                 };
                 //a listener is added after it has been appended to body
                 
@@ -576,7 +569,7 @@ $(document).ready(function(){
                     shiftColor = '<div style="clear: both; margin-left: -10vmin; heigth: 5px; width: 130%; background-color:'+ object["color"] +';"><br></div>';
                 };
                 
-                $(body).append('<div class="container shift" style="overflow: hidden; border: solid black 1px; margin-bottom: 5vmin;">\
+                $(body).append('<div id="'+ object["id"] +'" class="container shift" style="overflow: hidden; border: solid black 1px; margin-bottom: 5vmin;">\
                 '+ shiftColor +'\
                     <div>\
                         '+ title +'\
@@ -612,26 +605,13 @@ $(document).ready(function(){
         //gets the id from the button, the button's id is equal to the id of the shift in the JSON...
         var theShift = $(this).closest(".container").attr("id");
         
-        //the type of shift, booked or possible, true === a booked shift; false === a possibleShift
-        //var shiftType = $(this).hasClass("bookedDetailsBtn");
-        
         //has the admin allowed the user to delete the booked shift? if not, the button option to do so wont be shown...
         var allowDelete;
         
-        //is set to true if the shift is already booked, false if the shift hasn't been booked by the user yet...
-        //this var is also used by the back button, to evaluate if it should return you to showMyShifts or showPossibleShifts.
-        //var isBooked; may not need this anymore
-        
         $(body).empty();
         
-        //if the shiftType is true, it's a bookedShift
-        //if(shiftType) {
-            //retrieves the booked shifts
-            var theShifts = $.parseJSON(getFromStorage("savedBookedShifts"));
-        //}else {
-            //retrieves the possibleshifts shifts
-            //var theShifts = $.parseJSON(getFromStorage("savedPossibleShifts"));
-        //};
+        var theShifts = $.parseJSON(getFromStorage("savedBookedShifts"));
+        
         //iterates through shifts already booked by the user
         for (var i = 0; i < theShifts.length; i++) {
             //assign the current object containing JSON to "var object", so that I only need to write it once
@@ -651,28 +631,6 @@ $(document).ready(function(){
             if(object["id"] === theShift) {
                 //evaluates if the admin has allowed deletion, is needed to know whether it's okay to delete outside the scope of this for loop
                 allowDelete = object["allowdelete"];
-
-                /*//iterate through the object and get all properties that we want, then add them to the details string above, so we can add them all in the "$(body).append" below
-                for (var property in object) {
-                    //the properties we want is: title, day, date, starttime, endtime, roles(form/dropdown/radio), address, city, notes
-                    if(property === "title" && object[property] !== "" && object[property] !== null) { //if title isn't === "" or null, var title = title from the JSON
-                        title += "<p>"+ "Titel" +": "+ object[property] +"</p>";
-                    }else if(property === "notes" && object[property] !== "" && object[property] !== null) { //if notes aren't null or "", var notes = notes from JSON
-                        notes += "<label for=\"notesField\">"+ "Noter fra administrator" +":</label> <div id=\"notesField\" class=\"shift\" style=\"padding:2vmin; margin-bottom:3vmin; border:solid black 1px\"><p>"+ object[property] +"</p></div>";
-                    }else if(property === "startdate" && object[property] !== null) { //if startdate is not null, var date = a formatted startdate
-                        date += "<p>"+ "Dato" +": "+ getWeekday(object[property]) +" "+ getDate(object[property] +"</p>");
-                    }else if(property === "starttime" && object[property] !== null) { //if starttime is not null, var startTime = a formatted startime
-                        startTime += "<p>"+ "Starttid" +": "+ object[property].substring(0,5) +"</p>";
-                    }else if(property === "endtime" && object[property] !== null) { //if endtime is not null, var endTime = a formatted endtime
-                        endTime += "<p>"+ "Sluttid" +": "+ object[property].substring(0,5) +"</p>";
-                    }else if(property === "roles" && object[property] !== null) { //if roles is not null, var roles = roles from JSON //right now, I apparently don't receive roles...
-                        roles += "<p>"+ "Rolle" +": "+ object[property] +"</p>";
-                    }else if(property === "address" && object[property] !== null) { //if address is not null, var address = adress from JSON
-                        address += "<p>"+ "Adresse" +": "+ object[property] +"</p>";
-                    }else if(property === "city" && object[property] !== null) { //if city is not null, var city = city from JSON
-                        city += "<p>"+ "By" +": "+ object[property] +"</p>";
-                    };
-                };*/
                 
                 //the properties we want is: title, day, date, starttime, endtime, roles(form/dropdown/radio), address, city, notes
                 if(object["title"] !== undefined && object["title"] !== "" && object["title"] !== null) { //if there is a title and itisn't === "" or null, var title = title from the JSON
@@ -706,9 +664,15 @@ $(document).ready(function(){
                 }else {
                     $(body).append('<h1 class="page-header">Detaljer for vagten:</h1>');
                 };
-
+                
+                //creates a bookBtn
+                var bookBtn = '';
+                if(allowDelete === true) {
+                    bookBtn = '<button class="btn btn-danger bookBtn pull-right margBotBtn" type="button">Afmeld vagt</button>';
+                };
+                
                 //add the individual parts of the JSON to the append body, so that it can be viewed. Done this way to be easily modifiable...
-                $(body).append('<div class>'+title+date+startTime+endTime+city+address+roles+notes); //wrap div .container and gove it object["id"] as id, important for book/unbook to work
+                $(body).append('<div id="'+ object["id"] +'">'+ title+date+startTime+endTime+city+address+roles+notes+bookBtn +'</div>'); //wrap div .container and gove it object["id"] as id, important for book/unbook to work
                 //sets isBooked to true, letting the function know that it's dealing with a bookedShift as opposed to a possibleShift
                 //isBooked = true; may not need this anymore
             };
@@ -717,7 +681,6 @@ $(document).ready(function(){
         //adds a back button to the page, so that people can easily get back. OBS would be nice to navigate to the shift they were just viewing, but I'm not sure how to do this...
         $(body).append('<button class="btn btn-default backBtn pull-left margBotBtn">Tilbage</button>');
         //adds a listener/function to the back button
-//        $(".backBtn").on("click", backBtnFunc(isBooked, theShift));
         $(".backBtn").on("click", function() {
             //if(shiftType) {
 //                backBtnHandler().done(function() {
@@ -734,26 +697,19 @@ $(document).ready(function(){
 //                var evt = document.createEvent("Event");
 //                evt.initEvent("click", true, true);
 //                $('#'+theShift).get(0).dispatchEvent(evt);
-                showMyShifts();
-            //}else {
-                //showPossibleShifts();
-            //};
+            showMyShifts();
         });
-        
-        if(/*shiftType === true &&*/ allowDelete === true) {
-            $(body).append('<button id="'+ theShift +'" class="btn btn-danger bookBtn pull-right margBotBtn" type="button">Afmeld vagt</button>');
+        //if allow delete is true, append an onclick listener, the conditional is there to make sure we only append if there is a btn
+        if(allowDelete === true) {
             $(".bookBtn").on("click", showModalView);
-            
-        };//else if(shiftType === false) { //button should also submit info from your choice of roles, if present...
-            //$(body).append('<button class="btn btn-success pull-right margBotBtn" type="button">Tag vagt</button>');
-            //$("#bookBtn").on("click", showModalView);
-        //};
+        };
+        
     };
     //evaluates what kind of detail to show, then iterates through a collection of shifts and populates a requested detail
     function showPossibleShiftDetails() {
         
         //gets the id from the button, the button's id is equal to the id of the shift in the JSON...
-        var theShift = $(this).attr("id");
+        var theShift = $(this).closest(".container").attr("id");
         
         $(body).empty();
         
@@ -764,11 +720,6 @@ $(document).ready(function(){
         for (var i = 0; i < theShifts.length; i++) {
             //assign the current object containing JSON to "var object", so that I only need to write it once
             var object = theShifts[i];
-            
-//            // TEST
-//            for(var prop in object) {
-//                $("#UI_ELEMENT_TEST").append("<p>"+ prop +": "+ object[prop] +"</p>");
-//            };
             
             //breaks up the "start" attribute of the object, as this contains both the start date AND the start time
             var startArr = object["start"].split("T");
@@ -836,8 +787,14 @@ $(document).ready(function(){
                     $(body).append('<h1 class="page-header">Detaljer for vagten:</h1>');
                 };
                 
+                //makes sure whether or not you can take the shift, if you can, show a bookBtn
+                var bookBtn = '';
+                if(freeSpaces > 0) { //button should also submit info from your choice of roles, if present...
+                    bookBtn = '<button class="btn bookBtn btn-success pull-right margBotBtn" type="button">Tag vagt</button>';
+                };
+                
                 //add the individual parts of the JSON to the append body, so that it can be viewed. Done this way to be easily modifiable...
-                $(body).append(shiftColor+title+date+shiftStartTime+shiftEndTime+freeSpacesFormatted+notes);
+                $(body).append('<div id="'+ object["id"] +'">'+ shiftColor+title+date+shiftStartTime+shiftEndTime+freeSpacesFormatted+notes+bookBtn +'</div>');
             };
         };
         
@@ -847,12 +804,8 @@ $(document).ready(function(){
         $(".backBtn").on("click", function() {
                 showPossibleShifts();
         });
-        
-        //makes sure whether or not you can take the shift, if you can, show a bookBtn
-        if(freeSpaces > 0) { //button should also submit info from your choice of roles, if present...
-            $(body).append('<button class="btn bookBtn btn-success pull-right margBotBtn" type="button">Tag vagt</button>');
-            $(".bookBtn").on("click", showModalView);
-        };
+        //appends an onClick listener event on the bookBtn
+        $(".bookBtn").on("click", showModalView);
     };
     
 //    function backBtnFunc(isBooked, theShift) {
@@ -1611,17 +1564,18 @@ $(document).ready(function(){
 //    };
     //unbooks a shift, may be called from the modal windows opened through both Details and showMyShifts
     function unbookShift() {
+        //get the shift id, so we can post it, we need to get it now, before we empty the modal...
+        //get the id of the button (this), the afmeld vagt btn's id in the modalView, is the id of the shift...
+        var theId = $(this).attr("id");
         //this is called to make sure a potential modal window starts closing, the timeouts further down in the code are there to give the different modals opened time to close
         modalW.empty();
         setTimeout(function() {
             if(checkConnection()) {
-                //get the shift id, so we can post it
-                //get the id of the button (this), the afmeld vagt btn's id in the modalView, is the id of the shift...
-                var theId = $(this).attr("id");
+                //what to post, it's the id of the shift in question
                 var infoArr = {shiftid:theId};
                 //create the url, to post to
                 var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_dropshift";
-
+                
                 var ajaxCall = postAJAXCall(url, infoArr);
                 ajaxCall.done(function(data) {
                     //data will be true/false, as success/failure
@@ -1652,30 +1606,33 @@ $(document).ready(function(){
     };
     //a function which is called from unbookShift and bookShift, it deletes a shift from appropriate list in localStorage and calls the appropriate "populate" method with the new data
     function deleteShiftFromLocalStorage(id, saveLocation) { //pretty sure the way I delete is wrong...
-//        var retrievedJSON = JSON.parse(getFromStorage(saveLocation));
-//        delete retrievedJSON[id];
-//        saveToStorage(saveLocation, JSON.stringify(retrievedJSON));
-//        if(saveLocation === "savedBookedShifts") {
-//            body.empty();
-//            populateMyShifts(retrievedJSON);
-//        }else if(saveLocation === "savedPossibleShifts") {
-//            body.empty();
-//            populatePossibleShifts(retrievedJSON);
-//        };
-        // FOR NOW - START
-        setTimeout(function() {
-            modalW.empty();
-        }, 1000);
+        var storedJSON = JSON.parse(getFromStorage(saveLocation));
+        
+        storedJSON = $.grep(storedJSON, function(object) {
+            return object["id"] !== id;
+        });
+        saveToStorage(saveLocation, JSON.stringify(storedJSON));
         if(saveLocation === "savedBookedShifts") {
-            setTimeout(function() {
-                showMyShifts();
-            }, 3000);
+            body.empty();
+            populateMyShifts(storedJSON);
         }else if(saveLocation === "savedPossibleShifts") {
-            setTimeout(function() {
-                showPossibleShifts();
-            }, 3000);
+            body.empty();
+            populatePossibleShifts(storedJSON);
         };
-        // FOR NOW - END
+//        // FOR NOW - START
+//        setTimeout(function() {
+//            modalW.empty();
+//        }, 2000);
+//        if(saveLocation === "savedBookedShifts") {
+//            setTimeout(function() {
+//                showMyShifts();
+//            }, 3000);
+//        }else if(saveLocation === "savedPossibleShifts") {
+//            setTimeout(function() {
+//                showPossibleShifts();
+//            }, 3000);
+//        };
+//        // FOR NOW - END
     };
     
     //keeps track of whether or not there is an active ajax request, and notifies the user if there is one...
