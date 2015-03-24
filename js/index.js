@@ -435,10 +435,6 @@ $(document).ready(function(){
             //assign the current object containing JSON to the object var, so that I only need to write it once
             var object = myBookedShifts[i];
             
-            for(var prop in object) {
-                $("#UI_ELEMENT_TEST").append("<p>"+ prop +" :"+ object[prop] +"</p>"); // TEST
-            };
-            
             //checks to see if there is a role, then adds them to the var roller, which is added to the $(body).append() below.
             var roller = '';
             if(object["roles"]!== undefined) { //right now, roles isn't passed to me at all. Speak to Mark about this...
@@ -471,16 +467,13 @@ $(document).ready(function(){
                     '+ roller +'\
                 </div>\
             </div>');
-            
-            $("#UI_ELEMENT_TEST").append('object id: '+ object["id"]); // TEST
         };
         //adds a listener to the readMore button, so that people can open details
-        //$(".readMoreBtn").on("click", showMyShiftDetails); //ONLY REMOVED FOR TEST
+        $(".readMoreBtn").on("click", showMyShiftDetails);
         //adds a listener to the readMore button, so that it updates all the JSON while people are busy reading about a shifts details... THIS MEANS SEVERAL AJAX CALLS MAY BE MADE IN A VERY SHORT TIME, ONCE AFTER THE OTHER, IT MIGHT BE PRUDENT TO FIND A SOLUTION FOR THIS
-        //$(".readMoreBtn").on("click", updateAllListsReadMoreBtnHandler); //ONLY REMOVED FOR TEST
+        $(".readMoreBtn").on("click", updateAllListsReadMoreBtnHandler);
         //adds a listener to the unbookShift buttons, so what they can open the modal dialog window, allowing them to unbook the shift
-        //$(".container").closest(".container").find(".unbookBtn").on("click", showModalView); //ONLY REMOVED FOR TEST
-        $(".readMoreBtn").on("click", unbookShift); // TEST
+        $(".unbookBtn").on("click", showModalView);
         
         //starts an autoupdate timer for the myShifts JSON.
         if(jsonUpdateMyShiftsObj === undefined) {
@@ -1518,6 +1511,10 @@ $(document).ready(function(){
     
     //is used to show the modal window when trying to book/unbook
     function showModalView() {
+        
+        //takes the button that opened this window, then looks for it's closest container, which is its shift, then gets the shifts id which is equal to its id in the JSON/server
+        var shiftId = $(this).closest(".container").attr("id");
+        
         $(modalW).append('<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">\
           <div class="modal-dialog">\
             <div class="modal-content">\
@@ -1530,23 +1527,30 @@ $(document).ready(function(){
               </div>\
               <div class="modal-footer">\
                 <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Nej</button>\
-                <button id="modalYesBtn" type="button" class="btn btn-default btn-lg">Ja</button>\
+                <button id="'+ shiftId +'" type="button" class="btn modalYesBtn btn-default btn-lg">Ja</button>\
               </div>\
             </div>\
           </div>\
         </div>');
         
+        //gets the title of the modal off of the btn
         var title = $(this).html(); //if we want to use icons instead of text on the buttons, simply use an "if" to check what is written and assign "title" a value based on that...
+        //defines the setup changes of the modal, show===true so the modal is shown
         var options = {show: true};
+        //applies the changes defined in var options
         $("#myModal").modal(options);
+        //sets the title of the modal, so people know where they are
         $(".modal-title").html(title);
+        
+        //applies the unbook/book onClick events
         if(title==="Afmeld vagt") { //this derives from the text on the button, could maybe be done better?
-            $("#modalYesBtn").on("click", unbookShift);
+            $(".modalYesBtn").on("click", unbookShift);
         }else if(title==="Tilmeld vagt") { //this derives from the text on the button, could maybe be done better?
-            $("#modalYesBtn").on("click", bookShift);
+            $(".modalYesBtn").on("click", bookShift);
         };
+        
         //makes the "yes" button close the modal window
-        $("#modalYesBtn").on("click", function() {
+        $(".modalYesBtn").on("click", function() {
             $("#myModal").modal("hide");
         });
         
@@ -1607,43 +1611,40 @@ $(document).ready(function(){
 //    };
     //unbooks a shift, may be called from the modal windows opened through both Details and showMyShifts
     function unbookShift() {
+        //this is called to make sure a potential modal window starts closing, the timeouts further down in the code are there to give the different modals opened time to close
         modalW.empty();
-        if(checkConnection()) {
-            //get the shift id, so we can post it
-            //get the id of the button (this?), the afmeld vagt btn's id, is the id of the shift...
-            var theId = $(this).closest(".container").attr("id");
-            var infoArr = {shiftid:theId};
-            $("#UI_ELEMENT_TEST").append("<p>"+ theId +"</p>");
-            //create the url, to post to
-            var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_dropshift";
-            
-            var ajaxCall = postAJAXCall(url, infoArr);
-            ajaxCall.done(function(data) {
-                //data will be true/false, as success/failure
-                if(data["succes"]) {
-                    setTimeout(function() {
-                        showModalViewAccept("Succes", "Du er nu afmeldt vagten");
-                        
-                        //calls deleteShiftFromLocalStorage, which takes an id(what to delete) and a saveLocation(where to delete it from AND the context of the call, fx unbookShift)
-                        deleteShiftFromLocalStorage(theId, "savedBookedShifts");
-                    }, 100);
-                }else {
-                    setTimeout(function() {
-                        showModalViewAccept("Fejl", "Det var ikke muligt at afmelde dig vagten.");
-                    }, 100);
-                };
-                //TEST
-                var derp = 'TEST Output:<br>';
-                for(var prop in data) {
-                    derp += '<p>'+ prop +': '+ data[prop] +'</p><br>';
-                };
-                $("#UI_ELEMENT_TEST").append(derp);
-                //TEST END
-            });
-        }else {
-            //notify user of missing conenction
-            showModalViewAccept("Ingen internet forbindelse", "Der er ingen forbindelse til internettet, det er derfor ikke muligt af afmelde dig vagten.<br>Opret forbindelse til internettet og prøv igen.");
-        };
+        setTimeout(function() {
+            if(checkConnection()) {
+                //get the shift id, so we can post it
+                //get the id of the button (this), the afmeld vagt btn's id in the modalView, is the id of the shift...
+                var theId = $(this).attr("id");
+                var infoArr = {shiftid:theId};
+                //create the url, to post to
+                var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_dropshift";
+
+                var ajaxCall = postAJAXCall(url, infoArr);
+                ajaxCall.done(function(data) {
+                    //data will be true/false, as success/failure
+                    if(data["succes"]) {
+                        setTimeout(function() {
+                            showModalViewAccept("Succes", "Du er nu afmeldt vagten");
+
+                            //calls deleteShiftFromLocalStorage, which takes an id(what to delete) and a saveLocation(where to delete it from AND the context of the call, fx unbookShift)
+                            deleteShiftFromLocalStorage(theId, "savedBookedShifts");
+                        }, 100);
+                    }else {
+                        setTimeout(function() {
+                            showModalViewAccept("Fejl", "Det var ikke muligt at afmelde dig vagten.");
+                        }, 100);
+                    };
+                });
+            }else {
+                //notify user of missing conenction
+                setTimeout(function() {
+                    showModalViewAccept("Ingen internet forbindelse", "Der er ingen forbindelse til internettet, det er derfor ikke muligt af afmelde dig vagten.<br>Opret forbindelse til internettet og prøv igen.");
+                }, 100);
+            };
+        }, 100);
     };
     //books a shift, may be called from the modal windows opened through both Details and showPossibleShifts
     function bookShift() {
