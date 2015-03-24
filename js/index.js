@@ -56,8 +56,9 @@ $(document).ready(function(){
     function onBackKeyDown() {
         //does nothing, simply overriding the back button, so that it does nothing.
     };
-    document.appView.setVerticalScrollBarEnabled(true);
-    //document.appView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+    //scrollbar related, not working, breaks app pt.
+//    document.appView.setVerticalScrollBarEnabled(true);
+//    document.appView.setScrollBarStyle(app.SCROLLBARS_INSIDE_OVERLAY);
     
     //the #mCont dom element is saved here in runOnLoad
     var menu;
