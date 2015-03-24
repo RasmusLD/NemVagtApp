@@ -49,6 +49,13 @@ function phonegapReady() {
 
 $(document).ready(function(){
     
+    if(device.platform !== "iPhone") {
+        document.addEventListener("backbutton", onBackKeyDown, false);
+    };
+    function onBackKeyDown() {
+        //does nothing, simply overriding the back button, so that it does nothing.
+    };
+    
     //the #mCont dom element is saved here in runOnLoad
     var menu;
     //the #bCont dom element is saved here in runOnLoad
