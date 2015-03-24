@@ -672,7 +672,7 @@ $(document).ready(function(){
                 };
                 
                 //add the individual parts of the JSON to the append body, so that it can be viewed. Done this way to be easily modifiable...
-                $(body).append('<div id="'+ object["id"] +'">'+ title+date+startTime+endTime+city+address+roles+notes+bookBtn +'</div>'); //wrap div .container and gove it object["id"] as id, important for book/unbook to work
+                $(body).append('<div id="'+ object["id"] +'" class="container">'+ title+date+startTime+endTime+city+address+roles+notes+bookBtn +'</div>'); //wrap div .container and gove it object["id"] as id, important for book/unbook to work
                 //sets isBooked to true, letting the function know that it's dealing with a bookedShift as opposed to a possibleShift
                 //isBooked = true; may not need this anymore
             };
@@ -794,7 +794,7 @@ $(document).ready(function(){
                 };
                 
                 //add the individual parts of the JSON to the append body, so that it can be viewed. Done this way to be easily modifiable...
-                $(body).append('<div id="'+ object["id"] +'">'+ shiftColor+title+date+shiftStartTime+shiftEndTime+freeSpacesFormatted+notes+bookBtn +'</div>');
+                $(body).append('<div id="'+ object["id"] +'" class="container">'+ shiftColor+title+date+shiftStartTime+shiftEndTime+freeSpacesFormatted+notes+bookBtn +'</div>');
             };
         };
         
