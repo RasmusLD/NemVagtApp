@@ -447,7 +447,7 @@ $(document).ready(function(){
                 //a listener is added after it has been appended to body
             };
 
-            $(body).append('<div id="'+ object["id"] +'" class="container shift" style="border: solid black 1px; margin-bottom: 5vmin;">\
+            $(body).append('<div id="'+ object["id"] +'" class="container shiftTarget shift" style="border: solid black 1px; margin-bottom: 5vmin;">\
                 <div>\
                     '+ title +'\
                     <button style="margin-bottom: 1vmin; margin-right: -1vmin; margin-top: 3vmin;" type="button" class="btn bookedDetailsBtn btn-default readMoreBtn pull-right">Vis mere</button>\
@@ -569,7 +569,7 @@ $(document).ready(function(){
                     shiftColor = '<div style="clear: both; margin-left: -10vmin; heigth: 5px; width: 130%; background-color:'+ object["color"] +';"><br></div>';
                 };
                 
-                $(body).append('<div id="'+ object["id"] +'" class="container shift" style="overflow: hidden; border: solid black 1px; margin-bottom: 5vmin;">\
+                $(body).append('<div id="'+ object["id"] +'" class="container shiftTarget shift" style="overflow: hidden; border: solid black 1px; margin-bottom: 5vmin;">\
                 '+ shiftColor +'\
                     <div>\
                         '+ title +'\
@@ -671,15 +671,16 @@ $(document).ready(function(){
                     bookBtn = '<button class="btn btn-danger bookBtn pull-right margBotBtn" type="button">Afmeld vagt</button>';
                 };
                 
+                //adds a back button to the page, so that people can easily get back. OBS would be nice to navigate to the shift they were just viewing, but I'm not sure how to do this...
+                var backBtn = '<button class="btn btn-default backBtn pull-left margBotBtn">Tilbage</button>';
+                
                 //add the individual parts of the JSON to the append body, so that it can be viewed. Done this way to be easily modifiable...
-                $(body).append('<div id="'+ object["id"] +'" class="container">'+ title+date+startTime+endTime+city+address+roles+notes+bookBtn +'</div>'); //wrap div .container and gove it object["id"] as id, important for book/unbook to work
+                $(body).append('<div id="'+ object["id"] +'" class="shiftTarget">'+ title+date+startTime+endTime+city+address+roles+notes+backBtn+bookBtn +'</div>'); //wrap div .container and gove it object["id"] as id, important for book/unbook to work
                 //sets isBooked to true, letting the function know that it's dealing with a bookedShift as opposed to a possibleShift
                 //isBooked = true; may not need this anymore
             };
         };
         
-        //adds a back button to the page, so that people can easily get back. OBS would be nice to navigate to the shift they were just viewing, but I'm not sure how to do this...
-        $(body).append('<button class="btn btn-default backBtn pull-left margBotBtn">Tilbage</button>');
         //adds a listener/function to the back button
         $(".backBtn").on("click", function() {
             //if(shiftType) {
@@ -793,13 +794,14 @@ $(document).ready(function(){
                     bookBtn = '<button class="btn bookBtn btn-success pull-right margBotBtn" type="button">Tag vagt</button>';
                 };
                 
+                //adds a back button to the page, so that people can easily get back. OBS would be nice to navigate to the shift they were just viewing, but I'm not sure how to do this...
+                var backBtn = '<button class="btn backBtn btn-default pull-left margBotBtn">Tilbage</button>';
+                
                 //add the individual parts of the JSON to the append body, so that it can be viewed. Done this way to be easily modifiable...
-                $(body).append('<div id="'+ object["id"] +'" class="container">'+ shiftColor+title+date+shiftStartTime+shiftEndTime+freeSpacesFormatted+notes+bookBtn +'</div>');
+                $(body).append('<div id="'+ object["id"] +'" class="shiftTarget">'+ shiftColor+title+date+shiftStartTime+shiftEndTime+freeSpacesFormatted+notes+backBtn+bookBtn +'</div>');
             };
         };
         
-        //adds a back button to the page, so that people can easily get back. OBS would be nice to navigate to the shift they were just viewing, but I'm not sure how to do this...
-        $(body).append('<button class="btn backBtn btn-default pull-left margBotBtn">Tilbage</button>');
         //adds a listener/function to the back button
         $(".backBtn").on("click", function() {
                 showPossibleShifts();
@@ -1466,7 +1468,7 @@ $(document).ready(function(){
     function showModalView() {
         
         //takes the button that opened this window, then looks for it's closest container, which is its shift, then gets the shifts id which is equal to its id in the JSON/server
-        var shiftId = $(this).closest(".container").attr("id");
+        var shiftId = $(this).closest(".shiftTarget").attr("id");
         
         $(modalW).append('<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">\
           <div class="modal-dialog">\
