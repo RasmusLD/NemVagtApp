@@ -1091,7 +1091,10 @@ $(document).ready(function(){
                 //check for changes, if none are there, set var changesMade to false
                 var jsonFromStorage = JSON.parse(getFromStorage("savedUserProfile"));
                 var checkForm = $("#userProfileForm").serializeArray();
+                $("#UI_ELEMENT_TEST").append("<p>"+ checkForm.toString() +"</p>");
                 for(var i = 0; i < jsonFromStorage.length; i++) {
+                    $("#UI_ELEMENT_TEST").append("<p>fS: "+ jsonFromStorage[i]["fieldname"] +"</p>");
+                    $("#UI_ELEMENT_TEST").append("<p>fF: "+ checkForm[jsonFromStorage[i]["fieldname"]]["value"] +"</p>");
                     if(checkForm[jsonFromStorage[i]["fieldname"]]["value"] !== jsonFromStorage[i]["value"]) {
                         //sets changesMade to true, telling us a change was made..
                         changesMade = true;
