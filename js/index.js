@@ -602,7 +602,9 @@ $(document).ready(function(){
         //adds a listener to the readMore button, so that it updates all the JSON while people are busy reading about a shifts details... This is on a X(30) second timer
         $(".readMoreBtn").on("click", updateAllListsReadMoreBtnHandler);
         //adds a listener to the unbookShift buttons, so what they can open the modal dialog window, allowing them to unbook the shift
-        $(".container").closest(".container").find(".bookBtn").on("click", showModalView);
+        $(".bookBtn").on("click", function(event) {
+            getRolesBookShift(event);
+        });
         
         //starts an autoupdate timer for the possibleShifts JSON.
         if(jsonUpdatePossibleShiftsObj === undefined) {
@@ -818,7 +820,9 @@ $(document).ready(function(){
                 showPossibleShifts();
         });
         //appends an onClick listener event on the bookBtn
-        $(".bookBtn").on("click", showModalView);
+        $(".bookBtn").on("click", function(event) {
+            getRolesBookShift(event);
+        });
     };
     
 //    function backBtnFunc(isBooked, theShift) {
@@ -898,6 +902,7 @@ $(document).ready(function(){
         
         //adds a listener to the togglebuttons added in createCheckBoxes()
         toggleButtonHandler();
+        
 //        var form = $("#userProfileForm").serialize(); // TEST
 //        $(body).append("FORM-START: "+ form +"; FORM-END"); // TEST
         
@@ -960,7 +965,6 @@ $(document).ready(function(){
         };
         //makes a toggle button, to replace the visual representation of the checkbox
         var toggleBtn = createToggleButton(checked);
-        //menu.append(toggleBtn+"<br><br><br>");
         //returns the formatted form.
         return '<div class="checkbox userProfileElement"><label hidden><input hidden type="checkbox" '+ checked +' id="'+ object["fieldname"] +'" name="'+ object["fieldname"] +'" value="1">'+ object["showname"] +'</label> '+ toggleBtn +' <label>'+ object["showname"] +'</label></div>';
     };
@@ -1188,7 +1192,7 @@ $(document).ready(function(){
     //if we get the data locally, we notify the user.
     //Requires a string location where we want to save the data, a string telling us where we are and the data from the ajax call.
     function ajaxSuccesEvaluator(saveLocation, whereAreWe, data) {
-        if(data !== undefined){ //if succcess was reached in the postAJAXCall function, "data" is returned...
+        if(data !== undefined && data !== "") { //if succcess was reached in the postAJAXCall function, "data" is returned...
             //save the data to local storage, so it can be reused w/o having to make the AJAX call again
             saveToStorage(saveLocation , JSON.stringify(data));
             return data;
@@ -1475,32 +1479,51 @@ $(document).ready(function(){
         showLogin();
     };
     
-    //is used to show the modal window when trying to book/unbook
-    function showModalView() {
+    //is used to show the modal window when trying to book/unbook, if booking a shift, the function needs a string containing a form with roles
+    function showModalView(rolesFormStringBookShift) {
         
         //takes the button that opened this window, then looks for it's closest container, which is its shift, then gets the shifts id which is equal to its id in the JSON/server
         var shiftId = $(this).closest(".shiftTarget").attr("id");
         
-        $(modalW).append('<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">\
-          <div class="modal-dialog">\
-            <div class="modal-content">\
-              <div class="modal-header">\
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\
-                <h4 class="modal-title" id="myModalLabel">Modal title</h4>\
-              </div>\
-              <div class="modal-body">\
-                Er du sikker?\
-              </div>\
-              <div class="modal-footer">\
-                <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Nej</button>\
-                <button id="'+ shiftId +'" type="button" class="btn modalYesBtn btn-default btn-lg">Ja</button>\
-              </div>\
-            </div>\
-          </div>\
-        </div>');
-        
         //gets the title of the modal off of the btn
         var title = $(this).html(); //if we want to use icons instead of text on the buttons, simply use an "if" to check what is written and assign "title" a value based on that...
+        
+        //if we want to give the user the option of unbooking a shift
+        if(title==="Afmeld vagt") {
+            $(modalW).append('<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">\
+              <div class="modal-dialog">\
+                <div class="modal-content">\
+                  <div class="modal-header">\
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\
+                    <h4 class="modal-title" id="myModalLabel">Modal title</h4>\
+                  </div>\
+                  <div class="modal-body">\
+                    Er du sikker?\
+                  </div>\
+                  <div class="modal-footer">\
+                    <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Nej</button>\
+                    <button id="'+ shiftId +'" type="button" class="btn modalYesBtn btn-default btn-lg">Ja</button>\
+                  </div>\
+                </div>\
+              </div>\
+            </div>');
+        }else if(title==="Tilmeld vagt") { //if we want to give people the option of booking a shift
+            $(modalW).append('<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">\
+              <div class="modal-dialog">\
+                <div class="modal-content">\
+                  <div class="modal-header">\
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\
+                    <h4 class="modal-title" id="myModalLabel">Modal title</h4>\
+                  </div>\
+                  <div class="modal-body">\
+                    '+ rolesFormStringBookShift +'\
+                    <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Nej</button>\
+                  </div>\
+                </div>\
+              </div>\
+            </div>');
+        };
+        
         //defines the setup changes of the modal, show===true so the modal is shown
         var options = {show: true};
         //applies the changes defined in var options
@@ -1512,7 +1535,9 @@ $(document).ready(function(){
         if(title==="Afmeld vagt") { //this derives from the text on the button, could maybe be done better?
             $(".modalYesBtn").on("click", unbookShift);
         }else if(title==="Tilmeld vagt") { //this derives from the text on the button, could maybe be done better?
-            $(".modalYesBtn").on("click", bookShift);
+            $(".modalYesBtn").on("click", function(event) {
+                bookShift(event);
+            });
         };
         
         //makes the "yes" button close the modal window
@@ -1613,10 +1638,94 @@ $(document).ready(function(){
             };
         }, 100);
     };
-    //books a shift, may be called from the modal windows opened through both Details and showPossibleShifts
-    function bookShift() {
-        //$("body").append("<p>bookShift was called</p>");
+    
+    //makes an ajaxCall that does the actual booking of the shift, may be called from the modal windows opened through both Details and showPossibleShifts
+    function bookShift(event) {
+        event.preventDefault();
+        
+        //takes the button that opened this window, then looks for it's closest container, which is its shift, then gets the shifts id which is equal to its id in the JSON/server
+        var shiftId = $(this).closest(".shiftTarget").attr("id");
+        //get the form from the modal window
+        var form = $(this).closest(".shiftTarget").serialize();
+        
+        //this is called to make sure a potential modal window starts closing, the timeouts further down in the code are there to give the different modals opened time to close
+        modalW.empty();
+        setTimeout(function() {
+            if(checkConnection()) {
+                //what to post, it's the id of the shift in question
+                var infoArr = {shiftid:shiftId}; //also add the serialized form contained in the var "form"
+                //create the url, to post to
+                var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_XXX";
+                
+                //get the roles which we can pick(if any) and freeSpaces
+                var ajaxCall = postAJAXCall(url, infoArr);
+                
+                ajaxCall.done(function() {
+                    //if(data[succes]) {
+                    //
+                    //}else {
+                    //notify user of failure...
+                    //};
+                });
+            }else {
+                //notify user of missing conenction
+                setTimeout(function() {
+                    showModalViewAccept("Ingen internet forbindelse", "Der er ingen forbindelse til internettet, det er derfor ikke muligt af tilmelde dig vagten.<br>Opret forbindelse til internettet og prøv igen.");
+                }, 100);
+            };
+        }, 100);
+        
     };
+    //a function which is called when people try to book a shift
+    function getRolesBookShift(event) {
+        event.preventDefault();
+        //takes the button that opened this window, then looks for it's closest container, which is its shift, then gets the shifts id which is equal to its id in the JSON/server
+        var shiftId = $(this).closest(".shiftTarget").attr("id");
+        //this is called to make sure a potential modal window starts closing, the timeouts further down in the code are there to give the different modals opened time to close
+        modalW.empty();
+        setTimeout(function() {
+            if(checkConnection()) {
+                //what to post, it's the id of the shift in question
+                var infoArr = {shiftid:shiftId};
+                //create the url, to post to
+                var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_XXX";
+                
+                //get the roles which we can pick(if any) and freeSpaces
+                var ajaxCall = postAJAXCall(url, infoArr);
+                
+                //we may need to make some kind of check on the data, BEFORE we go on to iterating through it... like "if(data["succes"])", but it depends on the API
+                
+                //iterate through the data we got with roles then make a string containing a form and open a modal and parse it the string
+                ajaxCall.done(function(data) {
+                    //in these functions we open the modal with the form in it... when okay is pressed in that window: submit; Can this be used to hold/submit form: ?showModalView?
+                    
+                    //create the form string we'll be submitting
+                    var rolePickForm = '<form id="'+ shiftId +'" class="form-group shiftTarget" role="form" method="post" action="">'; //we may not hvae any reason to give this the shift id, if not then it doesn't need the .shiftTarget
+                    
+                    for(var i = 0; i < data.length; i++) {
+                        var object = data[i];
+                        for(var property in object) {
+                            rolePickForm += '<input type="radio" name="roles" value="'+ object["required indentifier"] +'" checked>'+ object[property] +'<br>';
+                        };
+                    };
+                    
+                    //append a submit btn to the form
+                    rolePickForm += '<button type="submit" class="btn modalYesBtn btn-success btn-lg">Tag vagt</button>';
+                    //close form
+                    rolePickForm += '</form>';
+                    //opens the modal and parses it the string with the form...
+                    showModalView(rolePickForm);
+                });
+            }else {
+                //notify user of missing conenction
+                setTimeout(function() {
+                    showModalViewAccept("Ingen internet forbindelse", "Der er ingen forbindelse til internettet, det er derfor ikke muligt af tilmelde dig vagten.<br>Opret forbindelse til internettet og prøv igen.");
+                }, 100);
+            };
+        }, 100);
+        
+    };
+    
     //a function which is called from unbookShift and bookShift, it deletes a shift from appropriate list in localStorage and calls the appropriate "populate" method with the new data
     function deleteShiftFromLocalStorage(id, saveLocation) { //pretty sure the way I delete is wrong...
         var storedJSON = JSON.parse(getFromStorage(saveLocation));
@@ -1690,7 +1799,7 @@ $(document).ready(function(){
         $('.btn-toggle').on("click", function(event) {
             event.preventDefault();
             
-            //this doesn't work, but I'm trying to grab the nearest checkbox and add/remove the checked prop...
+            //grabs the nearest checkbox and add/remove the checked prop...
             var checkbox = $(this).closest(".checkbox").find("input");
             checkbox.prop("checked", !checkbox.prop("checked"));
             
