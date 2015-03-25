@@ -1094,16 +1094,13 @@ $(document).ready(function(){
 
                 for(var i = 0; i < checkForm.length; i++) {
                     for(var x = 0; x < jsonFromStorage.length; x++) {
-                        var toCheck = $.grep(jsonFromStorage[x], function() {
-                            return jsonFromStorage[x]["fieldname"] === checkForm[i]["name"];
-                        });
+                        
                         $("#UI_ELEMENT_TEST").append("<p>fSfn: "+ jsonFromStorage[x]["fieldname"] +"</p>");
                         $("#UI_ELEMENT_TEST").append("<p>fSv: "+ jsonFromStorage[x]["value"] +"</p>");
                         $("#UI_ELEMENT_TEST").append("<p>fFn: "+ checkForm[i]["name"] +"</p>");
                         $("#UI_ELEMENT_TEST").append("<p>fFv"+ checkForm[i]["value"] +"</p>");
-                        $("#UI_ELEMENT_TEST").append("<p>tCv: "+ toCheck["value"] +"</p>");
                         
-                        if(toCheck["value"] !== checkForm[i]["value"]) {
+                        if(jsonFromStorage[x]["fieldname"] === checkForm[i]["name"] && jsonFromStorage[x]["value"] !== checkForm[i]["value"]) {
                             changesMade = true;
                         };
                     };
