@@ -1087,18 +1087,20 @@ $(document).ready(function(){
                 //make the form into a string, so I can POST it as such
                 var form = $("#userProfileForm").serialize();
                 
-                var changesMade = false;
-                //check for changes, if none are there, set var changesMade to false
+                //these are used to check for changes in the userProfile...
                 var jsonFromStorage = JSON.parse(getFromStorage("savedUserProfile"));
                 var checkForm = $("#userProfileForm").serializeArray();
-
+                //a var that we use to tell if there's been a change in the user profile
+                var changesMade = false;
+                //check for changes, if none are there, set var changesMade to false
                 for(var i = 0; i < checkForm.length; i++) {
                     for(var x = 0; x < jsonFromStorage.length; x++) {
                         
-                        $("#UI_ELEMENT_TEST").append("<p>fSfn: "+ jsonFromStorage[x]["fieldname"] +"</p>");
-                        $("#UI_ELEMENT_TEST").append("<p>fSv: "+ jsonFromStorage[x]["value"] +"</p>");
-                        $("#UI_ELEMENT_TEST").append("<p>fFn: "+ checkForm[i]["name"] +"</p>");
-                        $("#UI_ELEMENT_TEST").append("<p>fFv"+ checkForm[i]["value"] +"</p>");
+                        //Test that can show the key/value pairs and demonstrates that we DO actually break when we find a change...
+//                        $("#UI_ELEMENT_TEST").append("<p>fSfn: "+ jsonFromStorage[x]["fieldname"] +"</p>");
+//                        $("#UI_ELEMENT_TEST").append("<p>fSv: "+ jsonFromStorage[x]["value"] +"</p>");
+//                        $("#UI_ELEMENT_TEST").append("<p>fFn: "+ checkForm[i]["name"] +"</p>");
+//                        $("#UI_ELEMENT_TEST").append("<p>fFv"+ checkForm[i]["value"] +"</p>");
                         
                         if(jsonFromStorage[x]["fieldname"] === checkForm[i]["name"] && jsonFromStorage[x]["value"] !== checkForm[i]["value"]) {
                             changesMade = true;
