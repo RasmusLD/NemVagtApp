@@ -1075,8 +1075,7 @@ $(document).ready(function(){
     };
     //if can submit===true, make an ajax submission, else, notify user
     function submitUserProfile(canSubmit) {
-        //prevent the default(synchronous) POST, is already done in isRequiredFieldEmpty
-        //$(this).preventDefault();
+        //prevention of the default(synchronous) POST, is already done in isRequiredFieldEmpty
         
         //if all required fields are filled and we have an internet connection
         if(canSubmit) {
