@@ -1091,20 +1091,18 @@ $(document).ready(function(){
                 //check for changes, if none are there, set var changesMade to false
                 var jsonFromStorage = JSON.parse(getFromStorage("savedUserProfile"));
                 var checkForm = $("#userProfileForm").serializeArray();
-//                $("#UI_ELEMENT_TEST").append("<p>"+ checkForm.toString() +"</p>");
-//                for(var i = 0; i < jsonFromStorage.length; i++) {
-//                    $("#UI_ELEMENT_TEST").append("<p>fS: "+ jsonFromStorage[i]["fieldname"] +"</p>");
-//                    $("#UI_ELEMENT_TEST").append("<p>fF: "+ checkForm[i][jsonFromStorage[i]["fieldname"]]["value"] +"</p>");
-//                    if(checkForm[jsonFromStorage[i]["fieldname"]]["value"] !== jsonFromStorage[i]["value"]) {
-//                        //sets changesMade to true, telling us a change was made..
-//                        changesMade = true;
-//                    };
-//                };
+
                 for(var i = 0; i < checkForm.length; i++) {
                     for(var x = 0; x < jsonFromStorage.length; x++) {
                         var toCheck = $.grep(jsonFromStorage[x], function() {
                             return jsonFromStorage[x]["fieldname"] === checkForm[i]["name"];
                         });
+                        $("#UI_ELEMENT_TEST").append("<p>fSfn: "+ jsonFromStorage[x]["fieldname"] +"</p>");
+                        $("#UI_ELEMENT_TEST").append("<p>fSv: "+ jsonFromStorage[x]["value"] +"</p>");
+                        $("#UI_ELEMENT_TEST").append("<p>fFn: "+ checkForm[i]["name"] +"</p>");
+                        $("#UI_ELEMENT_TEST").append("<p>fFv"+ checkForm[i]["value"] +"</p>");
+                        $("#UI_ELEMENT_TEST").append("<p>tCv: "+ toCheck["value"] +"</p>");
+                        
                         if(toCheck["value"] !== checkForm[i]["value"]) {
                             changesMade = true;
                         };
