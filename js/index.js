@@ -1103,41 +1103,50 @@ $(document).ready(function(){
                         if(jsonFromStorage[x]["fieldname"] === checkForm[i]["name"] && jsonFromStorage[x]["value"] !== checkForm[i]["value"]) {
                             changesMade = true;
                         };
+                        if(changesMade === true) {
+                            break;
+                        };
+                    };
+                    if(changesMade === true) {
+                        break;
                     };
                 };
-                
+                //if a change was made in the form, let the user submit it
                 if(changesMade){
-                    var formattedPswHash = getFromStorage("pswHash");
+                    modalW.empty();
+                    setTimeout(function() {
+                        var formattedPswHash = getFromStorage("pswHash");
 
-                    var userid = getFromStorage("userId");
+                        var userid = getFromStorage("userId");
 
-                    var ajaxQuery = $.ajax({
-                        type: "POST",
-                        url: "https://"+ domain + ".nemvagt.dk/ajax/app_saveuserprofile",
-                        dataType: "text",
-                        data: form +"&pswhash="+ formattedPswHash +"&userid="+ userid
-                    });
-                    //after the submit, refesh the page, it's needed because of how we handle checkbox submission (see: isRequiredFieldEmpty)
-                    ajaxQuery.done(function(data) {
-                        //receives an answer from the server a json formatted string with succes:true/false
-                        var json = JSON.parse(data);
-                        if(json["succes"]) { //if succes===true
-                            //refresh
-                            showUserProfile();
-                        }else { //if succes was anything but true
-                            //clean up
-                            modalW.empty();
-                            body.empty();
+                        var ajaxQuery = $.ajax({
+                            type: "POST",
+                            url: "https://"+ domain + ".nemvagt.dk/ajax/app_saveuserprofile",
+                            dataType: "text",
+                            data: form +"&pswhash="+ formattedPswHash +"&userid="+ userid
+                        });
+                        //after the submit, refesh the page, it's needed because of how we handle checkbox submission (see: isRequiredFieldEmpty)
+                        ajaxQuery.done(function(data) {
+                            //receives an answer from the server a json formatted string with succes:true/false
+                            var json = JSON.parse(data);
+                            if(json["succes"]) { //if succes===true
+                                //refresh
+                                showUserProfile();
+                            }else { //if succes was anything but true
+                                //clean up
+                                modalW.empty();
+                                body.empty();
 
-                            //refresh from storage
-                            populateUserProfile(JSON.parse(getFromStorage("savedUserProfile")));
+                                //refresh from storage
+                                populateUserProfile(JSON.parse(getFromStorage("savedUserProfile")));
 
-                            //timeout is there to make sure the previous modal, from ajaxWatch has time to "un-animate", as it seems that if I dont do that, the "remove this modal view when a modal view becomes hidden" triggers from the other window being removed...
-                            setTimeout(function() {
-                                showModalViewAccept("Fejl", "Bruger Profilen blev ikke opdateret, dette kan være fordi du har forsøgt at gemme den uden at foretage en ændring.");
-                            }, 100);
-                        };
-                    });
+                                //timeout is there to make sure the previous modal, from ajaxWatch has time to "un-animate", as it seems that if I dont do that, the "remove this modal view when a modal view becomes hidden" triggers from the other window being removed...
+                                setTimeout(function() {
+                                    showModalViewAccept("Fejl", "Bruger Profilen blev ikke opdateret, dette kan være fordi du har forsøgt at gemme den uden at foretage en ændring.");
+                                }, 100);
+                            };
+                        });
+                    }, 100);
                 }else {
                     setTimeout(function() {
                         showModalViewAccept("Ingen ændring", "Der er ingen ændringer foretaget i din Brugerprofil og der er derfor ingen grund til at opdatere den.");
@@ -1149,7 +1158,7 @@ $(document).ready(function(){
                     showModalViewAccept("Manglende netværksforbindelse", "Der er ingen netværksforbindelse og det er derfor ikke muligt at opdatere din profil.");
                 }, 100);
             };
-        };//if a change was made in the form, let the user submit it
+        };
     };
     
     /*//we need to show the Organisations a User is affiliated with.
