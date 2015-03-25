@@ -1083,48 +1083,65 @@ $(document).ready(function(){
             if(checkConnection()) {
                 //retrieve the domain from localStorage
                 var domain = getFromStorage("domain");
-
-                //make the form into a string, so I can POST is as such, in accordance with my agreement with Mark
+                
+                //make the form into a string, so I can POST it as such
                 var form = $("#userProfileForm").serialize();
-
-                var formattedPswHash = getFromStorage("pswHash");
-
-                var userid = getFromStorage("userId");
-
-                var ajaxQuery = $.ajax({
-                    type: "POST",
-                    url: "https://"+ domain + ".nemvagt.dk/ajax/app_saveuserprofile",
-                    dataType: "text",
-                    data: form +"&pswhash="+ formattedPswHash +"&userid="+ userid
-                });
-                //after the submit, refesh the page, it's needed because of how we handle checkbox submission (see: isRequiredFieldEmpty)
-                ajaxQuery.done(function(data) {
-                    //receives an answer from the server a json formatted string with succes:true/false
-                    var json = JSON.parse(data);
-                    if(json["succes"]) { //if succes===true
-                        //refresh
-                        showUserProfile();
-                    }else { //if succes was anything but true
-                        //clean up
-                        modalW.empty();
-                        body.empty();
-
-                        //refresh from storage
-                        populateUserProfile(JSON.parse(getFromStorage("savedUserProfile")));
-
-                        //timeout is there to make sure the previous modal, from ajaxWatch has time to "un-animate", as it seems that if I dont do that, the "remove this modal view when a modal view becomes hidden" triggers from the other window being removed...
-                        setTimeout(function() {
-                            showModalViewAccept("Fejl", "Bruger Profilen blev ikke opdateret");
-                        }, 100);
+                
+                var changesMade = false;
+                //check for changes, if none are there, set var changesMade to false
+                var jsonFromStorage = JSON.parse(getFromStorage("savedUserProfile"));
+                var checkForm = $("#userProfileForm").serializeArray();
+                for(var i = 0; i < jsonFromStorage.length; i++) {
+                    if(checkForm[jsonFromStorage[i]["fieldname"]]["value"] !== jsonFromStorage[i]["value"]) {
+                        //sets changesMade to true, telling us a change was made..
+                        changesMade = true;
                     };
-                });
+                };
+                
+                if(changesMade){
+                    var formattedPswHash = getFromStorage("pswHash");
+
+                    var userid = getFromStorage("userId");
+
+                    var ajaxQuery = $.ajax({
+                        type: "POST",
+                        url: "https://"+ domain + ".nemvagt.dk/ajax/app_saveuserprofile",
+                        dataType: "text",
+                        data: form +"&pswhash="+ formattedPswHash +"&userid="+ userid
+                    });
+                    //after the submit, refesh the page, it's needed because of how we handle checkbox submission (see: isRequiredFieldEmpty)
+                    ajaxQuery.done(function(data) {
+                        //receives an answer from the server a json formatted string with succes:true/false
+                        var json = JSON.parse(data);
+                        if(json["succes"]) { //if succes===true
+                            //refresh
+                            showUserProfile();
+                        }else { //if succes was anything but true
+                            //clean up
+                            modalW.empty();
+                            body.empty();
+
+                            //refresh from storage
+                            populateUserProfile(JSON.parse(getFromStorage("savedUserProfile")));
+
+                            //timeout is there to make sure the previous modal, from ajaxWatch has time to "un-animate", as it seems that if I dont do that, the "remove this modal view when a modal view becomes hidden" triggers from the other window being removed...
+                            setTimeout(function() {
+                                showModalViewAccept("Fejl", "Bruger Profilen blev ikke opdateret, dette kan være fordi du har forsøgt at gemme den uden at foretage en ændring.");
+                            }, 100);
+                        };
+                    });
+                }else {
+                    setTimeout(function() {
+                        showModalViewAccept("Ingen ændring", "Der er ingen ændringer foretaget i din Brugerprofil og der er derfor ingen grund til at opdatere den.");
+                    }, 100);
+                };
             }else {
                 //timeout is there to make sure the previous modal, from ajaxWatch has time to "un-animate", as it seems that if I dont do that, the "remove this modal view when a modal view becomes hidden" triggers from the other window being removed...
                 setTimeout(function() {
                     showModalViewAccept("Manglende netværksforbindelse", "Der er ingen netværksforbindelse og det er derfor ikke muligt at opdatere din profil.");
                 }, 100);
             };
-        };
+        };//if a change was made in the form, let the user submit it
     };
     
     /*//we need to show the Organisations a User is affiliated with.
@@ -1624,7 +1641,7 @@ $(document).ready(function(){
                             //calls deleteShiftFromLocalStorage, which takes an id(what to delete) and a saveLocation(where to delete it from AND the context of the call, fx unbookShift)
                             deleteShiftFromLocalStorage(theId, "savedBookedShifts");
                         }, 100);
-                    }else {
+                    }else { //notify user of failure
                         setTimeout(function() {
                             showModalViewAccept("Fejl", "Det var ikke muligt at afmelde dig vagten.");
                         }, 100);
@@ -1653,18 +1670,20 @@ $(document).ready(function(){
         setTimeout(function() {
             if(checkConnection()) {
                 //what to post, it's the id of the shift in question
-                var infoArr = {shiftid:shiftId}; //also add the serialized form contained in the var "form"
+                var toPost = "shiftid="+ shiftId +"&"; //also add the serialized form contained in the var "form", make sure the name of the id is right.
                 //create the url, to post to
                 var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_XXX";
                 
                 //get the roles which we can pick(if any) and freeSpaces
-                var ajaxCall = postAJAXCall(url, infoArr);
+                var ajaxCall = postAJAXCall(url, toPost);
                 
                 ajaxCall.done(function() {
-                    //if(data[succes]) {
+                    //if(data[succes]) {    //look for inspiration in the corresponding function in unbookShift
                     //
-                    //}else {
-                    //notify user of failure...
+                    //}else { //notify user of failure
+                    //setTimeout(function() {
+                    //        showModalViewAccept("Fejl", "Det var ikke muligt at tilmelde dig vagten.");
+                    //    }, 100);
                     //};
                 });
             }else {
