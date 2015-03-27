@@ -46,7 +46,9 @@
     text-transform:uppercase;
     width:100%;
 }*/
-
+#bCont {
+    overflow: auto;
+}
 .btn {
     outline: none !important;
 }
