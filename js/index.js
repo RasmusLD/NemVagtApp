@@ -84,6 +84,9 @@ $(document).ready(function(){
         //creates listeners for ajaxStart/ajaxStop
         ajaxWatch = ajaxWatch();
         
+        //removes the large logo, shown on app startup
+        $("#sCont").empty();
+        
         //instantiates the UI
         hasSavedLogin();
         
@@ -1620,45 +1623,45 @@ $(document).ready(function(){
                 //create the url, to post to
                 var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_rejectshift";
                 
-                infoArr.pswhash = getFromStorage("pswHash");
-        
-                infoArr.userid = getFromStorage("userId");
+//                infoArr.pswhash = getFromStorage("pswHash");
+//        
+//                infoArr.userid = getFromStorage("userId");
                 
-                //var ajaxCall = postAJAXCall(url, infoArr);
+                var ajaxCall = postAJAXCall(url, infoArr);
                 
-                var ajaxCall = $.ajax({
-                    type: "POST",
-                    url: url,
-                    dataType: "text",
-                    data: infoArr
-                });
-                ajaxCall.fail(function(data) {
-                    $("#UI_ELEMENT_TEST").append("<p>Fail: "+ data +"</p>");
-                });
-                
+//                var ajaxCall = $.ajax({
+//                    type: "POST",
+//                    url: url,
+//                    dataType: "text",
+//                    data: infoArr
+//                });
+//                ajaxCall.fail(function(data) {
+//                    $("#UI_ELEMENT_TEST").append("<p>Fail: "+ data +"</p>");
+//                });
+//                
                 ajaxCall.done(function(data) {
-                    $("#UI_ELEMENT_TEST").append("<p>Done: "+ data +"</p>");
-                    try{
-                        JSON.parse(data);
-                    }catch(e){
-                        $("#UI_ELEMENT_TEST").append("<p>Done: trying to JSON.parse data FAILED</p>");
-                    };
+//                    $("#UI_ELEMENT_TEST").append("<p>Done: "+ data +"</p>");
+//                    try{
+//                        JSON.parse(data);
+//                    }catch(e){
+//                        $("#UI_ELEMENT_TEST").append("<p>Done: trying to JSON.parse data FAILED</p>");
+//                    };
 //                    for(var prop in data) {
 //                        $("#UI_ELEMENT_TEST").append("<p>"+ prop +": "+ data[prop] +"</p>");
 //                    };
                     //data will be true/false, as success/failure
-//                    if(data["succes"]) {
-//                        setTimeout(function() {
-//                            showModalViewAccept("Succes", "Vagten er nu afvist");
-//
-//                            //calls deleteShiftFromLocalStorage, which takes an id(what to delete) and a saveLocation(where to delete it from AND the context of the call, fx unbookShift)
-//                            deleteShiftFromLocalStorage(theId, "savedPossibleShifts");
-//                        }, 100);
-//                    }else { //notify user of failure
-//                        setTimeout(function() {
-//                            showModalViewAccept("Fejl", "Det var ikke muligt at afvise vagten.");
-//                        }, 100);
-//                    };
+                    if(data["succes"]) {
+                        setTimeout(function() {
+                            showModalViewAccept("Succes", "Vagten er nu afvist");
+
+                            //calls deleteShiftFromLocalStorage, which takes an id(what to delete) and a saveLocation(where to delete it from AND the context of the call, fx unbookShift)
+                            deleteShiftFromLocalStorage(theId, "savedPossibleShifts");
+                        }, 100);
+                    }else { //notify user of failure
+                        setTimeout(function() {
+                            showModalViewAccept("Fejl", "Det var ikke muligt at afvise vagten.");
+                        }, 100);
+                    };
                 });
             }else {
                 //notify user of missing conenction
