@@ -38,7 +38,9 @@ var app = {
     },
     // Update DOM on a Received Event
     receivedEvent: function() {
-        phonegapReady();
+        setTimeout(function() {
+            phonegapReady();
+        }, 3000);
     }
 };
 
@@ -392,7 +394,7 @@ $(document).ready(function(){
             //adds a button to unbook the shift to the shift, if the option is provided
             var unbookBtn = '';
             if(object["allowdelete"] === true) {
-                unbookBtn = '<button class="btn btn-danger pull-right margBotBtn unbookBtn" style="margin-right: -1vmin;">Afmeld vagt</button>'; //kendte/havde Mark måske et wastebasket/trashcan icon?
+                unbookBtn = '<button class="btn btn-danger pull-right margBotBtn unBookBtn" style="margin-right: -1vmin;">Afmeld vagt</button>'; //kendte/havde Mark måske et wastebasket/trashcan icon?
                 //a listener is added after it has been appended to body
             };
 
@@ -415,7 +417,7 @@ $(document).ready(function(){
         //adds a listener to the readMore button, so that it updates all the JSON while people are busy reading about a shifts details... THIS MEANS SEVERAL AJAX CALLS MAY BE MADE IN A VERY SHORT TIME, ONCE AFTER THE OTHER, IT MIGHT BE PRUDENT TO FIND A SOLUTION FOR THIS
         $(".readMoreBtn").on("click", updateAllListsReadMoreBtnHandler);
         //adds a listener to the unbookShift buttons, so what they can open the modal dialog window, allowing them to unbook the shift
-        $(".unbookBtn").on("click", showModalView);
+        $(".unBookBtn").on("click", showModalView);
         
         //starts an autoupdate timer for the myShifts JSON.
         if(jsonUpdateMyShiftsObj === undefined) {
@@ -515,7 +517,7 @@ $(document).ready(function(){
                 //if people can remove the shift from their list of shifts, give them a button to do so...
                 var allowNoThanks = '';
                 if(object["allownothanks"]) {
-                    allowNoThanks = '<button style="margin-bottom: 1vmin; margin-right: -1vmin; margin-top: 3vmin;" type="button" class="btn btn-default noThanksBtn pull-left">Afvis</button>';
+                    allowNoThanks = '<button type="button" class="btn btn-default margBotBtn noThanksBtn pull-left">Afvis</button>';
                 };
                 
                 //gives the shift a color type, if it has one
@@ -626,16 +628,16 @@ $(document).ready(function(){
                 };
                 
                 //creates a bookBtn
-                var bookBtn = '';
+                var unBookBtn = '';
                 if(allowDelete === true) {
-                    bookBtn = '<button class="btn btn-danger bookBtn pull-right margBotBtn" type="button">Afmeld vagt</button>';
+                    unBookBtn = '<button class="btn btn-danger unBookBtn pull-right margBotBtn" type="button">Afmeld vagt</button>';
                 };
                 
                 //adds a back button to the page, so that people can easily get back. OBS would be nice to navigate to the shift they were just viewing, but I'm not sure how to do this...
                 var backBtn = '<button class="btn btn-default backBtn pull-left margBotBtn">Tilbage</button>';
                 
                 //add the individual parts of the JSON to the append body, so that it can be viewed. Done this way to be easily modifiable...
-                $(body).append('<div id="'+ object["id"] +'" class="shiftTarget">'+ title+date+startTime+endTime+city+address+roles+notes+backBtn+bookBtn +'</div>'); //wrap div .container and gove it object["id"] as id, important for book/unbook to work
+                $(body).append('<div id="'+ object["id"] +'" class="shiftTarget">'+ title+date+startTime+endTime+city+address+roles+notes+backBtn+unBookBtn +'</div>'); //wrap div .container and gove it object["id"] as id, important for book/unbook to work
                 //sets isBooked to true, letting the function know that it's dealing with a bookedShift as opposed to a possibleShift
                 //isBooked = true; may not need this anymore
             };
@@ -662,7 +664,7 @@ $(document).ready(function(){
         });
         //if allow delete is true, append an onclick listener, the conditional is there to make sure we only append if there is a btn
         if(allowDelete === true) {
-            $(".bookBtn").on("click", showModalView);
+            $(".unBookBtn").on("click", showModalView);
         };
         
     };
@@ -719,7 +721,7 @@ $(document).ready(function(){
                 };
                 //if notes aren't null or "", var notes = notes from JSON
                 if(object["shiftnotes"] !== undefined && object["shiftnotes"] !== "" && object["shiftnotes"] !== null) {
-                    notes = "<label for=\"notesField\">"+ "Noter fra administrator" +":</label> <div id=\"notesField\" class=\"shift\" style=\"padding:2vmin; margin-bottom:3vmin; border:solid black 1px\"><p>"+ object["shiftnotes"] +"</p></div>";
+                    notes = "<label for=\"notesField\">"+ "Noter fra den vagtskema anvarlige" +":</label> <div id=\"notesField\" class=\"shift\" style=\"padding:2vmin; margin-bottom:3vmin; border:solid black 1px\"><p>"+ object["shiftnotes"] +"</p></div>";
                 };
                 //gives the shift a color type, if it has one
                 if(object["color"] !== undefined && object["color"] !== null && object["label"] !== undefined && object["label"] !== null) {
@@ -748,7 +750,7 @@ $(document).ready(function(){
                     $(body).append('<h1 class="page-header">Detaljer for vagten:</h1>');
                 };
                 
-                //makes sure whether or not you can take the shift, if you can, show a bookBtn
+                //makes sure whether or not you can take the shift, if you can, then show a bookBtn
                 var bookBtn = '';
                 if(freeSpaces > 0) { //button should also submit info from your choice of roles, if present...
                     bookBtn = '<button class="btn bookBtn btn-success pull-right margBotBtn" type="button">Tag vagt</button>';
@@ -757,7 +759,7 @@ $(document).ready(function(){
                 //if people can remove the shift from their list of shifts, give them a button to do so...
                 var allowNoThanks = '';
                 if(object["allownothanks"]) {
-                    allowNoThanks = '<button style="margin-bottom: 1vmin; margin-right: -1vmin; margin-top: 3vmin;" type="button" class="btn btn-default noThanksBtn pull-left">Afvis</button>';
+                    allowNoThanks = '<button style="margin-left:2vmin;" type="button" class="btn btn-default noThanksBtn pull-left">Afvis</button>';
                 };
                 
                 //adds a back button to the page, so that people can easily get back. OBS would be nice to navigate to the shift they were just viewing, but I'm not sure how to do this...
@@ -776,6 +778,7 @@ $(document).ready(function(){
         $(".bookBtn").on("click", function(event) {
             getRolesBookShift(event);
         });
+        //adds a listener on the noThanksBtn
         $(".noThanksBtn").on("click", showModalView);
     };
     
@@ -1466,11 +1469,24 @@ $(document).ready(function(){
         //takes the button that opened this window, then looks for it's closest container, which is its shift, then gets the shifts id which is equal to its id in the JSON/server
         var shiftId = $(this).closest(".shiftTarget").attr("id");
         
+        var title = '';
+        var whereAreWe = ''; // 1===unbook; 2===book; 3===reject;
+        if($(this).hasClass("unBookBtn")) {
+            title = "Afmeld vagt";
+            whereAreWe = 1;
+        }else if($(this).hasClass("bookBtn")) {
+            title = "Tilmed vagt";
+            whereAreWe = 2;
+        }else if($(this).hasClass("noThanksBtn")) {
+            title = "Afvis";
+            whereAreWe = 3;
+        };
+        
         //gets the title of the modal off of the btn
         var title = $(this).html(); //if we want to use icons instead of text on the buttons, simply use an "if" to check what is written and assign "title" a value based on that...
         
         //if we want to give the user the option of unbooking a shift
-        if(title==="Afmeld vagt") {
+        if(whereAreWe === 1) {
             $(modalW).append('<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">\
               <div class="modal-dialog">\
                 <div class="modal-content">\
@@ -1488,7 +1504,7 @@ $(document).ready(function(){
                 </div>\
               </div>\
             </div>');
-        }else if(title==="Tilmeld vagt") { //if we want to give people the option of booking a shift
+        }else if(whereAreWe === 2) { //if we want to give people the option of booking a shift
             $(modalW).append('<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">\
               <div class="modal-dialog">\
                 <div class="modal-content">\
@@ -1503,7 +1519,7 @@ $(document).ready(function(){
                 </div>\
               </div>\
             </div>');
-        }else if(title==="Afvis") {
+        }else if(whereAreWe === 3) { //if we want to give people the option of saying "noThanks" to a shift
             $(modalW).append('<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">\
               <div class="modal-dialog">\
                 <div class="modal-content">\
@@ -1604,21 +1620,45 @@ $(document).ready(function(){
                 //create the url, to post to
                 var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_rejectshift";
                 
-                var ajaxCall = postAJAXCall(url, infoArr);
+                infoArr.pswhash = getFromStorage("pswHash");
+        
+                infoArr.userid = getFromStorage("userId");
+                
+                //var ajaxCall = postAJAXCall(url, infoArr);
+                
+                var ajaxCall = $.ajax({
+                    type: "POST",
+                    url: url,
+                    dataType: "text",
+                    data: infoArr
+                });
+                ajaxCall.fail(function(data) {
+                    $("#UI_ELEMENT_TEST").append("<p>Fail: "+ data +"</p>");
+                });
+                
                 ajaxCall.done(function(data) {
-                    //data will be true/false, as success/failure
-                    if(data["succes"]) {
-                        setTimeout(function() {
-                            showModalViewAccept("Succes", "Vagten er nu afvist");
-
-                            //calls deleteShiftFromLocalStorage, which takes an id(what to delete) and a saveLocation(where to delete it from AND the context of the call, fx unbookShift)
-                            deleteShiftFromLocalStorage(theId, "savedPossibleShifts");
-                        }, 100);
-                    }else { //notify user of failure
-                        setTimeout(function() {
-                            showModalViewAccept("Fejl", "Det var ikke muligt at afvise vagten.");
-                        }, 100);
+                    $("#UI_ELEMENT_TEST").append("<p>Done: "+ data +"</p>");
+                    try{
+                        JSON.parse(data);
+                    }catch(e){
+                        $("#UI_ELEMENT_TEST").append("<p>Done: trying to JSON.parse data FAILED</p>");
                     };
+//                    for(var prop in data) {
+//                        $("#UI_ELEMENT_TEST").append("<p>"+ prop +": "+ data[prop] +"</p>");
+//                    };
+                    //data will be true/false, as success/failure
+//                    if(data["succes"]) {
+//                        setTimeout(function() {
+//                            showModalViewAccept("Succes", "Vagten er nu afvist");
+//
+//                            //calls deleteShiftFromLocalStorage, which takes an id(what to delete) and a saveLocation(where to delete it from AND the context of the call, fx unbookShift)
+//                            deleteShiftFromLocalStorage(theId, "savedPossibleShifts");
+//                        }, 100);
+//                    }else { //notify user of failure
+//                        setTimeout(function() {
+//                            showModalViewAccept("Fejl", "Det var ikke muligt at afvise vagten.");
+//                        }, 100);
+//                    };
                 });
             }else {
                 //notify user of missing conenction
