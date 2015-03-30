@@ -42,8 +42,6 @@ var app = {
     }
 };
 
-//line created to force gitshell to notice update after encoding change
-
 //this function is called once the 'deviceready' event has been fired
 function phonegapReady() {
 
@@ -56,9 +54,6 @@ $(document).ready(function(){
     function onBackKeyDown() {
         //does nothing, simply overriding the back button, so that it does nothing.
     };
-    //scrollbar related, not working, breaks app pt.
-//    document.appView.setVerticalScrollBarEnabled(true);
-//    document.appView.setScrollBarStyle(app.SCROLLBARS_INSIDE_OVERLAY);
     
     //the #mCont dom element is saved here in runOnLoad
     var menu;
@@ -87,25 +82,8 @@ $(document).ready(function(){
         //creates listeners for ajaxStart/ajaxStop
         ajaxWatch = ajaxWatch();
         
-        //next two lines were added here to test the changeCollapseIcon function...
-        //colBtn = document.getElementById("collapseBtn");
-        //colBtn.addEventListener("click", changeCollapseIcon);
-        
-        //added to immediately give us a menu on all pages; We don't want to show the menu before the login has been accepted.
-        //showMenu();
-        
-        //added here for testing purposes... this might be the right place for it after all...
+        //instantiates the UI
         hasSavedLogin();
-        checkConnection();
-        
-//        //added here for testing purposes...
-//        showMyShifts();
-        
-//        //added to open the login screen first, might be deprecated because of "hasSavedLogin()"...
-//        showLogin();
-        
-        //added here for testing purposes...
-        //showUserProfile();
         
     });
     
@@ -115,7 +93,6 @@ $(document).ready(function(){
         setInterval(function() {
             if(checkConnection()) {
                 var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_myshifts";
-                //also needs to post a pswHash?
                 var infoArr = {userid:getFromStorage("userId")}; //what to post, once I I need to POST a pswHash, do it here.
                 var ajaxReq = postAJAXCall(url, infoArr, false); //false sets the global option to false, meaning the request will be invisible to the ajaxStart/ajaxStop.
                 ajaxReq.done(saveToStorange("savedBookedShifts", JSON.stringify(this)));
@@ -128,7 +105,6 @@ $(document).ready(function(){
         setInterval(function() {
             if(checkConnection()) {
                 var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_myshiftplan";
-                //also needs to post a pswHash?
                 var infoArr = {userid:getFromStorage("userId")}; //what to post, isn't really needed except that we need to pass Something into parameter placement of infoArr, since we need to set global to false...
                 var ajaxReq = postAJAXCall(url, infoArr, false); //false sets the global option to false, meaning the request will be invisible to the ajaxStart/ajaxStop.
                 ajaxReq.done(saveToStorange("savedPossibleShifts", JSON.stringify(this)));
@@ -143,31 +119,14 @@ $(document).ready(function(){
             //this is needed to retrieve saved info from 
             var loginInfo = {usr:getFromStorage("email"), pswhash:getFromStorage("pswHash"), remember:1};
             var domain = getFromStorage("domain");
-            //for testing purposes...
-//            body.append("<p>saved email: "+ loginInfo.usr +"</p>");
-//            body.append("<p>saved pswhash: "+ loginInfo.pswhash +"</p>");
-//            body.append("<p>saved psw: "+ loginInfo.psw +"</p>");
             if(checkConnection()) { //if online, this will evaluate true, making the app attempt to log on
-                //needed to attempt an automatic AJAX login.
+                //is needed to attempt an automatic AJAX login.
                 $.ajax({ //this function has it's own AJAX call because it wasn't worth the time to standardize it and loginEvaluator expects dataType: "text" instead of JSON...
                     type: "POST",
                     url: "https://"+ domain +".nemvagt.dk/ajax/login",
                     dataType: "text",
-                    data: loginInfo//,
-    //                success: function(data) {
-    //                    //each is only here for testing purposes
-    ////                    $(body).append("<p>JSON output from hasSavedLogin:</p>");
-    ////                    $.each($.parseJSON(userInfoHash), function(index, value) {
-    ////                        $(body).append("<p>"+ index +": "+ value +"</p>");
-    ////                    });
-    //                },
-    //                error: function() {
-    //                    //$(body).append("<p>Something went wrong in hasSavedLogin() AJAX call</p>");
-    //                }
+                    data: loginInfo
                 }).done(function(data) {
-                    //
-    //                $(body).append("<p>Done was reached in hasSavedLogin()</p>");
-    //                $(body).append("<p>usr - returned JSON VS saved: "+ $.parseJSON(userInfoHash).email +" : "+ loginInfo.usr +"</p>");
                     loginEvaluater(data, loginInfo.usr, domain);
                 });
             }else {
@@ -176,7 +135,6 @@ $(document).ready(function(){
             };
             
         }else {
-//            $(body).append("<p>Else was reached in hasSavedLogin()</p>");
             //cleans localStorage, when no pswHash was found, to make sure there is no "old dirt"...
             localStorage.clear();
             showLogin();
@@ -209,7 +167,6 @@ $(document).ready(function(){
         
         //we need this to override and handle the onclick event for the login form
         $("#loginBtn").on("click", function(event) {
-            //localStorage.removeItem("pswHash"); //removes the given key from localStorage...
             event.preventDefault();
             
             //only try to login if we have an internet connection, notify user if there is no connection
@@ -226,10 +183,6 @@ $(document).ready(function(){
                     data: form.serialize() + "&remember=1",
                     success: function(data) {
                         returnedData = data;
-                        //only here for testing purposes
-    //                    $.each($.parseJSON(data), function(index, value) {
-    //                        $(body).append("<p>"+ index +": "+ value +"</p>");
-    //                    });
                     },
                     error: function() {
                         $(body).append("<p>Something went wrong in AjaxCall from showLogin()</p> <br>"+"<p>status: "+ error.status + "; readyState: " + error.readyState +"; statusText: "+ error.statusText +"; responseText:"+ error.responseText +";</p>");
@@ -238,9 +191,6 @@ $(document).ready(function(){
                         loginEvaluater(returnedData, email, domain);
                     });
                 }else {
-                    //$(body).empty();
-                    //$(body).append("<h3>Husk at udfylde \"Forenings domæne\"</h3>");
-                    //setTimeout(showLogin, 4000);
                     showModalViewAccept("Manglende udfyldning", "<p>Husk at udfylde \"Forenings domæne\"</p>");
                 };
             }else {
@@ -284,18 +234,6 @@ $(document).ready(function(){
                 //get the shifts that the person has already voluntered for
                 var ajaxCall = postAJAXCall(url, toPost);
                 ajaxCall.done(function(data) {
-    //                if(data!==undefined){ //if succcess was reached in the postAJAXCall function, "data" is returned...
-    //                    //save the shifts to local storage, so they can be reused w/o having to make the AJAX call again
-    //                    saveToStorage("savedBookedShifts", JSON.stringify(data));
-    //                    populateMyShifts(data);
-    //                }else { //on error
-    //                    //if we fail to get JSON, get it locally
-    //                    //$(body).append("<p>Something went wrong with myShift first AJAX call</p>");
-    //                    notificationModal("OBS, kunne ikke hente fra nettet", "Henter \"Vagter\" fra telefonens hukommelse, data kan være forældet.");
-    //                    var myBookedShifts = $.parseJSON(getFromStorage("savedBookedShifts"));
-    //                    setTimeout(modalW.empty(),3000);
-    //                    setTimeout(populateMyShifts(myBookedShifts),3100);
-    //                }
                     populateMyShifts(ajaxSuccesEvaluator("savedBookedShifts", "Mine vagter", data));
                 });
             }else { //we already have a pretty recent version of the JSON, so get JSON from localStorage, as this is much faster than the internet.
@@ -574,6 +512,12 @@ $(document).ready(function(){
                 };
                 //a listener is added after it has been appended to body
                 
+                //if people can remove the shift from their list of shifts, give them a button to do so...
+                var allowNoThanks = '';
+                if(object["allownothanks"]) {
+                    allowNoThanks = '<button style="margin-bottom: 1vmin; margin-right: -1vmin; margin-top: 3vmin;" type="button" class="btn btn-default noThanksBtn pull-left">Afvis</button>';
+                };
+                
                 //gives the shift a color type, if it has one
                 var shiftColor = '';
                 if(object["color"] !== null && object["color"] !== undefined) {
@@ -591,6 +535,7 @@ $(document).ready(function(){
                         <p>Kl: '+ startTime +' til '+ endTime +'</p>\
                         <p>Ledige pladser: '+ freeSpaces +'</p>\
                         '+ roller +'\
+                        '+ allowNoThanks +'\
                         '+ bookBtn +'\
                     </div>\
                 </div>');
@@ -601,7 +546,9 @@ $(document).ready(function(){
         $(".readMoreBtn").on("click", showPossibleShiftDetails);
         //adds a listener to the readMore button, so that it updates all the JSON while people are busy reading about a shifts details... This is on a X(30) second timer
         $(".readMoreBtn").on("click", updateAllListsReadMoreBtnHandler);
-        //adds a listener to the unbookShift buttons, so what they can open the modal dialog window, allowing them to unbook the shift
+        //adds a listener to all noThanks buttons
+        $(".noThanksBtn").on("click", showModalView);
+        //adds a listener to the bookShift buttons, so what they can open the modal dialog window, allowing them to book the shift
         $(".bookBtn").on("click", function(event) {
             getRolesBookShift(event);
         });
@@ -807,11 +754,17 @@ $(document).ready(function(){
                     bookBtn = '<button class="btn bookBtn btn-success pull-right margBotBtn" type="button">Tag vagt</button>';
                 };
                 
+                //if people can remove the shift from their list of shifts, give them a button to do so...
+                var allowNoThanks = '';
+                if(object["allownothanks"]) {
+                    allowNoThanks = '<button style="margin-bottom: 1vmin; margin-right: -1vmin; margin-top: 3vmin;" type="button" class="btn btn-default noThanksBtn pull-left">Afvis</button>';
+                };
+                
                 //adds a back button to the page, so that people can easily get back. OBS would be nice to navigate to the shift they were just viewing, but I'm not sure how to do this...
                 var backBtn = '<button class="btn backBtn btn-default pull-left margBotBtn">Tilbage</button>';
                 
                 //add the individual parts of the JSON to the append body, so that it can be viewed. Done this way to be easily modifiable...
-                $(body).append('<div id="'+ object["id"] +'" class="shiftTarget">'+ shiftColor+title+date+shiftStartTime+shiftEndTime+freeSpacesFormatted+notes+backBtn+bookBtn +'</div>');
+                $(body).append('<div id="'+ object["id"] +'" class="shiftTarget">'+ shiftColor+title+date+shiftStartTime+shiftEndTime+freeSpacesFormatted+notes+backBtn+allowNoThanks+bookBtn +'</div>');
             };
         };
         
@@ -823,6 +776,7 @@ $(document).ready(function(){
         $(".bookBtn").on("click", function(event) {
             getRolesBookShift(event);
         });
+        $(".noThanksBtn").on("click", showModalView);
     };
     
 //    function backBtnFunc(isBooked, theShift) {
@@ -1103,8 +1057,6 @@ $(document).ready(function(){
                         
                         if(jsonFromStorage[x]["fieldname"] === checkForm[i]["name"] && jsonFromStorage[x]["value"] !== checkForm[i]["value"]) {
                             changesMade = true;
-                        };
-                        if(changesMade === true) {
                             break;
                         };
                     };
@@ -1149,11 +1101,26 @@ $(document).ready(function(){
                         });
                     }, 100);
                 }else {
+                    
+                    //clean up
+                    modalW.empty();
+                    body.empty();
+
+                    //refresh from storage
+                    populateUserProfile(JSON.parse(getFromStorage("savedUserProfile")));
+                    
                     setTimeout(function() {
                         showModalViewAccept("Ingen ændring", "Der er ingen ændringer foretaget i din Brugerprofil og der er derfor ingen grund til at opdatere den.");
                     }, 100);
                 };
             }else {
+                //clean up
+                modalW.empty();
+                body.empty();
+
+                //refresh from storage
+                populateUserProfile(JSON.parse(getFromStorage("savedUserProfile")));
+                
                 //timeout is there to make sure the previous modal, from ajaxWatch has time to "un-animate", as it seems that if I dont do that, the "remove this modal view when a modal view becomes hidden" triggers from the other window being removed...
                 setTimeout(function() {
                     showModalViewAccept("Manglende netværksforbindelse", "Der er ingen netværksforbindelse og det er derfor ikke muligt at opdatere din profil.");
@@ -1195,10 +1162,10 @@ $(document).ready(function(){
           <li role="presentation" class="divider"></li>\
           <li role="presentation"><a id="updateJSONMenu" '+ styling +' role="menuitem" tabindex="-1" href="#">Opdater alt</a></li>\
           <li role="presentation" class="divider"></li>\
-          <li role="presentation"><a id="logOutMenu" '+ styling +' role="menuitem" tabindex="-1" href="#" >Log ud</a></li>\
           <!--<li role="presentation"><a id="myOrganisationsMenu" '+ styling +' role="menuitem" tabindex="-1" href="#" >Vis de steder jeg er frivillig</a></li>\
           <li role="presentation"><a id="possibleOrganisationsMenu" '+ styling +' role="menuitem" tabindex="-1" href="#" >Vis de steder jeg kan blive frivillig</a></li>\
-          <li role="presentation"><a id="testingResetMenu" '+ styling +' role="menuitem" tabindex="-1" href="#" >TESTING RESET</a></li>-->\
+          <li role="presentation" class="divider"></li>\-->\
+          <li role="presentation"><a id="logOutMenu" '+ styling +' role="menuitem" tabindex="-1" href="#" >Log ud</a></li>\
         </ul>\
       </div>');
         
@@ -1212,17 +1179,9 @@ $(document).ready(function(){
         //the next two might not get to be in the first release, if not included, remember to remove them from the menu above too...
         //$("#myOrganisationsMenu").on("click", showMyOrganisations);
         //$("#possibleOrganisationsMenu").on("click", showPossibleOrganisations);
-        //for testing puroposes...
-        $("#testingResetMenu").on("click", testReset);
+        
     };
-    //for testing purposes...
-    function testReset() {
-        $(body).empty();
-        //showMyShifts();
-        //showLogin();
-        hasSavedLogin();
-        //showUserProfile();
-    };
+    
     //handles/evaluates success/error from ajax calls, if we get the data from the internet it is returned after being saved, if we can't get it, we get it locally and return it
     //if we get the data locally, we notify the user.
     //Requires a string location where we want to save the data, a string telling us where we are and the data from the ajax call.
@@ -1281,16 +1240,13 @@ $(document).ready(function(){
         var myShiftsAJAXObj = postAJAXCall(urlMyShifts, toPost);
         myShiftsAJAXObj.done(function(data) {
             saveToStorage("savedBookedShifts", JSON.stringify(data));
-            //$("#UI_ELEMENT_TEST").append("saved myShifts from updateAllBtn"); //TEST
         }).done(function() {
-            //$("#UI_ELEMENT_TEST").append("myShiftsDone === true"); //TEST
             //Looks at the status of the other ajax queries, if they're done or if we were on this page when we started the update, evaluate what to update, then do so.
             if(possibleShiftsDone && userProfileDone || whereAmI === 1) {
-                //$("#UI_ELEMENT_TEST").append("Updated JSON by-way of \"opdater alt\" button, in the menu"); //TEST
                 //evaluates what to update, then does so.
                 updateAllListsMenuHandlerUpdateEvaluator(whereAmI);
             }else {
-                //tells the method that myShifts are done updating
+                //tells the method that myShifts is done updating
                 myShiftsDone = true;
             };
         });
@@ -1305,26 +1261,24 @@ $(document).ready(function(){
             if(myShiftsDone && userProfileDone || whereAmI === 2) {
                 updateAllListsMenuHandlerUpdateEvaluator(whereAmI);
             }else {
+                //tells the method that possibleShifts is done updating
                 possibleShiftsDone = true;
             };
         });
         
-        //tells myShiftsAJAXObj where to POST to
+        //tells userProfileAJAXObj where to POST to
         var urlUserProfile = "https://"+ domain +".nemvagt.dk/ajax/app_myshifts";
-        //update myShifts
+        //update userProfile
         var userProfileAJAXObj = postAJAXCall(urlUserProfile, toPost);
-        userProfileAJAXObj//.done(function(data) {
-            //saveToStorage("savedBookedShifts", JSON.stringify(data)); //NOT IMPLEMENTED YET
-            //$("#UI_ELEMENT_TEST").append("saved myShifts from updateAllBtn"); //TEST
-        //})
-        .done(function() {
+        userProfileAJAXObj.done(function(data) {
+            saveToStorage("savedBookedShifts", JSON.stringify(data));
+        }).done(function() {
         //Looks at the status of the other ajax queries, if they're done or if we were on this page when we started the update, evaluate what to update, then do so.
             if(possibleShiftsDone && myShiftsDone || whereAmI === 3) {
-                //$("#UI_ELEMENT_TEST").append("Updated JSON by-way of \"opdater alt\" button, in the menu"); //TEST
                 //evaluates what to update, then does so.
                 updateAllListsMenuHandlerUpdateEvaluator(whereAmI);
             }else {
-                //tells the method that myShifts are done updating
+                //tells the method that userProfile is done updating
                 userProfileDone = true;
             };
         });
@@ -1358,12 +1312,10 @@ $(document).ready(function(){
             }, 30000);
         };
     };
-    //var derp = 0; // TEST
+    
     //updates "savedBookedShifts" & "savedPossibleShifts" in localStorage, global is optional, but defines if the AJAX request will notify the user (will notify unless false)
     function updateAllLists(global) {
-        //for testing
-        //$("#UI_ELEMENT_TEST").append("running JSON update from \"vis mere\""+ derp); // TEST
-        //derp++; // TEST
+        
         //tells us what to POST
         var toPost = {userid:getFromStorage("userId")};
         //tells us the domain to post to
@@ -1376,16 +1328,15 @@ $(document).ready(function(){
         var myShiftsAJAXObj = postAJAXCall(urlMyShifts, toPost, global);
         myShiftsAJAXObj.done(function(data) {
             saveToStorage("savedBookedShifts", JSON.stringify(data));
-            //$("#UI_ELEMENT_TEST").append("Updated JSON by-way of \"vis mere\" button"); // TEST
         });
         
         //tells possibleShiftsAJAXObj where to POST to
-//        var urlPossibleShifts = "https://"+ domain +".nemvagt.dk/ajax/app_XXX"; //change XXX to the address needed for POST'ing to possibleShifts
-//        //update possibleShifts
-//        var possibleShiftsAJAXObj = postAJAXCall(urlPossibleShifts, toPost, global);
-//        possibleShiftsAJAXObj.done(function(data) {
-//            saveToStorage("savedPossibleShifts", JSON.stringify(data));
-//        });
+        var urlPossibleShifts = "https://"+ domain +".nemvagt.dk/ajax/app_myshiftplan";
+        //update possibleShifts
+        var possibleShiftsAJAXObj = postAJAXCall(urlPossibleShifts, toPost, global);
+        possibleShiftsAJAXObj.done(function(data) {
+            saveToStorage("savedPossibleShifts", JSON.stringify(data));
+        });
     };
     
     //needed so show the NemVagt logo
@@ -1445,7 +1396,6 @@ $(document).ready(function(){
     
     //is used to check the connection state/type, plugs into the browser
     function checkConnection() {
-        //$(body).append('Checker:');
         var networkState = navigator.connection.type;
         
         var states = {};
@@ -1459,10 +1409,8 @@ $(document).ready(function(){
         states[Connection.NONE]     = 'No network connection';
         
         if(states[networkState] === 'No network connection') {
-            //$(body).append('Connection type: failed: ' + states[networkState]);
             return false;
         }else {
-            //$(body).append('Connection type: succeded: ' + states[networkState]);
             return true;
         };
     }
@@ -1470,10 +1418,8 @@ $(document).ready(function(){
     //we need this to make sure html5 storage is available, it's essentially a formality in this app
     function supportsLocalStorage() {
         try {
-            //$(body).append('<p>localStorage available</p>');
             return 'localStorage' in window && window['localStorage'] !== null;
         } catch (e) {
-            //$(body).append('<p>localStorage uavailable</p>'+ e.toString());
             return false;
         }
     };
@@ -1530,10 +1476,10 @@ $(document).ready(function(){
                 <div class="modal-content">\
                   <div class="modal-header">\
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\
-                    <h4 class="modal-title" id="myModalLabel">Modal title</h4>\
+                    <h4 class="modal-title" id="myModalLabel">'+ title +'</h4>\
                   </div>\
                   <div class="modal-body">\
-                    Er du sikker?\
+                    Er du sikker på at du vil afmelde dig vagten?\
                   </div>\
                   <div class="modal-footer">\
                     <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Nej</button>\
@@ -1548,11 +1494,29 @@ $(document).ready(function(){
                 <div class="modal-content">\
                   <div class="modal-header">\
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\
-                    <h4 class="modal-title" id="myModalLabel">Modal title</h4>\
+                    <h4 class="modal-title" id="myModalLabel">'+ title +'</h4>\
                   </div>\
                   <div class="modal-body">\
                     '+ rolesFormStringBookShift +'\
                     <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Nej</button>\
+                  </div>\
+                </div>\
+              </div>\
+            </div>');
+        }else if(title==="Afvis") {
+            $(modalW).append('<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">\
+              <div class="modal-dialog">\
+                <div class="modal-content">\
+                  <div class="modal-header">\
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\
+                    <h4 class="modal-title" id="myModalLabel">'+ title +'</h4>\
+                  </div>\
+                  <div class="modal-body">\
+                    Vil du afvise denne vagt?\
+                  </div>\
+                  <div class="modal-footer">\
+                    <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Nej</button>\
+                    <button id="'+ shiftId +'" type="button" class="btn modalYesBtn btn-default btn-lg">Ja</button>\
                   </div>\
                 </div>\
               </div>\
@@ -1564,7 +1528,7 @@ $(document).ready(function(){
         //applies the changes defined in var options
         $("#myModal").modal(options);
         //sets the title of the modal, so people know where they are
-        $(".modal-title").html(title);
+        //$(".modal-title").html(title); is done directly in the html
         
         //applies the unbook/book onClick events
         if(title==="Afmeld vagt") { //this derives from the text on the button, could maybe be done better?
@@ -1573,6 +1537,8 @@ $(document).ready(function(){
             $(".modalYesBtn").on("click", function(event) {
                 bookShift(event);
             });
+        }else if(title==="Afvis") {
+            $(".modalYesBtn").on("click", postNoThanks);
         };
         
         //makes the "yes" button close the modal window
@@ -1624,17 +1590,45 @@ $(document).ready(function(){
         });
     };
     
-//    //a method that books/unbooks a shift, it evaluates which itself, may be called from the modal windows opened through both Details, showPossibleShifts and showMyShifts
-//    function shiftBookingHandler() { //unfinished?
-//        var title = $(this).html();
-//        if(title==="Afmeld vagt") {
-//            $("body").append("<p>unbookShift was called</p>");
-//            //unbook the shift
-//        }else if(title==="Tilmeld Vagt") {
-//            $("body").append("<p>bookShift was called</p>");
-//            //book the shift
-//        };
-//    };
+    //allows a user to remove a shift from their list of possible shifts
+    function postNoThanks() {
+        //get the shift id, so we can post it, we need to get it now, before we empty the modal...
+        //get the id of the button (this), the afmeld vagt btn's id in the modalView, is the id of the shift...
+        var theId = $(this).attr("id");
+        //this is called to make sure a potential modal window starts closing, the timeouts further down in the code are there to give the different modals opened time to close
+        modalW.empty();
+        setTimeout(function() {
+            if(checkConnection()) {
+                //what to post, it's the id of the shift in question
+                var infoArr = {shiftid:theId};
+                //create the url, to post to
+                var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_rejectshift";
+                
+                var ajaxCall = postAJAXCall(url, infoArr);
+                ajaxCall.done(function(data) {
+                    //data will be true/false, as success/failure
+                    if(data["succes"]) {
+                        setTimeout(function() {
+                            showModalViewAccept("Succes", "Vagten er nu afvist");
+
+                            //calls deleteShiftFromLocalStorage, which takes an id(what to delete) and a saveLocation(where to delete it from AND the context of the call, fx unbookShift)
+                            deleteShiftFromLocalStorage(theId, "savedPossibleShifts");
+                        }, 100);
+                    }else { //notify user of failure
+                        setTimeout(function() {
+                            showModalViewAccept("Fejl", "Det var ikke muligt at afvise vagten.");
+                        }, 100);
+                    };
+                });
+            }else {
+                //notify user of missing conenction
+                setTimeout(function() {
+                    showModalViewAccept("Ingen internet forbindelse", "Der er ingen forbindelse til internettet, det er derfor ikke muligt af afvise vagten.<br>Opret forbindelse til internettet og prøv igen.");
+                }, 100);
+            };
+        }, 100);
+    };
+    
     //unbooks a shift, may be called from the modal windows opened through both Details and showMyShifts
     function unbookShift() {
         //get the shift id, so we can post it, we need to get it now, before we empty the modal...
@@ -1688,7 +1682,7 @@ $(document).ready(function(){
         setTimeout(function() {
             if(checkConnection()) {
                 //what to post, it's the id of the shift in question
-                var toPost = "shiftid="+ shiftId +"&"; //also add the serialized form contained in the var "form", make sure the name of the id is right.
+                var toPost = "shiftid="+ shiftId +"&"; //also add the serialized form contained in the var "form" but I need the name from Mark, make sure the name of the id is right.
                 //create the url, to post to
                 var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_XXX";
                 
@@ -1721,7 +1715,7 @@ $(document).ready(function(){
         //this is called to make sure a potential modal window starts closing, the timeouts further down in the code are there to give the different modals opened time to close
         modalW.empty();
         setTimeout(function() {
-            if(checkConnection()) {
+            if(false) { //checkConnection()
                 //what to post, it's the id of the shift in question
                 var infoArr = {shiftid:shiftId};
                 //create the url, to post to
@@ -1734,7 +1728,7 @@ $(document).ready(function(){
                 
                 //iterate through the data we got with roles then make a string containing a form and open a modal and parse it the string
                 ajaxCall.done(function(data) {
-                    //in these functions we open the modal with the form in it... when okay is pressed in that window: submit; Can this be used to hold/submit form: ?showModalView?
+                    //in these functions we open the modal with the form in it... when okay is pressed in that window: submit;
                     
                     //create the form string we'll be submitting
                     var rolePickForm = '<form id="'+ shiftId +'" class="form-group shiftTarget" role="form" method="post" action="">'; //we may not hvae any reason to give this the shift id, if not then it doesn't need the .shiftTarget
@@ -1764,7 +1758,7 @@ $(document).ready(function(){
     };
     
     //a function which is called from unbookShift and bookShift, it deletes a shift from appropriate list in localStorage and calls the appropriate "populate" method with the new data
-    function deleteShiftFromLocalStorage(id, saveLocation) { //pretty sure the way I delete is wrong...
+    function deleteShiftFromLocalStorage(id, saveLocation) {
         var storedJSON = JSON.parse(getFromStorage(saveLocation));
         
         storedJSON = $.grep(storedJSON, function(object) {
@@ -1778,20 +1772,6 @@ $(document).ready(function(){
             body.empty();
             populatePossibleShifts(storedJSON);
         };
-//        // FOR NOW - START
-//        setTimeout(function() {
-//            modalW.empty();
-//        }, 2000);
-//        if(saveLocation === "savedBookedShifts") {
-//            setTimeout(function() {
-//                showMyShifts();
-//            }, 3000);
-//        }else if(saveLocation === "savedPossibleShifts") {
-//            setTimeout(function() {
-//                showPossibleShifts();
-//            }, 3000);
-//        };
-//        // FOR NOW - END
     };
     
     //keeps track of whether or not there is an active ajax request, and notifies the user if there is one...
