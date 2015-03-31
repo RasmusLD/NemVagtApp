@@ -53,8 +53,66 @@ $(document).ready(function(){
     if(device.platform !== "iPhone") {
         document.addEventListener("backbutton", onBackKeyDown, false);
     };
+//    /*url til prfil billede, er /avatar/md5(userid)/size(int size i want)*/
+    function derp() {
+        
+        var infoArr = {};
+        
+        var url = "https://"+ getFromStorage("domain") +"/ajax/app_shiftdetails";
+        
+        infoArr.pswhash = getFromStorage("pswHash");
+        
+        infoArr.userid = getFromStorage("userId");
+        
+        $.ajax({
+            type: "POST",
+            url: url,
+            dataType: "JSON",
+            data: infoArr
+        });
+    }
+    
+//    //camera use // TEST START
+//    var picSour = navigator.camera.PictureSourceType;
+//    var picDest = navigator.camera.DestinationType; 
+//    
+//    function getPhoto() {
+//        $("#UI_ELEMENT_TEST").append("<p>getPhoto called</p>");
+//        // Retrieve image file location from specified source
+//        navigator.camera.getPicture(onPhotoURISuccess, onPhotoFail, { quality: 50,
+//        destinationType: picDest.FILE_URI,
+//        //destinationType: picDest.DATA_URL,
+//        sourceType: picSour.PHOTOLIBRARY });
+//        $("#UI_ELEMENT_TEST").append("<p>end of getPhoto reached</p>");
+//    };
+//    function onPhotoURISuccess(imageURI) {
+//        $("#UI_ELEMENT_TEST").append("<p>photoSuccess called</p>");
+//        //post the image URI
+//        $("#UI_ELEMENT_TEST").append("<p>the imageURI: "+ imageURI +";</p>");
+//        var img = $("#largeImage");
+//        //$("#UI_ELEMENT_TEST").append("<p>rdy to style img as block</p>");
+//        //img.style.display = "block";
+//        $("#UI_ELEMENT_TEST").append("<p>rdy to set img.src</p>");
+//        var changedPath = imageURI.split("//")[1];
+//        //img.src = imageURI;
+//        $("#UI_ELEMENT_TEST").append("<p>changedPath length: "+ changedPath.length +"</p>");
+//        $("#UI_ELEMENT_TEST").append("<p>changedPath: "+ changedPath +"</p>");
+//        img.src = changedPath;
+//        $("#UI_ELEMENT_TEST").append("<p>end of photoSuccess reached</p>");
+//    };
+//    function onPhotoFail(msg) {
+//        //notify user?
+//        $("#UI_ELEMENT_TEST").append("<p>photoFail called</p>");
+//        $("#UI_ELEMENT_TEST").append("<p>getPictureState: Fail; msg: "+ msg +"</p>");
+//        $("#UI_ELEMENT_TEST").append("<p>end of photoFail reached</p>");
+//    };
+//    // TEST END - Also see "getPhoto" in "onBackKeyDown"
+    
     function onBackKeyDown() {
         //does nothing, simply overriding the back button, so that it does nothing.
+        //var camH = navigator.camera.getPicture( cameraSuccess, cameraError, [ cameraOptions ] );
+//        getPhoto();
+        derp();
     };
     
     //the #mCont dom element is saved here in runOnLoad
@@ -97,7 +155,7 @@ $(document).ready(function(){
     function autoupdateMyShifts() {
         setInterval(function() {
             if(checkConnection()) {
-                var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_myshifts";
+                var url = "https://"+ getFromStorage("domain") +"/ajax/app_myshifts";
                 var infoArr = {userid:getFromStorage("userId")}; //what to post, once I I need to POST a pswHash, do it here.
                 var ajaxReq = postAJAXCall(url, infoArr, false); //false sets the global option to false, meaning the request will be invisible to the ajaxStart/ajaxStop.
                 ajaxReq.done(saveToStorange("savedBookedShifts", JSON.stringify(this)));
@@ -109,7 +167,7 @@ $(document).ready(function(){
     function autoupdatePossibleShifts() {
         setInterval(function() {
             if(checkConnection()) {
-                var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_myshiftplan";
+                var url = "https://"+ getFromStorage("domain") +"/ajax/app_myshiftplan";
                 var infoArr = {userid:getFromStorage("userId")}; //what to post, isn't really needed except that we need to pass Something into parameter placement of infoArr, since we need to set global to false...
                 var ajaxReq = postAJAXCall(url, infoArr, false); //false sets the global option to false, meaning the request will be invisible to the ajaxStart/ajaxStop.
                 ajaxReq.done(saveToStorange("savedPossibleShifts", JSON.stringify(this)));
@@ -128,7 +186,7 @@ $(document).ready(function(){
                 //is needed to attempt an automatic AJAX login.
                 $.ajax({ //this function has it's own AJAX call because it wasn't worth the time to standardize it and loginEvaluator expects dataType: "text" instead of JSON...
                     type: "POST",
-                    url: "https://"+ domain +".nemvagt.dk/ajax/login",
+                    url: "https://"+ domain +"/ajax/login",
                     dataType: "text",
                     data: loginInfo
                 }).done(function(data) {
@@ -178,12 +236,12 @@ $(document).ready(function(){
             if(checkConnection()) {
                 var form = $("#loginForm");
                 var email = $('input[name=usr]').val();
-                var domain = $('input[name=domain]').val();
+                var domain = $('input[name=domain]').val() +".nemvagt.dk"; //this will be changed when we find a solution for differing domains
                 var returnedData;
-                if(domain !== "") {
+                if($('input[name=domain]').val() !== "") {
                     $.ajax({ //this function has it's own AJAX call because it wasn't worth the time to standardize it and loginEvaluator expects dataType: "text" instead of JSON...
                     type: form.attr("method"),
-                    url: "https://"+ domain + ".nemvagt.dk/ajax/login",
+                    url: "https://"+ domain + "/ajax/login",
                     dataType: "text",
                     data: form.serialize() + "&remember=1",
                     success: function(data) {
@@ -235,7 +293,7 @@ $(document).ready(function(){
                 //tells us what to POST
                 var toPost = {userid:getFromStorage("userId")};
                 //tells us where to POST to
-                var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_myshifts";
+                var url = "https://"+ getFromStorage("domain") +"/ajax/app_myshifts";
                 //get the shifts that the person has already voluntered for
                 var ajaxCall = postAJAXCall(url, toPost);
                 ajaxCall.done(function(data) {
@@ -259,7 +317,7 @@ $(document).ready(function(){
         //get the shifts that the person has already voluntered for
         $.ajax({
             type: "POST",
-            url: "https://"+ domain +".nemvagt.dk/ajax/app_myshifts",
+            url: "https://"+ domain +"/ajax/app_myshifts",
             dataType: "JSON",
             data: toPost,
             success: function(data) {
@@ -440,7 +498,7 @@ $(document).ready(function(){
                 //tells us what to POST, strictly speaking not needed, as postAJAXCall automatically adds userid and pswhash...
                 var toPost = {userid:getFromStorage("userId")};
                 //tells us where to POST to
-                var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_myshiftplan";
+                var url = "https://"+ getFromStorage("domain") +"/ajax/app_myshiftplan";
                 //get the shifts that the person can volunteer for
                 var ajaxCall = postAJAXCall(url, toPost);
                 ajaxCall.done(function(data) {
@@ -480,9 +538,9 @@ $(document).ready(function(){
             if(object["visible"]) {
                 //checks to see if there is a role, then adds them to the var roller, which is added to the $(body).append() below.
                 var roller = '';
-                if(object["roles"]!== undefined) { //right now, roles isn't passed to me at all. Speak to Mark about this... Also, maybe it should be a radial input when dealing with possible shifts
-                    roller = '"<p>Roller: '+ object["roles"] +'</p>"';
-                };
+//                if(object["roles"]!== undefined) { //right now, roles isn't passed to me at all. Speak to Mark about this... Also, maybe it should be a radial input when dealing with possible shifts
+//                    roller = '"<p>Roller: '+ object["roles"] +'</p>"';
+//                };
                 
                 //adds a title to the shift, if one is provided
                 var title = '';
@@ -501,7 +559,13 @@ $(document).ready(function(){
                 
                 //there is no check on this as the values should/will always be included and we NEED the calculation later on, so not having it isn't an option anyway...
                 //calculates how many freeSpaces we have in the shift
-                var freeSpaces = parseInt(object["maxmembers"])-parseInt(object["taken"]);
+                var freeSpaces;
+                if(object["rolemaxmembers"] > 0) {
+                    freeSpaces = parseInt(object["rolemaxmembers"])-parseInt(object["taken"]);
+                }else {
+                    freeSpaces = parseInt(object["maxmembers"])-parseInt(object["taken"]);
+                };
+                
                 
                 //adds a button to book the shift, to the shift
                 var bookBtn = '';
@@ -554,9 +618,7 @@ $(document).ready(function(){
         //adds a listener to all noThanks buttons
         $(".noThanksBtn").on("click", showModalView);
         //adds a listener to the bookShift buttons, so what they can open the modal dialog window, allowing them to book the shift
-        $(".bookBtn").on("click", function(event) {
-            getRolesBookShift(event);
-        });
+        $(".bookBtn").on("click", getRolesBookShift);
         
         //starts an autoupdate timer for the possibleShifts JSON.
         if(jsonUpdatePossibleShiftsObj === undefined) {
@@ -717,7 +779,11 @@ $(document).ready(function(){
             if(object.id === theShift) {
                 
                 //calculate the number of free spaces in the shift
-                freeSpaces = parseInt(object["maxmembers"])-parseInt(object["taken"]);
+                if(object["rolemaxmembers"] > 0) {
+                    freeSpaces = parseInt(object["rolemaxmembers"])-parseInt(object["taken"]);
+                }else {
+                    freeSpaces = parseInt(object["maxmembers"])-parseInt(object["taken"]);
+                };
                 //if there are any free spaces, show how many there are
                 if(freeSpaces > 0) {
                     freeSpacesFormatted = "<p>Der er "+ freeSpaces +" ledige pladser på vagten</p>";
@@ -778,9 +844,7 @@ $(document).ready(function(){
                 showPossibleShifts();
         });
         //appends an onClick listener event on the bookBtn
-        $(".bookBtn").on("click", function(event) {
-            getRolesBookShift(event);
-        });
+        $(".bookBtn").on("click", getRolesBookShift);
         //adds a listener on the noThanksBtn
         $(".noThanksBtn").on("click", showModalView);
     };
@@ -804,7 +868,7 @@ $(document).ready(function(){
         $(body).empty();
         if(checkConnection()) {
             //the url to POST to, so we can get our UserProfile JSON
-            var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_userprofile";
+            var url = "https://"+ getFromStorage("domain") +"/ajax/app_userprofile";
             //the object containing the data/authenticator to POST, so we are allowed to retrieve the JSON
             var toPost = {userid:getFromStorage("userId")};
             //make the AJAX call and save it to the var, so we can call .done on it
@@ -1080,7 +1144,7 @@ $(document).ready(function(){
 
                         var ajaxQuery = $.ajax({
                             type: "POST",
-                            url: "https://"+ domain + ".nemvagt.dk/ajax/app_saveuserprofile",
+                            url: "https://"+ domain + "/ajax/app_saveuserprofile",
                             dataType: "text",
                             data: form +"&pswhash="+ formattedPswHash +"&userid="+ userid
                         });
@@ -1241,7 +1305,7 @@ $(document).ready(function(){
         };
         
         //tells myShiftsAJAXObj where to POST to
-        var urlMyShifts = "https://"+ domain +".nemvagt.dk/ajax/app_myshifts";
+        var urlMyShifts = "https://"+ domain +"/ajax/app_myshifts";
         //update myShifts
         var myShiftsAJAXObj = postAJAXCall(urlMyShifts, toPost);
         myShiftsAJAXObj.done(function(data) {
@@ -1258,7 +1322,7 @@ $(document).ready(function(){
         });
         
         //tells possibleShiftsAJAXObj where to POST to
-        var urlPossibleShifts = "https://"+ domain +".nemvagt.dk/ajax/app_myshiftplan"; //change XXX to the address needed for POST'ing to possibleShifts
+        var urlPossibleShifts = "https://"+ domain +"/ajax/app_myshiftplan"; //change XXX to the address needed for POST'ing to possibleShifts
         //update possibleShifts
         var possibleShiftsAJAXObj = postAJAXCall(urlPossibleShifts, toPost);
         possibleShiftsAJAXObj.done(function(data) {
@@ -1273,7 +1337,7 @@ $(document).ready(function(){
         });
         
         //tells userProfileAJAXObj where to POST to
-        var urlUserProfile = "https://"+ domain +".nemvagt.dk/ajax/app_myshifts";
+        var urlUserProfile = "https://"+ domain +"/ajax/app_myshifts";
         //update userProfile
         var userProfileAJAXObj = postAJAXCall(urlUserProfile, toPost);
         userProfileAJAXObj.done(function(data) {
@@ -1329,7 +1393,7 @@ $(document).ready(function(){
         //keeps track of whether or not the AJAX call is done
         
         //tells myShiftsAJAXObj where to POST to
-        var urlMyShifts = "https://"+ domain +".nemvagt.dk/ajax/app_myshifts";
+        var urlMyShifts = "https://"+ domain +"/ajax/app_myshifts";
         //update myShifts
         var myShiftsAJAXObj = postAJAXCall(urlMyShifts, toPost, global);
         myShiftsAJAXObj.done(function(data) {
@@ -1337,7 +1401,7 @@ $(document).ready(function(){
         });
         
         //tells possibleShiftsAJAXObj where to POST to
-        var urlPossibleShifts = "https://"+ domain +".nemvagt.dk/ajax/app_myshiftplan";
+        var urlPossibleShifts = "https://"+ domain +"/ajax/app_myshiftplan";
         //update possibleShifts
         var possibleShiftsAJAXObj = postAJAXCall(urlPossibleShifts, toPost, global);
         possibleShiftsAJAXObj.done(function(data) {
@@ -1621,7 +1685,7 @@ $(document).ready(function(){
                 //what to post, it's the id of the shift in question
                 var infoArr = {shiftid:theId};
                 //create the url, to post to
-                var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_rejectshift";
+                var url = "https://"+ getFromStorage("domain") +"/ajax/app_rejectshift";
                 
 //                infoArr.pswhash = getFromStorage("pswHash");
 //        
@@ -1684,7 +1748,7 @@ $(document).ready(function(){
                 //what to post, it's the id of the shift in question
                 var infoArr = {shiftid:theId};
                 //create the url, to post to
-                var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_dropshift";
+                var url = "https://"+ getFromStorage("domain") +"/ajax/app_dropshift";
                 
                 var ajaxCall = postAJAXCall(url, infoArr);
                 ajaxCall.done(function(data) {
@@ -1727,7 +1791,7 @@ $(document).ready(function(){
                 //what to post, it's the id of the shift in question
                 var toPost = "shiftid="+ shiftId +"&"; //also add the serialized form contained in the var "form" but I need the name from Mark, make sure the name of the id is right.
                 //create the url, to post to
-                var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_XXX";
+                var url = "https://"+ getFromStorage("domain") +"/ajax/app_XXX";
                 
                 //get the roles which we can pick(if any) and freeSpaces
                 var ajaxCall = postAJAXCall(url, toPost);
@@ -1751,44 +1815,76 @@ $(document).ready(function(){
         
     };
     //a function which is called when people try to book a shift
-    function getRolesBookShift(event) {
-        event.preventDefault();
+    function getRolesBookShift() {
         //takes the button that opened this window, then looks for it's closest container, which is its shift, then gets the shifts id which is equal to its id in the JSON/server
         var shiftId = $(this).closest(".shiftTarget").attr("id");
         //this is called to make sure a potential modal window starts closing, the timeouts further down in the code are there to give the different modals opened time to close
         modalW.empty();
         setTimeout(function() {
-            if(false) { //checkConnection()
+            if(checkConnection()) { //checkConnection()
                 //what to post, it's the id of the shift in question
                 var infoArr = {shiftid:shiftId};
                 //create the url, to post to
-                var url = "https://"+ getFromStorage("domain") +".nemvagt.dk/ajax/app_XXX";
+                var url = "https://"+ getFromStorage("domain") +"/ajax/app_shiftdetails";
+                
+                infoArr.pswhash = getFromStorage("pswHash");
+                infoArr.userid = getFromStorage("userId");
                 
                 //get the roles which we can pick(if any) and freeSpaces
-                var ajaxCall = postAJAXCall(url, infoArr);
+                //var ajaxCall = postAJAXCall(url, infoArr);
+                var ajaxCall = $.ajax({
+                    type: "POST",
+                    url: url,
+                    dataType: "text",
+                    data: infoArr});
                 
                 //we may need to make some kind of check on the data, BEFORE we go on to iterating through it... like "if(data["succes"])", but it depends on the API
                 
                 //iterate through the data we got with roles then make a string containing a form and open a modal and parse it the string
                 ajaxCall.done(function(data) {
                     //in these functions we open the modal with the form in it... when okay is pressed in that window: submit;
-                    
-                    //create the form string we'll be submitting
-                    var rolePickForm = '<form id="'+ shiftId +'" class="form-group shiftTarget" role="form" method="post" action="">'; //we may not hvae any reason to give this the shift id, if not then it doesn't need the .shiftTarget
-                    
-                    for(var i = 0; i < data.length; i++) {
-                        var object = data[i];
-                        for(var property in object) {
-                            rolePickForm += '<input type="radio" name="roles" value="'+ object["required indentifier"] +'" checked>'+ object[property] +'<br>';
+                    $("#UI_ELEMENT_TEST").append('<p>ajaxDataAsString: '+ data +'</p>');
+                    if(data["succes"]) {
+                        //continue to show modal with roles etc
+                        
+                        //create the form string we'll be submitting
+//                        var rolePickForm = '<form id="'+ shiftId +'" class="form-group shiftTarget" role="form" method="post" action="">';
+                        var rolePickForm = '';
+                        var optionsString = '';
+                        if(data["roles"].length > 0) {
+                            var object = data["roles"];
+                            for(var i = 0; i < object.length; i++) {
+                                optionsString += "<option value="+ object[i]["roleid"] +">"+ object[i]["rolename"] +"</option>";
+                            };
+                            for(var property in object) {
+                                rolePickForm += '<p>'+ property +': '+ object[property] +'</p>';
+                                //we need to user select instead of radio... rolePickForm += '<input type="radio" name="roles" value="'+ object["required indentifier"] +'" checked>'+ object[property] +'<br>';
+    //                            rolePickForm += '<input type="radio" name="roles" value="'+ object["required indentifier"] +'" checked>'+ object[property] +'<br>';
+                            };
+                            $("#UI_ELEMENT_TEST").append(rolePickForm);
+                        }else {
+                            $("#UI_ELEMENT_TEST").append('<p>role.length'+ data["roles"].length +'</p>');
+                            $("#UI_ELEMENT_TEST").append('<p>roleId'+ data["roles"][0]["roleid"] +'</p>');
+                            $("#UI_ELEMENT_TEST").append('<p>roleName'+ data["roles"][0]["rolename"] +'</p>');
+                            $("#UI_ELEMENT_TEST").append('<p>roleMaxMembers'+ data["roles"][0]["maxmembers"] +'</p>');
+                            $("#UI_ELEMENT_TEST").append('<p>roleTaken'+ data["roles"][0]["taken"] +'</p>');
+                            $("#UI_ELEMENT_TEST").append('<p>msg'+ data["msg"] +'</p>');
+                            $("#UI_ELEMENT_TEST").append('<p>msg'+ data["shiftuid"] +'</p>');
                         };
-                    };
+                        
+                        //"<option value="+ options[i] +">"+ options[i] +"</option>"'<label for="'+ object["fieldname"] +'">'+ object["showname"] +':</label><select class="form-control userProfileElement" id="'+ object["fieldname"] +'" name="'+ object["fieldname"] +'">'+ optionString +'</select>';
+                        
+                        //append a submit btn to the form
+//                        rolePickForm += '<button type="submit" class="btn modalYesBtn btn-success btn-lg">Tag vagt</button>';
+//                        //close form
+//                        rolePickForm += '</form>';
+                        //opens the modal and parses it the string with the form...
+//                        showModalView(rolePickForm);
                     
-                    //append a submit btn to the form
-                    rolePickForm += '<button type="submit" class="btn modalYesBtn btn-success btn-lg">Tag vagt</button>';
-                    //close form
-                    rolePickForm += '</form>';
-                    //opens the modal and parses it the string with the form...
-                    showModalView(rolePickForm);
+                    }else { //if succes isn't true, it should be false and if so, there are no more free slots/spaces for the shift
+                        //notify user that last slot was just filled... display data["MSG"] in content of modal
+                        $("#UI_ELEMENT_TEST").append("<p>fail</p>");
+                    };
                 });
             }else {
                 //notify user of missing conenction
