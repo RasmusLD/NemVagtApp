@@ -53,12 +53,13 @@ $(document).ready(function(){
     if(device.platform !== "iPhone") {
         document.addEventListener("backbutton", onBackKeyDown, false);
     };
+    
 //    /*url til prfil billede, er /avatar/md5(userid)/size(int size i want)*/
     function derp() {
         
         var infoArr = {};
         
-        var url = "https://"+ getFromStorage("domain") +"/ajax/app_shiftdetails";
+        var url = "https://"+ getFromStorage("domain") +"/avatar/";
         
         infoArr.pswhash = getFromStorage("pswHash");
         
@@ -70,49 +71,29 @@ $(document).ready(function(){
             dataType: "JSON",
             data: infoArr
         });
-    }
+    };
     
-//    //camera use // TEST START
-//    var picSour = navigator.camera.PictureSourceType;
-//    var picDest = navigator.camera.DestinationType; 
-//    
-//    function getPhoto() {
-//        $("#UI_ELEMENT_TEST").append("<p>getPhoto called</p>");
-//        // Retrieve image file location from specified source
-//        navigator.camera.getPicture(onPhotoURISuccess, onPhotoFail, { quality: 50,
-//        destinationType: picDest.FILE_URI,
-//        //destinationType: picDest.DATA_URL,
-//        sourceType: picSour.PHOTOLIBRARY });
-//        $("#UI_ELEMENT_TEST").append("<p>end of getPhoto reached</p>");
-//    };
-//    function onPhotoURISuccess(imageURI) {
-//        $("#UI_ELEMENT_TEST").append("<p>photoSuccess called</p>");
-//        //post the image URI
-//        $("#UI_ELEMENT_TEST").append("<p>the imageURI: "+ imageURI +";</p>");
-//        var img = $("#largeImage");
-//        //$("#UI_ELEMENT_TEST").append("<p>rdy to style img as block</p>");
-//        //img.style.display = "block";
-//        $("#UI_ELEMENT_TEST").append("<p>rdy to set img.src</p>");
-//        var changedPath = imageURI.split("//")[1];
-//        //img.src = imageURI;
-//        $("#UI_ELEMENT_TEST").append("<p>changedPath length: "+ changedPath.length +"</p>");
-//        $("#UI_ELEMENT_TEST").append("<p>changedPath: "+ changedPath +"</p>");
-//        img.src = changedPath;
-//        $("#UI_ELEMENT_TEST").append("<p>end of photoSuccess reached</p>");
-//    };
-//    function onPhotoFail(msg) {
-//        //notify user?
-//        $("#UI_ELEMENT_TEST").append("<p>photoFail called</p>");
-//        $("#UI_ELEMENT_TEST").append("<p>getPictureState: Fail; msg: "+ msg +"</p>");
-//        $("#UI_ELEMENT_TEST").append("<p>end of photoFail reached</p>");
-//    };
-//    // TEST END - Also see "getPhoto" in "onBackKeyDown"
     
     function onBackKeyDown() {
         //does nothing, simply overriding the back button, so that it does nothing.
-        //var camH = navigator.camera.getPicture( cameraSuccess, cameraError, [ cameraOptions ] );
-//        getPhoto();
-        derp();
+        
+        //appends buttons to the test UI_Element
+        $("#UI_ELEMENT_TEST").append('<button id="capPhotoD">Capture Photo With Image Data</button> <br>\
+            <button id="capPhotoFU">Capture Photo With Image File URI</button> <br>\
+            <button id="getPhotoL">From Photo Library</button><br>\
+            <button id="getPhotoPA">From Photo Album</button><br>');
+        
+        //appends listeners for the buttons
+        $("#capPhotoD").on("click", capturePhotoWithData);
+        $("#capPhotoFU").on("click", capturePhotoWithFile);
+        $("#getPhotoL").on("click", function() {
+            getPhoto(pictureSource.PHOTOLIBRARY);
+        });
+        $("#getPhotoPA").on("click", function() {
+            getPhoto(pictureSource.SAVEDPHOTOALBUM);
+        });
+        
+        //derp();
     };
     
     //the #mCont dom element is saved here in runOnLoad
@@ -127,6 +108,10 @@ $(document).ready(function(){
     var possibleShiftsFirstUpdate = true;
     //a listener for ajax queries is saved here in runOnLoad
     var ajaxWatch;
+    //picture source
+    var pictureSource;
+    //sets the format of returned value
+    var destinationType;
     
     //this must be the first function, so that the JS instantiates properly
     $(function runOnLoad(){
@@ -142,6 +127,11 @@ $(document).ready(function(){
         //creates listeners for ajaxStart/ajaxStop
         ajaxWatch = ajaxWatch();
         
+        //instantiates the variables we need to handle pictures
+        pictureSource=navigator.camera.PictureSourceType;
+        destinationType=navigator.camera.DestinationType;
+        
+        
         //removes the large logo, shown on app startup
         $("#sCont").empty();
         
@@ -149,6 +139,67 @@ $(document).ready(function(){
         hasSavedLogin();
         
     });
+    
+    //Called when a photo is successfully retrieved
+    function onPhotoDataSuccess(imageData) {
+        $("#UI_ELEMENT_TEST").append('<img style="display:block;width:60px;height:60px;" id="smallImage" src="'+ imageData +'" />');
+        //Get image handle
+        //var smallImage = $('#smallImage');
+        //Unhide image elements
+        //smallImage.style.display = 'block';
+        //Show the captured photo
+        //The inline CSS rules are used to resize the image
+        //smallImage.src = "data:image/jpeg;base64," + imageData;
+    };
+    // Called when a photo is successfully retrieved
+    function onPhotoFileSuccess(imageData) {
+        //Get image handle
+        $("#UI_ELEMENT_TEST").append('<img style="display:block;width:60px;height:60px;" id="smallImage" src="'+ imageData +'" />');
+        
+        //var smallImage = $('#smallImage');
+        
+        //Unhide image elements
+        //smallImage.style.display = 'block';
+        
+        //Show the captured photo
+        //The inline CSS rules are used to resize the image
+        //smallImage.src = imageData;
+    };
+    //Called when a photo is successfully retrieved
+    function onPhotoURISuccess(imageURI) {
+        //Get image handle
+        $("#UI_ELEMENT_TEST").append('<img style="display:block;" id="largeImage" src="'+ imageURI +'" />');
+        //var largeImage = $('#largeImage');
+        
+        //Unhide image elements
+        //largeImage.style.display = 'block';
+        
+        //Show the captured photo
+        //The inline CSS rules are used to resize the image
+        //largeImage.src = imageURI;
+    };
+    
+    //A button will call this function
+    function capturePhotoWithData() {
+    //Take picture using device camera and retrieve image as base64-encoded string
+        navigator.camera.getPicture(onPhotoDataSuccess, onFail, { quality: 50 });
+    };
+    function capturePhotoWithFile() {
+        navigator.camera.getPicture(onPhotoFileSuccess, onFail, { quality: 50, destinationType: Camera.DestinationType.FILE_URI });
+    };
+    //A button will call this function
+    function getPhoto(source) {
+        //Retrieve image file location from specified source
+        navigator.camera.getPicture(onPhotoURISuccess, onFail, { quality: 50,
+        destinationType: destinationType.FILE_URI,
+        sourceType: source });
+    };
+    
+    //Called on error.
+    function onFail(message) {
+        $("#UI_ELEMENT_TEST").append('<p>Error: '+ message +'</p>');
+    };
+    
     
     //object to save the autoupdate of the myShifts to, autoupdateMyShifts is added to the variable at the end of the populateMyShifts method if it is still undefined
     var jsonUpdateMyShiftsObj;
