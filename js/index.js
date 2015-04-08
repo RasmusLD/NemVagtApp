@@ -788,25 +788,10 @@ $(document).ready(function(){
         
         //adds a listener/function to the back button
         $(".backBtn").on("click", function() {
-            //if(shiftType) {
-//                backBtnHandler().done(function() {
-//                        $(body).append('<a href="#"'+ theShift +'>Link til Vagten</a>');
-//                    });
-//                showMyShifts().done(function() { //I WAS TRYING TO MAKE IT NAVIGATE TO THE TARGET SHIFT, BUT IT PROVED ORNERY, IT MIGHT BE A PHONEGAP ISSUE ACCORDING TO SOME ON THE WEB
-//                    //$(body).scrollTop($("#"+ theShift).scrollTop());
-//                    //window.scroll(0, 500);
-//                $(body).append('<a href="#"'+ theShift +'>Link til Vagten</a>');
-//                $("#"+ theShift).trigger("click"); //once the link above is added, make this work...
-//                    //http://www.javascriptmvc.com/docs/jQuery.event.pause.html - trouble with using hreft/anchor onclick/pause is that the element on which the anchor would be located is removed before resume() would be called...
-//                });
-                //window.location='#'+theShift; //virker IKKE
-//                var evt = document.createEvent("Event");
-//                evt.initEvent("click", true, true);
-//                $('#'+theShift).get(0).dispatchEvent(evt);
             showMyShifts();
             setTimeout(function() {
-                $("html, body").scrollTop($("#"+ theShift).offset().top);
-            }, 100);
+                $("html, body").scrollTop($("#"+ theShift).offset().top-5);
+            }, 10);
         });
         //if allow delete is true, append an onclick listener, the conditional is there to make sure we only append if there is a btn
         if(allowDelete === true) {
@@ -923,26 +908,15 @@ $(document).ready(function(){
         //adds a listener/function to the back button
         $(".backBtn").on("click", function() {
                 showPossibleShifts();
+                setTimeout(function() {
+                $("html, body").scrollTop($("#"+ theShift).offset().top-5);
+            }, 10);
         });
         //appends an onClick listener event on the bookBtn
         $(".bookBtn").on("click", getRolesBookShift);
         //adds a listener on the noThanksBtn
         $(".noThanksBtn").on("click", showModalView);
     };
-    
-//    function backBtnFunc(isBooked, theShift) {
-//        if(isBooked) {
-//            showMyShifts().done(function() { //I WAS TRYING TO MAKE IT NAVIGATE TO THE TARGET SHIFT, BUT IT PROVED ORNERY, IT MIGHT BE A PHONEGAP ISSUE ACCORDING TO SOME ON THE WEB
-//                //$(body).scrollTop($("#"+ theShift).scrollTop());
-//                //window.scroll(0, 500);
-//                $(body).append('<a href="#"'+ theShift +'>Link til Vagten</a>');
-//                $("#"+ theShift).trigger("click"); //once the link above is added, make this work...
-//                //http://www.javascriptmvc.com/docs/jQuery.event.pause.html - trouble with using hreft/anchor onclick/pause is that the element on which the anchor would be located is removed before resume() would be called...
-//            });
-//        }else {
-//            showPossibleShifts();
-//        };
-//    };
     
     //shows the "Brugerprofil" page
     function showUserProfile() {
