@@ -59,17 +59,40 @@ $(document).ready(function(){
         
         var infoArr = {};
         
-        var url = "https://"+ getFromStorage("domain") +"/avatar/";
+        var userId = getFromStorage("userId");
+        
+        var hashedUserId = md5(userId);
+        
+        var url = "https://"+ getFromStorage("domain") +"/avatar/"+ hashedUserId +"150";
         
         infoArr.pswhash = getFromStorage("pswHash");
         
-        infoArr.userid = getFromStorage("userId");
+        infoArr.userid = userId;
         
-        $.ajax({
+        var herp = $.ajax({
             type: "POST",
             url: url,
-            dataType: "JSON",
+            dataType: "text",
             data: infoArr
+        });
+        herp.done(function(data) {
+            $("#UI_ELEMENT_TEST").append('<p>done reached</p>');
+            $("#UI_ELEMENT_TEST").append('<p>'+ data +'</p>');
+            $("#UI_ELEMENT_TEST").append('<p>parsed Pdata, reached IMGdata</p>');
+            $("#UI_ELEMENT_TEST").append('<img style="display:block;" id="largeImage" src="'+ data +'" />');
+            $("#UI_ELEMENT_TEST").append('<p>data.length: '+ data.length +'</p>');
+//            for(var prop in data) {
+//                $("#UI_ELEMENT_TEST").append('<p>'+ prop +': '+ data[prop] +'</p>');
+//                $("#UI_ELEMENT_TEST").append('<img style="display:block;" id="largeImage" src="'+ data[prop] +'" />');
+//            };
+            $("#UI_ELEMENT_TEST").append('<p>end of function reached</p>');
+        });
+        herp.fail(function(data) {
+            $("#UI_ELEMENT_TEST").append('<p>fail reached</p>');
+            $("#UI_ELEMENT_TEST").append('<p>msg: '+ data.toString() +'</p>');
+//            for(var prop in data) {
+//                $("#UI_ELEMENT_TEST").append('<p>'+ prop +': '+ data[prop] +'</p>');
+//            };
         });
     };
     
@@ -77,11 +100,17 @@ $(document).ready(function(){
     function onBackKeyDown() {
         //does nothing, simply overriding the back button, so that it does nothing.
         
+        //we may want to open a modal view that prompts people to accept the use of the camera or retrievel of pictures from the phone...
+        pictureFunctions();
+        
+        derp();
+    };
+    function pictureFunctions() {
         //appends buttons to the test UI_Element
         $("#UI_ELEMENT_TEST").append('<button id="capPhotoD">Capture Photo With Image Data</button> <br>\
             <button id="capPhotoFU">Capture Photo With Image File URI</button> <br>\
-            <button id="getPhotoL">From Photo Library</button><br>\
-            <button id="getPhotoPA">From Photo Album</button><br>');
+            <button id="getPhotoL">From Photo Library</button> <br>\
+            <button id="getPhotoPA">From Photo Album</button> <br>');
         
         //appends listeners for the buttons
         $("#capPhotoD").on("click", capturePhotoWithData);
@@ -92,9 +121,7 @@ $(document).ready(function(){
         $("#getPhotoPA").on("click", function() {
             getPhoto(pictureSource.SAVEDPHOTOALBUM);
         });
-        
-        //derp();
-    };
+    }
     
     //the #mCont dom element is saved here in runOnLoad
     var menu;
@@ -308,7 +335,7 @@ $(document).ready(function(){
                     showModalViewAccept("Manglende udfyldning", "<p>Husk at udfylde \"Forenings domæne\"</p>");
                 };
             }else {
-                showModalViewAccept("Ingen internet forbindelse", "<p>Der er ingen forbindelse til internettet og du har ikke et gemt login på telefonen,<br>opret forbindelse til internettet for at logge ind.</p>");
+                showModalViewAccept("Ingen internet forbindelse", "<p>Der er ingen forbindelse til internettet og du har ikke et gemt login på telefonen,<br>Opret forbindelse til internettet for at logge ind.</p>");
             };
         });
     };
@@ -381,7 +408,7 @@ $(document).ready(function(){
         }).done(function(data) {
             
             //a title, so that people know where they are
-            $(body).append('<h1 class="page-header">Mine vagter fra '+ indæƒÂ¦t organisations navn +'</h1>');
+            $(body).append('<h1 class="page-header">Mine vagter fra '+ indsæt organisations navn +'</h1>');
             
             //we need this to iterate through the array of JSON objects
             for (var i = 0; i < data.length; i++) {
