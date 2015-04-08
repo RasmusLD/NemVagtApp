@@ -289,7 +289,7 @@ $(document).ready(function(){
         $(body).append('<h1 class="page-header">NemVagt Login</h1>');
         //the submit btn should be set to .disabled, unless all required fields are filled with data.
         $(body).append('<form id=loginForm role="form" method="post" action="" >\
-    <label for="domain">Forenings Domæne</label>\
+    <label for="domain">Forenings DomÃ¦ne</label>\
 <div class="input-group form-group">\
     <span class="input-group-addon">'+ 'https://' +'</span>\
     <input value="mobiludvikling" type="url" name="domain" class="form-control" placeholder="festival">\
@@ -332,10 +332,10 @@ $(document).ready(function(){
                         loginEvaluater(returnedData, email, domain);
                     });
                 }else {
-                    showModalViewAccept("Manglende udfyldning", "<p>Husk at udfylde \"Forenings domæne\"</p>");
+                    showModalViewAccept("Manglende udfyldning", "<p>Husk at udfylde \"Forenings domÃ¦ne\"</p>");
                 };
             }else {
-                showModalViewAccept("Ingen internet forbindelse", "<p>Der er ingen forbindelse til internettet og du har ikke et gemt login på telefonen,<br>Opret forbindelse til internettet for at logge ind.</p>");
+                showModalViewAccept("Ingen internet forbindelse", "<p>Der er ingen forbindelse til internettet og du har ikke et gemt login pÃ¥ telefonen,<br>Opret forbindelse til internettet for at logge ind.</p>");
             };
         });
     };
@@ -408,7 +408,7 @@ $(document).ready(function(){
         }).done(function(data) {
             
             //a title, so that people know where they are
-            $(body).append('<h1 class="page-header">Mine vagter fra '+ indsæt organisations navn +'</h1>');
+            $(body).append('<h1 class="page-header">Mine vagter fra '+ indsÃ¦t organisations navn +'</h1>');
             
             //we need this to iterate through the array of JSON objects
             for (var i = 0; i < data.length; i++) {
@@ -440,7 +440,7 @@ $(document).ready(function(){
                 //adds a button to unbook the shift to the shift, if the option is provided
                 var unbookBtn = '';
                 if(object["allowdelete"] === true) {
-                    unbookBtn = '<button class="btn pull-right margBotBtn unbookBtn">Afmeld vagt</button>'; //kendte/havde Mark måske et wastebasket/trashcan icon?
+                    unbookBtn = '<button class="btn pull-right margBotBtn unbookBtn">Afmeld vagt</button>'; //kendte/havde Mark mÃ¥ske et wastebasket/trashcan icon?
                     //a listener is added after it has been appended to body (if object[allowdelete] is true)
                 };
                 
@@ -533,7 +533,7 @@ $(document).ready(function(){
             //adds a button to unbook the shift to the shift, if the option is provided
             var unbookBtn = '';
             if(object["allowdelete"] === true) {
-                unbookBtn = '<button class="btn btn-danger pull-right margBotBtn unBookBtn" style="margin-right: -1vmin;">Afmeld vagt</button>'; //kendte/havde Mark måske et wastebasket/trashcan icon?
+                unbookBtn = '<button class="btn btn-danger pull-right margBotBtn unBookBtn" style="margin-right: -1vmin;">Afmeld vagt</button>'; //kendte/havde Mark mÃ¥ske et wastebasket/trashcan icon?
                 //a listener is added after it has been appended to body
             };
 
@@ -804,6 +804,9 @@ $(document).ready(function(){
 //                evt.initEvent("click", true, true);
 //                $('#'+theShift).get(0).dispatchEvent(evt);
             showMyShifts();
+            setTimeout(function() {
+                $("html, body").scrollTop($("#"+ theShift).offset().top);
+            }, 100);
         });
         //if allow delete is true, append an onclick listener, the conditional is there to make sure we only append if there is a btn
         if(allowDelete === true) {
@@ -864,7 +867,7 @@ $(document).ready(function(){
                 };
                 //if there are any free spaces, show how many there are
                 if(freeSpaces > 0) {
-                    freeSpacesFormatted = "<p>Der er "+ freeSpaces +" ledige pladser på vagten</p>";
+                    freeSpacesFormatted = "<p>Der er "+ freeSpaces +" ledige pladser pÃ¥ vagten</p>";
                 };
                 //if notes aren't null or "", var notes = notes from JSON
                 if(object["shiftnotes"] !== undefined && object["shiftnotes"] !== "" && object["shiftnotes"] !== null) {
@@ -996,7 +999,7 @@ $(document).ready(function(){
             };
         };
         //adds a submit button to the UserProfile form, done outside the "for loop" it will always be at the end of the form
-        profileFields += '<button type="submit" class="btn btn-success btn-lg" id="saveUserProfileBtn">Gem ændringer</button>';
+        profileFields += '<button type="submit" class="btn btn-success btn-lg" id="saveUserProfileBtn">Gem Ã¦ndringer</button>';
         //closes the UserProfile form, done here outside the "for loop", since we don't know how long the form will be
         profileFields += '</form>';
         //appends the UserProfile form to the body, so it can be viewed
@@ -1142,7 +1145,7 @@ $(document).ready(function(){
                 var valueOfObject = $("#"+ object["fieldname"]).val();
                 if(valueOfObject === "" || valueOfObject === null || valueOfObject === undefined) {
                     //if something that should be filled out isn't, notify user and display helptext (only tells of/displays help for, the first instance of incorrectly filled form element)
-                    showModalViewAccept("Manglende udfyldning", "Feltet \""+ object["showname"] +"\" skal være udfyldt.<br>Hjælp til udfyldning:<br>"+ object["helptext"] +"<br><br>Felter der skal være udfyldt og ikke er det, er nu highlighted");
+                    showModalViewAccept("Manglende udfyldning", "Feltet \""+ object["showname"] +"\" skal vÃ¦re udfyldt.<br>HjÃ¦lp til udfyldning:<br>"+ object["helptext"] +"<br><br>Felter der skal vÃ¦re udfyldt og ikke er det, er nu highlighted");
                     //highlights all incorrectly filled form elements, making it easy for the user to find them...
                     $("#"+ object["fieldname"]).addClass("myHighlight");
                     //removes the highlight once the user manipulates the form element
@@ -1243,7 +1246,7 @@ $(document).ready(function(){
 
                                 //timeout is there to make sure the previous modal, from ajaxWatch has time to "un-animate", as it seems that if I dont do that, the "remove this modal view when a modal view becomes hidden" triggers from the other window being removed...
                                 setTimeout(function() {
-                                    showModalViewAccept("Fejl", "Bruger Profilen blev ikke opdateret, dette kan være fordi du har forsøgt at gemme den uden at foretage en ændring.");
+                                    showModalViewAccept("Fejl", "Bruger Profilen blev ikke opdateret, dette kan vÃ¦re fordi du har forsÃ¸gt at gemme den uden at foretage en Ã¦ndring.");
                                 }, 100);
                             };
                         });
@@ -1258,7 +1261,7 @@ $(document).ready(function(){
                     populateUserProfile(JSON.parse(getFromStorage("savedUserProfile")));
                     
                     setTimeout(function() {
-                        showModalViewAccept("Ingen ændring", "Der er ingen ændringer foretaget i din Brugerprofil og der er derfor ingen grund til at opdatere den.");
+                        showModalViewAccept("Ingen Ã¦ndring", "Der er ingen Ã¦ndringer foretaget i din Brugerprofil og der er derfor ingen grund til at opdatere den.");
                     }, 100);
                 };
             }else {
@@ -1271,7 +1274,7 @@ $(document).ready(function(){
                 
                 //timeout is there to make sure the previous modal, from ajaxWatch has time to "un-animate", as it seems that if I dont do that, the "remove this modal view when a modal view becomes hidden" triggers from the other window being removed...
                 setTimeout(function() {
-                    showModalViewAccept("Manglende netværksforbindelse", "Der er ingen netværksforbindelse og det er derfor ikke muligt at opdatere din profil.");
+                    showModalViewAccept("Manglende netvÃ¦rksforbindelse", "Der er ingen netvÃ¦rksforbindelse og det er derfor ikke muligt at opdatere din profil.");
                 }, 100);
             };
         };
@@ -1346,9 +1349,9 @@ $(document).ready(function(){
             
             //if there's something to retrive notify user, if there's nothing to retrieve, tell the user that...
             if(saved !== undefined && saved !== "" && saved !== null) {
-                notificationModal("OBS, kunne ikke hente fra nettet", "<p>Henter \""+ whereAreWe +"\" fra telefonens hukommelse, data kan være forældet.</p>");
+                notificationModal("OBS, kunne ikke hente fra nettet", "<p>Henter \""+ whereAreWe +"\" fra telefonens hukommelse, data kan vÃ¦re forÃ¦ldet.</p>");
             }else {
-                notificationModal("OBS, kunne ikke hente fra nettet", "<p>Der er ingen data for \""+ whereAreWe +"\" gemt på din telefon, hvis du har brug for at få det vist skal der bruges et netværk.</p>");
+                notificationModal("OBS, kunne ikke hente fra nettet", "<p>Der er ingen data for \""+ whereAreWe +"\" gemt pÃ¥ din telefon, hvis du har brug for at fÃ¥ det vist skal der bruges et netvÃ¦rk.</p>");
             };
             //removes the modal window after X 1/1000 of a second has passed.
             setTimeout(function() {
@@ -1497,13 +1500,13 @@ $(document).ready(function(){
     function getWeekday(date) {
         var aDay = new Date(date).getDay();
         var weekdays = {
-            0: "Søndag",
+            0: "SÃ¸ndag",
             1: "Mandag",
             2: "Tirsdag",
             3: "Onsdag",
             4: "Torsdag",
             5: "Fredag",
-            6: "Lørdag"
+            6: "LÃ¸rdag"
         };
         return weekdays[aDay];
     };
@@ -1640,7 +1643,7 @@ $(document).ready(function(){
                     <h4 class="modal-title" id="myModalLabel">'+ title +'</h4>\
                   </div>\
                   <div class="modal-body">\
-                    Er du sikker på at du vil afmelde dig vagten?\
+                    Er du sikker pÃ¥ at du vil afmelde dig vagten?\
                   </div>\
                   <div class="modal-footer">\
                     <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Nej</button>\
@@ -1808,7 +1811,7 @@ $(document).ready(function(){
             }else {
                 //notify user of missing conenction
                 setTimeout(function() {
-                    showModalViewAccept("Ingen internet forbindelse", "Der er ingen forbindelse til internettet, det er derfor ikke muligt af afvise vagten.<br>Opret forbindelse til internettet og prøv igen.");
+                    showModalViewAccept("Ingen internet forbindelse", "Der er ingen forbindelse til internettet, det er derfor ikke muligt af afvise vagten.<br>Opret forbindelse til internettet og prÃ¸v igen.");
                 }, 100);
             };
         }, 100);
@@ -1847,7 +1850,7 @@ $(document).ready(function(){
             }else {
                 //notify user of missing conenction
                 setTimeout(function() {
-                    showModalViewAccept("Ingen internet forbindelse", "Der er ingen forbindelse til internettet, det er derfor ikke muligt af afmelde dig vagten.<br>Opret forbindelse til internettet og prøv igen.");
+                    showModalViewAccept("Ingen internet forbindelse", "Der er ingen forbindelse til internettet, det er derfor ikke muligt af afmelde dig vagten.<br>Opret forbindelse til internettet og prÃ¸v igen.");
                 }, 100);
             };
         }, 100);
@@ -1886,7 +1889,7 @@ $(document).ready(function(){
             }else {
                 //notify user of missing conenction
                 setTimeout(function() {
-                    showModalViewAccept("Ingen internet forbindelse", "Der er ingen forbindelse til internettet, det er derfor ikke muligt af tilmelde dig vagten.<br>Opret forbindelse til internettet og prøv igen.");
+                    showModalViewAccept("Ingen internet forbindelse", "Der er ingen forbindelse til internettet, det er derfor ikke muligt af tilmelde dig vagten.<br>Opret forbindelse til internettet og prÃ¸v igen.");
                 }, 100);
             };
         }, 100);
@@ -1967,7 +1970,7 @@ $(document).ready(function(){
             }else {
                 //notify user of missing conenction
                 setTimeout(function() {
-                    showModalViewAccept("Ingen internet forbindelse", "Der er ingen forbindelse til internettet, det er derfor ikke muligt af tilmelde dig vagten.<br>Opret forbindelse til internettet og prøv igen.");
+                    showModalViewAccept("Ingen internet forbindelse", "Der er ingen forbindelse til internettet, det er derfor ikke muligt af tilmelde dig vagten.<br>Opret forbindelse til internettet og prÃ¸v igen.");
                 }, 100);
             };
         }, 100);
