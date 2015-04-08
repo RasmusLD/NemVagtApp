@@ -107,10 +107,10 @@ $(document).ready(function(){
     };
     function pictureFunctions() {
         //appends buttons to the test UI_Element
-        $("#UI_ELEMENT_TEST").append('<button id="capPhotoD">Capture Photo With Image Data</button> <br>\
-            <button id="capPhotoFU">Capture Photo With Image File URI</button> <br>\
-            <button id="getPhotoL">From Photo Library</button> <br>\
-            <button id="getPhotoPA">From Photo Album</button> <br>');
+        $("#UI_ELEMENT_TEST").append('<button class="btn btn-default" id="capPhotoD">Capture Photo With Image Data</button> <br>\
+            <button class="btn btn-default" id="capPhotoFU">Capture Photo With Image File URI</button> <br>\
+            <button class="btn btn-default" id="getPhotoL">From Photo Library</button> <br>\
+            <button class="btn btn-default" id="getPhotoPA">From Photo Album</button> <br>');
         
         //appends listeners for the buttons
         $("#capPhotoD").on("click", capturePhotoWithData);
@@ -222,9 +222,23 @@ $(document).ready(function(){
         sourceType: source });
     };
     
-    //Called on error.
+    //Called on error and cancel
     function onFail(message) {
-        $("#UI_ELEMENT_TEST").append('<p>Error: '+ message +'</p>');
+        //the onFail function is also called on cancelling the use of the camera/photoBrowser...
+        
+        //var that lets us know if it's a real error or not, true is a real error, false is probably, a cancellation by user
+        var trueError = true;
+        //look for the word "cancelled." in the error message if we find it, set trueError to false, we don't know for sure that it will only show up when the user cancels, but let's hope...
+        var msgArr = message.split(" ");
+        for(var i = 0; i < msgArr.length; i++) {
+            if(msgArr[i] === "cancelled.") { //the dot is there because that's the format I've seen on expected fails, so far...
+                trueError = false;
+            };
+        };
+        //if the word "cancelled." wasn't found, notify user of the error
+        if(trueError) {
+            showModalViewAccept("Fejl", "Problem ved hentning af billede: "+ message);
+        };
     };
     
     
