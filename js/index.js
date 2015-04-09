@@ -533,9 +533,9 @@ $(document).ready(function(){
             var object = myBookedShifts[i];
             
             //checks to see if there is a role, then adds them to the var roller, which is added to the $(body).append() below.
-            var roller = '';
-            if(object["roles"]!== undefined) { //right now, roles isn't passed to me at all. Speak to Mark about this...
-                roller = '"<p>Roller: '+ object["roles"] +'</p>"';
+            var role = '';
+            if(object["rolename"] !== undefined && object["rolename"] !== null) {
+                role = '<p>Rolle: '+ object["rolename"] +'</p>';
             }
 
             //adds a title to the shift, if one is provided
@@ -550,8 +550,15 @@ $(document).ready(function(){
                 unbookBtn = '<button class="btn btn-danger pull-right margBotBtn unBookBtn" style="margin-right: -1vmin;">Afmeld vagt</button>'; //kendte/havde Mark måske et wastebasket/trashcan icon?
                 //a listener is added after it has been appended to body
             };
-
-            $(body).append('<div id="'+ object["id"] +'" class="container shiftTarget shift" style="border: solid black 1px; margin-bottom: 5vmin;">\
+            
+            //gives the shift a color type, if it has one
+            var shiftColor = '';
+            if(object["color"] !== null && object["color"] !== undefined) {
+                shiftColor = '<div style="clear: both; margin-left: -10vmin; heigth: 5px; width: 130%; background-color:'+ object["color"] +';"><br></div>';
+            };
+            
+            $(body).append('<div id="'+ object["id"] +'" class="container shiftTarget shift" style="overflow: hidden; border: solid black 1px; margin-bottom: 5vmin;">\
+                '+ shiftColor +'\
                 <div>\
                     '+ title +'\
                     <button style="margin-bottom: 1vmin; margin-right: -1vmin; margin-top: 3vmin;" type="button" class="btn bookedDetailsBtn btn-default readMoreBtn pull-right">Vis mere</button>\
@@ -560,8 +567,8 @@ $(document).ready(function(){
                 </div>\
                 <div style="clear: both;">\
                     <p>Kl: '+ object["starttime"].substring(0,5) +' til '+ object["endtime"].substring(0,5) +'</p>\
+                    '+ role +'\
                     '+ unbookBtn +'\
-                    '+ roller +'\
                 </div>\
             </div>');
         };
@@ -745,6 +752,7 @@ $(document).ready(function(){
             var roles = '';
             var city = '';
             var address = '';
+            var shiftColor = '';
 
             //Checks to see if the id of the shift, from the JSON is equal to the id of the shift we want
             if(object["id"] === theShift) {
@@ -767,14 +775,18 @@ $(document).ready(function(){
                 if(object["endtime"] !== undefined && object["endtime"] !== "" && object["endtime"] !== null) { //if endtime exists, is not null or "", var endTime = a formatted endtime
                     endTime = "<p>"+ "Sluttid" +": "+ object["endtime"].substring(0,5) +"</p>";
                 };
-                if(object["roles"] !== undefined && object["endtime"] !== "" && object["endtime"] !== null) { //if roles exists, is not null or "", var roles = roles from JSON //right now, I apparently don't receive roles...
-                    roles = "<p>"+ "Rolle" +": "+ object["endtime"] +"</p>";
+                if(object["rolename"] !== undefined && object["rolename"] !== "" && object["rolename"] !== null) { //if roles exists, is not null or "", var roles = roles from JSON
+                    roles = "<p>"+ "Rolle" +": "+ object["rolename"] +"</p>";
                 };
                 if(object["address"] !== undefined && object["address"] !== "" && object["address"] !== null) { //if address exists, is not null or "", var address = adress from JSON
                     address = "<p>"+ "Adresse" +": "+ object["address"] +"</p>";
                 };
                 if(object["city"] !== undefined && object["city"] !== "" && object["city"] !== null) { //if city exists, is not null or "", var city = city from JSON
                     city = "<p>"+ "By" +": "+ object["city"] +"</p>";
+                };
+                //gives the shift a color & type, if it has one
+                if(object["color"] !== undefined && object["color"] !== null && object["label"] !== undefined && object["label"] !== null) {
+                    shiftColor = '<p>Vagt type: '+ object["label"] +'</p><div style="clear: both; margin-top: -2vmin; heigth: 5px; width: 100%; border-radius: 5px; background-color:'+ object["color"] +';"><p><br></p></div>';
                 };
                 
                 //appends the title of the shift to the body, that way, the user knows where they are... if the title is ==="" it outputs "vagten" instead...
@@ -794,7 +806,7 @@ $(document).ready(function(){
                 var backBtn = '<button class="btn btn-default backBtn pull-left margBotBtn">Tilbage</button>';
                 
                 //add the individual parts of the JSON to the append body, so that it can be viewed. Done this way to be easily modifiable...
-                $(body).append('<div id="'+ object["id"] +'" class="shiftTarget">'+ title+date+startTime+endTime+city+address+roles+notes+backBtn+unBookBtn +'</div>'); //wrap div .container and gove it object["id"] as id, important for book/unbook to work
+                $(body).append('<div id="'+ object["id"] +'" class="shiftTarget">'+ shiftColor+title+date+startTime+endTime+city+address+roles+notes+backBtn+unBookBtn +'</div>'); //wrap div .container and gove it object["id"] as id, important for book/unbook to work
                 //sets isBooked to true, letting the function know that it's dealing with a bookedShift as opposed to a possibleShift
                 //isBooked = true; may not need this anymore
             };
@@ -872,7 +884,7 @@ $(document).ready(function(){
                 if(object["shiftnotes"] !== undefined && object["shiftnotes"] !== "" && object["shiftnotes"] !== null) {
                     notes = "<label for=\"notesField\">"+ "Noter fra den vagtskema anvarlige" +":</label> <div id=\"notesField\" class=\"shift\" style=\"padding:2vmin; margin-bottom:3vmin; border:solid black 1px\"><p>"+ object["shiftnotes"] +"</p></div>";
                 };
-                //gives the shift a color type, if it has one
+                //gives the shift a color & type, if it has one
                 if(object["color"] !== undefined && object["color"] !== null && object["label"] !== undefined && object["label"] !== null) {
                     shiftColor = '<p>Vagt type: '+ object["label"] +'</p><div style="clear: both; margin-top: -2vmin; heigth: 5px; width: 100%; border-radius: 5px; background-color:'+ object["color"] +';"><p><br></p></div>';
                 };
@@ -1350,7 +1362,9 @@ $(document).ready(function(){
         };
     };
     
-    //updates "savedBookedShifts" & "savedPossibleShifts" in localStorage, when "opdater alt" in menu is pressed, then updates the page you were on
+    //updates myShifts, possibleShifts & myInformation from the server, also updates "savedBookedShifts" & "savedPossibleShifts" in localStorage, when "opdater alt" in menu is pressed, then updates the page you were on
+    //might be a few discrepancies in the text above and what the method actually does, especially when it comes to userProfile
+    //this method is used by both the menu button updaterAll and by bookShift and unBookShift
     function updateAllListsMenuHandler() {
         //tells us what to POST
         var toPost = {userid:getFromStorage("userId")};
@@ -1361,7 +1375,7 @@ $(document).ready(function(){
         //keeps track of whether or not the AJAX call is done
         var possibleShiftsDone = false;
         //keeps track of whether or not the AJAX call is done
-        var userProfileDone = false;
+        var userProfileDone = true;
         
         //looks at the pageHeader, which allows the conditional statement below to know where we are...
         var whereAmI = $(body).find(".page-header").html();
@@ -1371,6 +1385,7 @@ $(document).ready(function(){
             whereAmI = 2;
         }else if(whereAmI === "Mine oplysninger") {
             whereAmI = 3;
+            userProfileDone = false;
         };
         
         //tells myShiftsAJAXObj where to POST to
@@ -1404,24 +1419,24 @@ $(document).ready(function(){
                 possibleShiftsDone = true;
             };
         });
-        
-        //tells userProfileAJAXObj where to POST to
-        var urlUserProfile = "https://"+ domain +"/ajax/app_myshifts";
-        //update userProfile
-        var userProfileAJAXObj = postAJAXCall(urlUserProfile, toPost);
-        userProfileAJAXObj.done(function(data) {
-            saveToStorage("savedBookedShifts", JSON.stringify(data));
-        }).done(function() {
-        //Looks at the status of the other ajax queries, if they're done or if we were on this page when we started the update, evaluate what to update, then do so.
-            if(possibleShiftsDone && myShiftsDone || whereAmI === 3) {
-                //evaluates what to update, then does so.
-                updateAllListsMenuHandlerUpdateEvaluator(whereAmI);
-            }else {
-                //tells the method that userProfile is done updating
-                userProfileDone = true;
-            };
-        });
-        
+        if(!userProfileDone) {
+//           //tells userProfileAJAXObj where to POST to
+//            var urlUserProfile = "https://"+ domain +"/ajax/app_userprofile";
+//            //update userProfile
+//            var userProfileAJAXObj = postAJAXCall(urlUserProfile, toPost);
+//            userProfileAJAXObj.done(function(data) {
+//                //saveToStorage("savedUserProfile", JSON.stringify(data));
+//            }).done(function(data) {
+            //Looks at the status of the other ajax queries, if they're done or if we were on this page when we started the update, evaluate what to update, then do so.
+                if(possibleShiftsDone && myShiftsDone || whereAmI === 3) {
+                    //evaluates what to update, then does so.
+                    updateAllListsMenuHandlerUpdateEvaluator(whereAmI);
+                }else {
+                    //tells the method that userProfile is done updating
+                    userProfileDone = true;
+                };
+//            });
+        };
     };
     //evaluates what to update in the "updateAllListsMenuHandler" function, then updates it.
     function updateAllListsMenuHandlerUpdateEvaluator(whereAmI) {
@@ -1441,7 +1456,8 @@ $(document).ready(function(){
                 };
     };
     
-    var updater = false; //these are used to administrate the AJAX updates called from the readMore button, so that only 1 instance will be called at once...
+    //these are used to administrate the AJAX updates called from the readMore button, so that it wont be called too often...
+    var updater = false;
     function updateAllListsReadMoreBtnHandler() {
         if(updater === false) {
             updateAllLists(false);
@@ -1453,6 +1469,7 @@ $(document).ready(function(){
     };
     
     //updates "savedBookedShifts" & "savedPossibleShifts" in localStorage, global is optional, but defines if the AJAX request will notify the user (will notify unless false)
+    //should only be called from updateAllListsReadMoreBtnHandler (that is, from the readMore/details buttons) as it is now...
     function updateAllLists(global) {
         
         //tells us what to POST
@@ -1599,19 +1616,26 @@ $(document).ready(function(){
         showLogin();
     };
     
-    //is used to show the modal window when trying to book/unbook, if booking a shift, the function needs a string containing a form with roles
-    function showModalView(rolesFormStringBookShift) {
+    //is used to show the modal window when trying to book/unbook, if booking a shift, the function needs a string containing a form with roles and a shiftuid.
+    function showModalView(argObj) {
+        var shiftId;
+        if(argObj["id"] === undefined) {
+            //takes the button that opened this window, then looks for it's closest shiftTarget, which is its shift, then gets the shifts id which is equal to its id in the JSON/server
+            shiftId = $(this).closest(".shiftTarget").attr("id");
+        }else {
+            shiftId = argObj["id"];
+        };
         
-        //takes the button that opened this window, then looks for it's closest container, which is its shift, then gets the shifts id which is equal to its id in the JSON/server
-        var shiftId = $(this).closest(".shiftTarget").attr("id");
         
+        //$("#UI_ELEMENT_TEST").append("<p>shiftId from modal: "+ shiftId +"</p>");
         var title = '';
         var whereAreWe = ''; // 1===unbook; 2===book; 3===reject;
         if($(this).hasClass("unBookBtn")) {
             title = "Afmeld vagt";
             whereAreWe = 1;
-        }else if($(this).hasClass("bookBtn")) {
-            title = "Tilmed vagt";
+        }else if(argObj["id"] !== undefined) {
+            //$("#UI_ELEMENT_TEST").append("<p>this had class bookBtn</p>");
+            title = "Tilmeld vagt";
             whereAreWe = 2;
         }else if($(this).hasClass("noThanksBtn")) {
             title = "Afvis";
@@ -1619,7 +1643,7 @@ $(document).ready(function(){
         };
         
         //gets the title of the modal off of the btn
-        var title = $(this).html(); //if we want to use icons instead of text on the buttons, simply use an "if" to check what is written and assign "title" a value based on that...
+        //var title = $(this).html(); //if we want to use icons instead of text on the buttons, simply use an "if" to check what is written and assign "title" a value based on that...
         
         //if we want to give the user the option of unbooking a shift
         if(whereAreWe === 1) {
@@ -1649,7 +1673,7 @@ $(document).ready(function(){
                     <h4 class="modal-title" id="myModalLabel">'+ title +'</h4>\
                   </div>\
                   <div class="modal-body">\
-                    '+ rolesFormStringBookShift +'\
+                    '+ argObj["form"] +'\
                     <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Nej</button>\
                   </div>\
                 </div>\
@@ -1683,11 +1707,11 @@ $(document).ready(function(){
         //$(".modal-title").html(title); is done directly in the html
         
         //applies the unbook/book onClick events
-        if(title==="Afmeld vagt") { //this derives from the text on the button, could maybe be done better?
+        if(title==="Afmeld vagt") {
             $(".modalYesBtn").on("click", unbookShift);
-        }else if(title==="Tilmeld vagt") { //this derives from the text on the button, could maybe be done better?
+        }else if(title==="Tilmeld vagt") {
             $(".modalYesBtn").on("click", function(event) {
-                bookShift(event);
+                bookShift(event, this);
             });
         }else if(title==="Afvis") {
             $(".modalYesBtn").on("click", postNoThanks);
@@ -1827,7 +1851,8 @@ $(document).ready(function(){
                             showModalViewAccept("Succes", "Du er nu afmeldt vagten");
 
                             //calls deleteShiftFromLocalStorage, which takes an id(what to delete) and a saveLocation(where to delete it from AND the context of the call, fx unbookShift)
-                            deleteShiftFromLocalStorage(theId, "savedBookedShifts");
+                            //deleteShiftFromLocalStorage(theId, "savedBookedShifts");
+                            updateAllListsMenuHandler();
                         }, 100);
                     }else { //notify user of failure
                         setTimeout(function() {
@@ -1845,34 +1870,60 @@ $(document).ready(function(){
     };
     
     //makes an ajaxCall that does the actual booking of the shift, may be called from the modal windows opened through both Details and showPossibleShifts
-    function bookShift(event) {
+    function bookShift(event, context) {
         event.preventDefault();
         
         //takes the button that opened this window, then looks for it's closest container, which is its shift, then gets the shifts id which is equal to its id in the JSON/server
-        var shiftId = $(this).closest(".shiftTarget").attr("id");
+        var shiftId = $(context).closest(".shiftTarget").attr("id");
+        //$("#UI_ELEMENT_TEST").append("<p>shiftId from bookShift: "+ shiftId +"</p>");
         //get the form from the modal window
-        var form = $(this).closest(".shiftTarget").serialize();
+        var form = $(context).closest(".shiftTarget").serialize();
+        //$("#UI_ELEMENT_TEST").append("<p>form from bookShift: "+ form +"</p>");
+        //the name of the shiftTarget/form is the actual unhashed id of the shift, we need it to delete it locally
+        var realShiftId = $(context).closest(".shiftTarget").attr("name");
+        //$("#UI_ELEMENT_TEST").append("<p>realId from bookShift: "+ realShiftId +"</p>");
         
         //this is called to make sure a potential modal window starts closing, the timeouts further down in the code are there to give the different modals opened time to close
         modalW.empty();
         setTimeout(function() {
             if(checkConnection()) {
+                
+                var pswhash = getFromStorage("pswHash");
+                var userid = getFromStorage("userId");
+                
                 //what to post, it's the id of the shift in question
-                var toPost = "shiftid="+ shiftId +"&"; //also add the serialized form contained in the var "form" but I need the name from Mark, make sure the name of the id is right.
+                var toPost = "shiftuid="+ shiftId +"&pswhash="+ pswhash+"&userid="+ userid +"&"+ form; //also add the serialized form contained in the var "form"
                 //create the url, to post to
-                var url = "https://"+ getFromStorage("domain") +"/ajax/app_XXX";
+                var url = "https://"+ getFromStorage("domain") +"/ajax/app_takethatshift";
                 
                 //get the roles which we can pick(if any) and freeSpaces
-                var ajaxCall = postAJAXCall(url, toPost);
+                var ajaxCall = $.ajax({
+                    type: "POST",
+                    url: url,
+                    dataType: "JSON",
+                    data: toPost,
+                    success: function(data) {
+                        return data;
+                    },
+                    error: function() {
+                        $(body).append("<p>Something went wrong in postAJAXCall</p>"+"<p>status: "+ error.status + "; readyState: " + error.readyState +"; statusText: "+ error.statusText +"; responseText:"+ error.responseText +";</p>");
+                    }
+                });
                 
-                ajaxCall.done(function() {
-                    //if(data[succes]) {    //look for inspiration in the corresponding function in unbookShift
-                    //
-                    //}else { //notify user of failure
-                    //setTimeout(function() {
-                    //        showModalViewAccept("Fejl", "Det var ikke muligt at tilmelde dig vagten.");
-                    //    }, 100);
-                    //};
+                ajaxCall.done(function(data) {
+                    if(data["succes"]) {
+                    setTimeout(function() {
+                            showModalViewAccept("Succes", "Du er nu tilmeldt vagten");
+
+                            //calls deleteShiftFromLocalStorage, which takes an id(what to delete) and a saveLocation(where to delete it from AND the context of the call, fx unbookShift)
+                            //deleteShiftFromLocalStorage(realShiftId, "savedPossibleShifts");
+                            updateAllListsMenuHandler();
+                        }, 100);
+                    }else { //notify user of failure
+                    setTimeout(function() {
+                            showModalViewAccept("Fejl", "Det var ikke muligt at tilmelde dig vagten.");
+                        }, 100);
+                    };
                 });
             }else {
                 //notify user of missing conenction
@@ -1887,76 +1938,79 @@ $(document).ready(function(){
     function getRolesBookShift() {
         //takes the button that opened this window, then looks for it's closest container, which is its shift, then gets the shifts id which is equal to its id in the JSON/server
         var shiftId = $(this).closest(".shiftTarget").attr("id");
+        
         //this is called to make sure a potential modal window starts closing, the timeouts further down in the code are there to give the different modals opened time to close
         modalW.empty();
         setTimeout(function() {
-            if(checkConnection()) { //checkConnection()
+            if(checkConnection()) {
                 //what to post, it's the id of the shift in question
                 var infoArr = {shiftid:shiftId};
                 //create the url, to post to
                 var url = "https://"+ getFromStorage("domain") +"/ajax/app_shiftdetails";
                 
-                infoArr.pswhash = getFromStorage("pswHash");
-                infoArr.userid = getFromStorage("userId");
+//                infoArr.pswhash = getFromStorage("pswHash");
+//                infoArr.userid = getFromStorage("userId");
                 
                 //get the roles which we can pick(if any) and freeSpaces
-                //var ajaxCall = postAJAXCall(url, infoArr);
-                var ajaxCall = $.ajax({
-                    type: "POST",
-                    url: url,
-                    dataType: "text",
-                    data: infoArr});
-                
-                //we may need to make some kind of check on the data, BEFORE we go on to iterating through it... like "if(data["succes"])", but it depends on the API
+                var ajaxCall = postAJAXCall(url, infoArr);
+//                var ajaxCall = $.ajax({ // TEST START
+//                    type: "POST",
+//                    url: url,
+//                    dataType: "TEXT",
+//                    data: infoArr}); // TEST END
                 
                 //iterate through the data we got with roles then make a string containing a form and open a modal and parse it the string
                 ajaxCall.done(function(data) {
                     //in these functions we open the modal with the form in it... when okay is pressed in that window: submit;
-                    $("#UI_ELEMENT_TEST").append('<p>ajaxDataAsString: '+ data +'</p>');
+                    //$("#UI_ELEMENT_TEST").append('<p>ajaxDataAsString: '+ data +'</p>'); // TEST
                     if(data["succes"]) {
                         //continue to show modal with roles etc
-                        
+                        var shiftuid = data["shiftuid"];
                         //create the form string we'll be submitting
-//                        var rolePickForm = '<form id="'+ shiftId +'" class="form-group shiftTarget" role="form" method="post" action="">';
-                        var rolePickForm = '';
-                        var optionsString = '';
+                        var rolePickForm = '<form id="'+ data["shiftuid"] +'" name="'+ shiftId +'" class="form-group shiftTarget" role="form" method="post" action="">';
+                        //if there are roles, make an appropriate select input
                         if(data["roles"].length > 0) {
+                            //$("#UI_ELEMENT_TEST").append("<p>roles was bigger than 0</p>");
+                            var optionsString = '';
                             var object = data["roles"];
-                            for(var i = 0; i < object.length; i++) {
-                                optionsString += "<option value="+ object[i]["roleid"] +">"+ object[i]["rolename"] +"</option>";
-                            };
-                            for(var property in object) {
-                                rolePickForm += '<p>'+ property +': '+ object[property] +'</p>';
-                                //we need to user select instead of radio... rolePickForm += '<input type="radio" name="roles" value="'+ object["required indentifier"] +'" checked>'+ object[property] +'<br>';
-    //                            rolePickForm += '<input type="radio" name="roles" value="'+ object["required indentifier"] +'" checked>'+ object[property] +'<br>';
-                            };
-                            $("#UI_ELEMENT_TEST").append(rolePickForm);
-                        }else {
-                            $("#UI_ELEMENT_TEST").append('<p>role.length'+ data["roles"].length +'</p>');
-                            $("#UI_ELEMENT_TEST").append('<p>roleId'+ data["roles"][0]["roleid"] +'</p>');
-                            $("#UI_ELEMENT_TEST").append('<p>roleName'+ data["roles"][0]["rolename"] +'</p>');
-                            $("#UI_ELEMENT_TEST").append('<p>roleMaxMembers'+ data["roles"][0]["maxmembers"] +'</p>');
-                            $("#UI_ELEMENT_TEST").append('<p>roleTaken'+ data["roles"][0]["taken"] +'</p>');
-                            $("#UI_ELEMENT_TEST").append('<p>msg'+ data["msg"] +'</p>');
-                            $("#UI_ELEMENT_TEST").append('<p>msg'+ data["shiftuid"] +'</p>');
+                            //create the options for the select
+                            //$("#UI_ELEMENT_TEST").append("<p>create optionsSting</p>");
+                            if(object.length === 1) {
+                                for(var i = 0; i < object.length; i++) {
+                                    optionsString += "<option selected=\"selected\" name="+ object[i]["roleid"] +" value="+ object[i]["roleid"] +">"+ object[i]["rolename"] +"</option>";
+                                };
+                            }else {
+                                optionsString += "<option selected=\"selected\" name=\"standard\" value=\"0\">Vælg en rolle</option>";
+                                for(var i = 0; i < object.length; i++) {
+                                    optionsString += "<option name="+ object[i]["roleid"] +" value="+ object[i]["roleid"] +">"+ object[i]["rolename"] +"</option>";
+                                };
+                            }
+                            //$("#UI_ELEMENT_TEST").append("<p>optionsString created</p>");
+                            //create the select, with the created options
+                            rolePickForm += '<select class="form-control userProfileElement" name="roleid">'+ optionsString +'</select>';
+                            //$("#UI_ELEMENT_TEST").append("<p>optionsString and select added to rolePickForm var</p>");
+                        }else {//if there aren't any roles, make a simple confirm
+                            //$("#UI_ELEMENT_TEST").append("<p>roles was 0 or less</p>");
                         };
+                        //append a submit btn to the form and close it
+                        rolePickForm += '<button type="submit" class="btn modalYesBtn btn-success btn-lg pull-right bookBtn" id="submitRolePickerForm">Tag Vagt</button> </form>';
+                        //$("#UI_ELEMENT_TEST").append("<p>button added to rolePickForm and form closed</p>");
+                        //$("#UI_ELEMENT_TEST").append("<p>"+ rolePickForm +"</p>");
                         
-                        //"<option value="+ options[i] +">"+ options[i] +"</option>"'<label for="'+ object["fieldname"] +'">'+ object["showname"] +':</label><select class="form-control userProfileElement" id="'+ object["fieldname"] +'" name="'+ object["fieldname"] +'">'+ optionString +'</select>';
+                        //opens the modal and parses it the string with the form and the shiftuid...
+                        setTimeout(function() {
+                            //$("#UI_ELEMENT_TEST").append("<p>trying to open showModalView</p>");
+                            var argObj = {form:rolePickForm, id:shiftuid};
+                            showModalView(argObj);
+                        }, 10);
                         
-                        //append a submit btn to the form
-//                        rolePickForm += '<button type="submit" class="btn modalYesBtn btn-success btn-lg">Tag vagt</button>';
-//                        //close form
-//                        rolePickForm += '</form>';
-                        //opens the modal and parses it the string with the form...
-//                        showModalView(rolePickForm);
-                    
                     }else { //if succes isn't true, it should be false and if so, there are no more free slots/spaces for the shift
                         //notify user that last slot was just filled... display data["MSG"] in content of modal
-                        $("#UI_ELEMENT_TEST").append("<p>fail</p>");
+                        //$("#UI_ELEMENT_TEST").append("<p>fail</p>");
                     };
                 });
             }else {
-                //notify user of missing conenction
+                //notify user of missing connection
                 setTimeout(function() {
                     showModalViewAccept("Ingen internet forbindelse", "Der er ingen forbindelse til internettet, det er derfor ikke muligt af tilmelde dig vagten.<br>Opret forbindelse til internettet og prøv igen.");
                 }, 100);
