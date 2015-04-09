@@ -990,11 +990,17 @@ $(document).ready(function(){
                         profileFields += createTextArea(object);
 
                         //grabs quite a few different things, that all need to be showed in a textField
-                    }else if(object[property] === "TEXT" || object[property] === "DATE" || object[property] === "EMAIL" || object[property] === "PHONE" || object[property] === "SIZE") {
+                    }else if(object[property] === "TEXT" || object[property] === "DATE" || object[property] === "EMAIL" || object[property] === "PHONE") {
                         profileFields += createTextField(object);
-
+                        
+                        //handles SIZE
+                    }else if(object[property] === "SIZE") {
+                        ddd!!
+                        //handle sizeArr - ?I need to create a select from the clothessize arr?
+                        //data[i]["clothessize"];
                     };
-                }
+                };
+                
                 //$("#UI_ELEMENT_TEST").append(property +" : "+ object[property] +";<br>"); // TEST
             };
         };
