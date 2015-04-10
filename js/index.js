@@ -54,57 +54,67 @@ $(document).ready(function(){
         document.addEventListener("backbutton", onBackKeyDown, false);
     };
     
-//    /*url til prfil billede, er /avatar/md5(userid)/size(int size i want)*/
-    function derp() {
-        
-        var infoArr = {};
-        
-        var userId = getFromStorage("userId");
-        
-        var hashedUserId = md5(userId);
-        
-        var url = "https://"+ getFromStorage("domain") +"/avatar/"+ hashedUserId +"150";
-        
-        infoArr.pswhash = getFromStorage("pswHash");
-        
-        infoArr.userid = userId;
-        
-        var herp = $.ajax({
-            type: "POST",
-            url: url,
-            dataType: "text",
-            data: infoArr
-        });
-        herp.done(function(data) {
-            $("#UI_ELEMENT_TEST").append('<p>done reached</p>');
-            $("#UI_ELEMENT_TEST").append('<p>'+ data +'</p>');
-            $("#UI_ELEMENT_TEST").append('<p>parsed Pdata, reached IMGdata</p>');
-            $("#UI_ELEMENT_TEST").append('<img style="display:block;" id="largeImage" src="'+ data +'" />');
-            $("#UI_ELEMENT_TEST").append('<p>data.length: '+ data.length +'</p>');
-//            for(var prop in data) {
-//                $("#UI_ELEMENT_TEST").append('<p>'+ prop +': '+ data[prop] +'</p>');
-//                $("#UI_ELEMENT_TEST").append('<img style="display:block;" id="largeImage" src="'+ data[prop] +'" />');
-//            };
-            $("#UI_ELEMENT_TEST").append('<p>end of function reached</p>');
-        });
-        herp.fail(function(data) {
-            $("#UI_ELEMENT_TEST").append('<p>fail reached</p>');
-            $("#UI_ELEMENT_TEST").append('<p>msg: '+ data.toString() +'</p>');
-//            for(var prop in data) {
-//                $("#UI_ELEMENT_TEST").append('<p>'+ prop +': '+ data[prop] +'</p>');
-//            };
-        });
-    };
-    
-    
     function onBackKeyDown() {
-        //does nothing, simply overriding the back button, so that it does nothing.
         
-        //we may want to open a modal view that prompts people to accept the use of the camera or retrievel of pictures from the phone...
-        pictureFunctions();
+        //doesn't work...
+//        if(device.app.canGoBack()) {
+//            device.app.goBack();
+//            return;
+//        };
+//        
+//        return device.app.onBackPressed();
         
-        derp();
     };
+    
+    //the #mCont dom element is saved here in runOnLoad
+    var menu;
+    //the #bCont dom element is saved here in runOnLoad
+    var body;
+    //the #modalCont dom element is saved here in runOnLoad
+    var modalW;
+    //keeps track of whether an myShifts has been updated in this session
+    var myShiftsFirstUpdate = true;
+    //keeps track of whether an possibleShifts has been updated in this session
+    var possibleShiftsFirstUpdate = true;
+    //a listener for ajax queries is saved here in runOnLoad
+    var ajaxWatch;
+//    //picture source
+//    var pictureSource;
+//    //sets the format of returned value
+//    var destinationType;
+    
+    //this must be the first function, so that the JS instantiates properly
+    $(function runOnLoad(){
+        
+        //needed to show the NemVagt logo on top of all screens
+        showLogo();
+        //instantiates var menu, that will need to be on every page.
+        menu = $("#mCont");
+        //instantiates var body, that will be used on every page.
+        body = $("#bCont");
+        //instantiates var modalW, that will be used on most pages.
+        modalW = $("#modalCont");
+        //creates listeners for ajaxStart/ajaxStop
+        ajaxWatch = ajaxWatch();
+        
+//        //instantiates the variables we need to handle pictures
+//        pictureSource=navigator.camera.PictureSourceType;
+//        destinationType=navigator.camera.DestinationType;
+        
+        
+        //removes the large logo, shown on app startup
+        $("#sCont").empty();
+        
+        //instantiates the UI
+        hasSavedLogin();
+        
+    });
+    
+    //camera & photo functionality
+    /*//Called when a photo is successfully retrieved
+    
+    //we may want to open a modal view that prompts people to accept the use of the camera or retrievel of pictures from the phone...
+    //pictureFunctions();
     function pictureFunctions() {
         //appends buttons to the test UI_Element
         $("#UI_ELEMENT_TEST").append('<button class="btn btn-default" id="capPhotoD">Capture Photo With Image Data</button> <br>\
@@ -121,53 +131,8 @@ $(document).ready(function(){
         $("#getPhotoPA").on("click", function() {
             getPhoto(pictureSource.SAVEDPHOTOALBUM);
         });
-    }
+    };
     
-    //the #mCont dom element is saved here in runOnLoad
-    var menu;
-    //the #bCont dom element is saved here in runOnLoad
-    var body;
-    //the #modalCont dom element is saved here in runOnLoad
-    var modalW;
-    //keeps track of whether an myShifts has been updated in this session
-    var myShiftsFirstUpdate = true;
-    //keeps track of whether an possibleShifts has been updated in this session
-    var possibleShiftsFirstUpdate = true;
-    //a listener for ajax queries is saved here in runOnLoad
-    var ajaxWatch;
-    //picture source
-    var pictureSource;
-    //sets the format of returned value
-    var destinationType;
-    
-    //this must be the first function, so that the JS instantiates properly
-    $(function runOnLoad(){
-        
-        //needed to show the NemVagt logo on top of all screens
-        showLogo();
-        //instantiates var menu, that will need to be on every page.
-        menu = $("#mCont");
-        //instantiates var body, that will be used on every page.
-        body = $("#bCont");
-        //instantiates var modalW, that will be used on most pages.
-        modalW = $("#modalCont");
-        //creates listeners for ajaxStart/ajaxStop
-        ajaxWatch = ajaxWatch();
-        
-        //instantiates the variables we need to handle pictures
-        pictureSource=navigator.camera.PictureSourceType;
-        destinationType=navigator.camera.DestinationType;
-        
-        
-        //removes the large logo, shown on app startup
-        $("#sCont").empty();
-        
-        //instantiates the UI
-        hasSavedLogin();
-        
-    });
-    
-    //Called when a photo is successfully retrieved
     function onPhotoDataSuccess(imageData) {
         $("#UI_ELEMENT_TEST").append('<img style="display:block;width:60px;height:60px;" id="smallImage" src="'+ imageData +'" />');
         //Get image handle
@@ -240,6 +205,50 @@ $(document).ready(function(){
             showModalViewAccept("Fejl", "Problem ved hentning af billede: "+ message);
         };
     };
+    
+    //url til prfil billede, er /avatar/md5(userid)/size(int size i want)
+    function derp() {
+        
+        var infoArr = {};
+        
+        var userId = getFromStorage("userId");
+        
+        var hashedUserId = md5(userId);
+        
+        var url = "https://"+ getFromStorage("domain") +"/avatar/"+ hashedUserId +"150";
+        
+        infoArr.pswhash = getFromStorage("pswHash");
+        
+        infoArr.userid = userId;
+        
+        var herp = $.ajax({
+            type: "POST",
+            url: url,
+            dataType: "text",
+            data: infoArr
+        });
+        herp.done(function(data) {
+            $("#UI_ELEMENT_TEST").append('<p>done reached</p>');
+            $("#UI_ELEMENT_TEST").append('<p>'+ data +'</p>');
+            $("#UI_ELEMENT_TEST").append('<p>parsed Pdata, reached IMGdata</p>');
+            $("#UI_ELEMENT_TEST").append('<img style="display:block;" id="largeImage" src="'+ data +'" />');
+            $("#UI_ELEMENT_TEST").append('<p>data.length: '+ data.length +'</p>');
+//            for(var prop in data) {
+//                $("#UI_ELEMENT_TEST").append('<p>'+ prop +': '+ data[prop] +'</p>');
+//                $("#UI_ELEMENT_TEST").append('<img style="display:block;" id="largeImage" src="'+ data[prop] +'" />');
+//            };
+            $("#UI_ELEMENT_TEST").append('<p>end of function reached</p>');
+        });
+        herp.fail(function(data) {
+            $("#UI_ELEMENT_TEST").append('<p>fail reached</p>');
+            $("#UI_ELEMENT_TEST").append('<p>msg: '+ data.toString() +'</p>');
+//            for(var prop in data) {
+//                $("#UI_ELEMENT_TEST").append('<p>'+ prop +': '+ data[prop] +'</p>');
+//            };
+        });
+    };
+        
+    */
     
     
     //object to save the autoupdate of the myShifts to, autoupdateMyShifts is added to the variable at the end of the populateMyShifts method if it is still undefined
@@ -995,7 +1004,7 @@ $(document).ready(function(){
                         
                         //handles SIZE
                     }else if(object[property] === "SIZE") {
-                        ddd!!
+                        //ddd!!
                         //handle sizeArr - ?I need to create a select from the clothessize arr?
                         //data[i]["clothessize"];
                     };
@@ -1521,7 +1530,7 @@ $(document).ready(function(){
         };
         return weekdays[aDay];
     };
-    //is passed a date in the YYYY-MM-DD format and returns it in format more easily readable by a most people, ie. DD/MM - YYYY
+    //is passed a date in the YYYY-MM-DD format and returns it in format more easily readable by a most people, ie. DD-MM-YYYY
     function getDate(date) {
       return date.substring(8,10) +'-'+ date.substring(5,7) +'-'+ date.substring(0,4);
     };
@@ -1624,11 +1633,13 @@ $(document).ready(function(){
     
     //is used to show the modal window when trying to book/unbook, if booking a shift, the function needs a string containing a form with roles and a shiftuid.
     function showModalView(argObj) {
+                
         var shiftId;
         if(argObj["id"] === undefined) {
             //takes the button that opened this window, then looks for it's closest shiftTarget, which is its shift, then gets the shifts id which is equal to its id in the JSON/server
             shiftId = $(this).closest(".shiftTarget").attr("id");
         }else {
+            //technically, I don't use this in the current implementation...
             shiftId = argObj["id"];
         };
         
@@ -1679,6 +1690,7 @@ $(document).ready(function(){
                     <h4 class="modal-title" id="myModalLabel">'+ title +'</h4>\
                   </div>\
                   <div class="modal-body">\
+                    <p>'+ argObj["data"]["msg"] +'</p>\
                     '+ argObj["form"] +'\
                     <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Nej</button>\
                   </div>\
@@ -1717,7 +1729,7 @@ $(document).ready(function(){
             $(".modalYesBtn").on("click", unbookShift);
         }else if(title==="Tilmeld vagt") {
             $(".modalYesBtn").on("click", function(event) {
-                bookShift(event, this);
+                bookShift(event, this, argObj);
             });
         }else if(title==="Afvis") {
             $(".modalYesBtn").on("click", postNoThanks);
@@ -1876,17 +1888,19 @@ $(document).ready(function(){
     };
     
     //makes an ajaxCall that does the actual booking of the shift, may be called from the modal windows opened through both Details and showPossibleShifts
-    function bookShift(event, context) {
+    function bookShift(event, context, argObj) {
         event.preventDefault();
         
-        //takes the button that opened this window, then looks for it's closest container, which is its shift, then gets the shifts id which is equal to its id in the JSON/server
+        //takes the button that opened this window, then looks for it's closest container, which is its shift, then gets the shifts id which is equal to the one of its ids that we need in the JSON/server (it has two, shiftuid and id)
         var shiftId = $(context).closest(".shiftTarget").attr("id");
-        //$("#UI_ELEMENT_TEST").append("<p>shiftId from bookShift: "+ shiftId +"</p>");
+        $("#UI_ELEMENT_TEST").append("<p>shiftId from bookShift: "+ shiftId +"</p>");
         //get the form from the modal window
-        var form = $(context).closest(".shiftTarget").serialize();
+        var form = $(context).closest(".shiftTarget").serializeArray();
+        
+        var formString = $(context).closest(".shiftTarget").serialize();
         //$("#UI_ELEMENT_TEST").append("<p>form from bookShift: "+ form +"</p>");
-        //the name of the shiftTarget/form is the actual unhashed id of the shift, we need it to delete it locally
-        var realShiftId = $(context).closest(".shiftTarget").attr("name");
+//        //the name of the shiftTarget/form is the actual unhashed id of the shift, we need it to delete it locally, which we no longer do, we instead update from server
+//        var realShiftId = $(context).closest(".shiftTarget").attr("name");
         //$("#UI_ELEMENT_TEST").append("<p>realId from bookShift: "+ realShiftId +"</p>");
         
         //this is called to make sure a potential modal window starts closing, the timeouts further down in the code are there to give the different modals opened time to close
@@ -1894,27 +1908,43 @@ $(document).ready(function(){
         setTimeout(function() {
             if(checkConnection()) {
                 
-                var pswhash = getFromStorage("pswHash");
-                var userid = getFromStorage("userId");
+                var pswHash = getFromStorage("pswHash");
+                var userId = getFromStorage("userId");
+                
+                //connect shiftuid from the form and the role picked...
+                var sobjects = argObj["data"]["shifts"];
+                $("#UI_ELEMENT_TEST").append('<p>sobjects.length: '+ sobjects.length +'</p>');
+                for(var i = 0; i < sobjects.length; i++) {
+                    $("#UI_ELEMENT_TEST").append('<p>formToString: '+ formString +'</p>');
+                    $("#UI_ELEMENT_TEST").append('<p>form[i]: '+ form[i] +'</p>');
+                    for(var prop in form[i]) {
+                        $("#UI_ELEMENT_TEST").append('<p>for each in form[i]: '+ prop +': '+ form[i][prop] +'</p>');
+                    };
+                    delete sobjects[i]["roles"];
+                    sobjects[i].roleid = form[i]["value"];
+                    $("#UI_ELEMENT_TEST").append('<p>sobjects[i][roleid]'+ sobjects[i]["roleid"] +'</p>');
+                };
                 
                 //what to post, it's the id of the shift in question
-                var toPost = "shiftuid="+ shiftId +"&pswhash="+ pswhash+"&userid="+ userid +"&"+ form; //also add the serialized form contained in the var "form"
+                var toPost = {pswhash:pswHash, userid:userId, shifts:sobjects};
+//                var toPost = "shiftuid="+ shiftId +"&pswhash="+ pswhash+"&userid="+ userid +"&"+ form; //also add the serialized form contained in the var "form"
                 //create the url, to post to
                 var url = "https://"+ getFromStorage("domain") +"/ajax/app_takethatshift";
                 
-                //get the roles which we can pick(if any) and freeSpaces
-                var ajaxCall = $.ajax({
-                    type: "POST",
-                    url: url,
-                    dataType: "JSON",
-                    data: toPost,
-                    success: function(data) {
-                        return data;
-                    },
-                    error: function() {
-                        $(body).append("<p>Something went wrong in postAJAXCall</p>"+"<p>status: "+ error.status + "; readyState: " + error.readyState +"; statusText: "+ error.statusText +"; responseText:"+ error.responseText +";</p>");
-                    }
-                });
+                //take a shift
+                var ajaxCall = postAJAXCall(url, toPost);
+//                var ajaxCall = $.ajax({
+//                    type: "POST",
+//                    url: url,
+//                    dataType: "JSON",
+//                    data: toPost,
+//                    success: function(data) {
+//                        return data;
+//                    },
+//                    error: function() {
+//                        $(body).append("<p>Something went wrong in postAJAXCall</p>"+"<p>status: "+ error.status + "; readyState: " + error.readyState +"; statusText: "+ error.statusText +"; responseText:"+ error.responseText +";</p>");
+//                    }
+//                });
                 
                 ajaxCall.done(function(data) {
                     if(data["succes"]) {
@@ -1968,45 +1998,74 @@ $(document).ready(function(){
                 //iterate through the data we got with roles then make a string containing a form and open a modal and parse it the string
                 ajaxCall.done(function(data) {
                     //in these functions we open the modal with the form in it... when okay is pressed in that window: submit;
-                    //$("#UI_ELEMENT_TEST").append('<p>ajaxDataAsString: '+ data +'</p>'); // TEST
+//                    $("#UI_ELEMENT_TEST").append('<p>ajaxDataAsString: '+ data +'</p>'); // TEST
+                    $("#UI_ELEMENT_TEST").append('<p>done reached...</p>');
                     if(data["succes"]) {
-                        //continue to show modal with roles etc
-                        var shiftuid = data["shiftuid"];
-                        //create the form string we'll be submitting
-                        var rolePickForm = '<form id="'+ data["shiftuid"] +'" name="'+ shiftId +'" class="form-group shiftTarget" role="form" method="post" action="">';
-                        //if there are roles, make an appropriate select input
-                        if(data["roles"].length > 0) {
-                            //$("#UI_ELEMENT_TEST").append("<p>roles was bigger than 0</p>");
-                            var optionsString = '';
-                            var object = data["roles"];
-                            //create the options for the select
-                            //$("#UI_ELEMENT_TEST").append("<p>create optionsSting</p>");
-                            if(object.length === 1) {
-                                for(var i = 0; i < object.length; i++) {
-                                    optionsString += "<option selected=\"selected\" name="+ object[i]["roleid"] +" value="+ object[i]["roleid"] +">"+ object[i]["rolename"] +"</option>";
+                        $("#UI_ELEMENT_TEST").append('<p>succes reached...</p>');
+                        //only really used to pass to the argObj, to pass on and let the modal know that we're trying to book a shift...
+                        var shiftuid = data["shifts"][0]["shiftuid"];
+                        $("#UI_ELEMENT_TEST").append('<p>data[shifts][0][shiftuid]: '+ shiftuid +'</p>');
+                        //create the start of the form, we do it before we enter the for loop, that iterates through all the shifts and adds them to the form.
+                        var rolePickForm = '<form id="'+ data["shifts"][0]["shiftuid"] +'" name="'+ shiftId +'" class="form-group shiftTarget" role="form" method="post" action="">';
+                        $("#UI_ELEMENT_TEST").append('<p>first add to the form: '+ rolePickForm +'</p>');
+                        //iterate through all the shifts you're about to take
+                        $("#UI_ELEMENT_TEST").append('<p>data[shifts].length: '+ data["shifts"].length +'</p>');
+                        for(var i = 0; i < data["shifts"].length; i++) {
+                            $("#UI_ELEMENT_TEST").append('<p>iterate thorugh the shifts</p>');
+                            var sdata = data["shifts"][i];
+                            $("#UI_ELEMENT_TEST").append('<p>sdata set to data[shifts][i], trying to for each sdata</p>');
+                            for(var prop in sdata) {
+                                $("#UI_ELEMENT_TEST").append('<p>'+ prop +': '+ sdata[prop] +'</p>');
+                            };
+                            //create the form string we'll be submitting
+                            //if there are roles, make an appropriate select input
+                            if(sdata.hasOwnProperty("roles")) {
+                                $("#UI_ELEMENT_TEST").append('<p>sdata[roles].length: '+ sdata["roles"].length +'</p>');
+                                $("#UI_ELEMENT_TEST").append("<p>roles was bigger than 0</p>");
+                                var optionsString = '';
+                                var object = sdata["roles"];
+                                //create the options for the select
+                                $("#UI_ELEMENT_TEST").append("<p>create optionsSting</p>");
+                                if(object.length === 1) {
+                                    for(var i = 0; i < object.length; i++) {
+                                        optionsString += "<option selected=\"selected\" name="+ object[i]["roleid"] +" value="+ object[i]["roleid"] +">"+ object[i]["rolename"] +"</option>";
+                                    };
+                                }else {
+                                    optionsString += "<option selected=\"selected\" name=\"standard\" value=\"0\">Vælg en rolle</option>";
+                                    for(var i = 0; i < object.length; i++) {
+                                        optionsString += "<option name="+ object[i]["roleid"] +" value="+ object[i]["roleid"] +">"+ object[i]["rolename"] +"</option>";
+                                    };
                                 };
+                                $("#UI_ELEMENT_TEST").append("<p>optionsString created</p>");
+                                
+                                //add a label for the shift, telling us when the shift is held
+                                rolePickForm += '<p>Dato: '+ getDate(sdata["startdate"]) +' '+ sdata["starttime"].substring(0,5) +' - '+ sdata["endtime"].substring(0,5) +'</p>';
+                                $("#UI_ELEMENT_TEST").append("<p>date p was added</p>");
+                                //create the select, with the created options
+                                rolePickForm += '<select class="form-control userProfileElement" name="roleid">'+ optionsString +'</select>';
+                                
+                                $("#UI_ELEMENT_TEST").append("<p>optionsString and select added to rolePickForm var</p>");
+                                
+                            //if there are no roles property in the shift
                             }else {
-                                optionsString += "<option selected=\"selected\" name=\"standard\" value=\"0\">Vælg en rolle</option>";
-                                for(var i = 0; i < object.length; i++) {
-                                    optionsString += "<option name="+ object[i]["roleid"] +" value="+ object[i]["roleid"] +">"+ object[i]["rolename"] +"</option>";
-                                };
-                            }
-                            //$("#UI_ELEMENT_TEST").append("<p>optionsString created</p>");
-                            //create the select, with the created options
-                            rolePickForm += '<select class="form-control userProfileElement" name="roleid">'+ optionsString +'</select>';
-                            //$("#UI_ELEMENT_TEST").append("<p>optionsString and select added to rolePickForm var</p>");
-                        }else {//if there aren't any roles, make a simple confirm
-                            //$("#UI_ELEMENT_TEST").append("<p>roles was 0 or less</p>");
+                                $("#UI_ELEMENT_TEST").append("<p>roles was 0 or less</p>");
+                                //rolePickForm += '<p>Dato: '+ getDate(sdata["startdate"]) +' '+ sdata["starttime"].substring(0,5) +' - '+ sdata["endtime"].substring(0,5) +'</p>';
+                                rolePickForm += '<div><label for="'+ sdata["shiftuid"] +'">Dato:</label><input id="'+sdata["shiftuid"]+ '" type="TEXTFIELD" name="'+ sdata["shiftuid"] +'" class="form-control" value="'+ getDate(sdata["startdate"]) +' '+ sdata["starttime"].substring(0,5) +' - '+ sdata["endtime"].substring(0,5) +'"></div>';
+                                $("#UI_ELEMENT_TEST").append('<p>no roles, dato add: '+ rolePickForm +'</p>');
+                            };
                         };
+                        
                         //append a submit btn to the form and close it
                         rolePickForm += '<button type="submit" class="btn modalYesBtn btn-success btn-lg pull-right bookBtn" id="submitRolePickerForm">Tag Vagt</button> </form>';
-                        //$("#UI_ELEMENT_TEST").append("<p>button added to rolePickForm and form closed</p>");
-                        //$("#UI_ELEMENT_TEST").append("<p>"+ rolePickForm +"</p>");
+                        $("#UI_ELEMENT_TEST").append("<p>button added to rolePickForm and form closed</p>");
+                        $("#UI_ELEMENT_TEST").append("<p>"+ rolePickForm +"</p>");
+                        
+                        //what to pass on to the next function (ie. the modal that allows you to pick roles and accept the shift).
+                        var argObj = {form:rolePickForm, id:shiftuid, data:data};
                         
                         //opens the modal and parses it the string with the form and the shiftuid...
                         setTimeout(function() {
-                            //$("#UI_ELEMENT_TEST").append("<p>trying to open showModalView</p>");
-                            var argObj = {form:rolePickForm, id:shiftuid};
+                            $("#UI_ELEMENT_TEST").append("<p>trying to open showModalView</p>");
                             showModalView(argObj);
                         }, 10);
                         
