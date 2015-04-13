@@ -55,7 +55,7 @@ $(document).ready(function(){
     };
     
     function onBackKeyDown() {
-        
+        navigator.app.backHistory();
         //doesn't work...
 //        if(device.app.canGoBack()) {
 //            device.app.goBack();
@@ -985,7 +985,7 @@ $(document).ready(function(){
             var object = data[i];
             for(var property in object) {
                 //makes sure we're only looking at field "type" properties
-                if(property==="ftype") {
+                if(property === "ftype") {
                     //statement that can identify something that needs a select statement (/radio buttons)
                     if(object[property]=== "SELECT" || object[property]=== "GENDER") {
                         profileFields += createSelectList(object);
@@ -1002,15 +1002,41 @@ $(document).ready(function(){
                     }else if(object[property] === "TEXT" || object[property] === "DATE" || object[property] === "EMAIL" || object[property] === "PHONE") {
                         profileFields += createTextField(object);
                         
-                        //handles SIZE
-                    }else if(object[property] === "SIZE") {
-                        //ddd!!
-                        //handle sizeArr - ?I need to create a select from the clothessize arr?
-                        //data[i]["clothessize"];
                     };
                 };
-                
-                //$("#UI_ELEMENT_TEST").append(property +" : "+ object[property] +";<br>"); // TEST
+                //handles SIZE
+//                $("#UI_ELEMENT_TEST").append("<p>about to compare property to clothessize</p>"); // TEST
+                if(property === "clothessize") {
+//                    $("#UI_ELEMENT_TEST").append("<p>property was clothessize</p>"); // TEST
+                    //find SIZE (ie. the users chosen size)
+                    var sizeObj = '';
+//                    $("#UI_ELEMENT_TEST").append("<p>about to iterate through data to find userSize</p>"); // TEST
+                    for(var h = 0; h < data.length; h++) {
+//                        $("#UI_ELEMENT_TEST").append("<p>about to iterate through data[h] to find userSize</p>"); // TEST
+                        for(var prop in data[h]) {
+//                            $("#UI_ELEMENT_TEST").append("<p>about to compare prop to ftype</p>"); // TEST
+                            if(prop === "ftype") {
+//                                $("#UI_ELEMENT_TEST").append("<p>about to compare data[h][ftype] to SIZE</p>"); // TEST
+                                if(data[h]["ftype"] === "SIZE") {
+                                    sizeObj = data[h];
+//                                    $("#UI_ELEMENT_TEST").append("<p>data[h][ftype] === SIZE, sizeObj = data[i]</p>"); // TEST
+                                    break;
+                                };
+                            };
+                        };
+                        //is done to stop iterating through the outer array once we have found what we were looking for...
+                        if(sizeObj !== '') {
+                            break;
+                        };
+                    };
+                    var argObj = {sizeArr:object, userSize:sizeObj};
+                    //only proceed if there is a property ftype === SIZE, otherwise, the user profile isn't actually using the SIZE field...
+                    if(sizeObj !== '') {
+//                        $("#UI_ELEMENT_TEST").append("<p>sizeObj wasn't ''</p>"); // TEST
+                        profileFields += createSelectList(argObj);
+                    };
+                };
+//                $("#UI_ELEMENT_TEST").append(property +" : "+ object[property] +";<br>"); // TEST
             };
         };
         //adds a submit button to the UserProfile form, done outside the "for loop" it will always be at the end of the form
@@ -1103,49 +1129,67 @@ $(document).ready(function(){
     function createSelectList(object) {
         //a var to store the html of the options, we get in the loop, in.
         var optionString = "";
-        
-        if(object["ftype"] === "SELECT") {
-            //the possible select values are a string, but will always be seperated by a semicolon, so we split the string into an array, so we can work with it
-            var options = object["selectvalues"].split(";");
-            //iterate through the array, and iteratively create the options
-            for(var i = 0; i < options.length; i++) {
+        if(object.hasOwnProperty("ftype")) {
+            if(object["ftype"] === "SELECT") {
+                //the possible select values are a string, but will always be seperated by a semicolon, so we split the string into an array, so we can work with it
+                var options = object["selectvalues"].split(";");
+                //iterate through the array, and iteratively create the options
+                for(var i = 0; i < options.length; i++) {
+                    var selected = "";
+                    if(object["value"] === options[i]) {
+                        selected = "selected=\"selected\"";
+                    };
+                    if(i > 0) {
+                        optionString += "<option "+ selected +" value="+ options[i] +">"+ options[i] +"</option>";
+                    }else {
+                        optionString += "<option value=\"\">"+ options[i] +"</option>";
+                    };
+                };
+            }else if(object["ftype"] === "GENDER") {
+                var male = "selected=\"selected\"";
+                var female = "";
+                //if the initial value is K, set male to "" and female to selected, making the gender evaluate as female instead of male
+                if(object["value"] === "K") {
+                    male = "";
+                    female = "selected=\"selected\"";
+                };
+                optionString += "<option "+ male +" value=\"M\">Mand</option> <option "+ female +" value=\"K\">Kvinde</option>";
+            };
+            
+            //returns the formatted form
+            return '<label for="'+ object["fieldname"] +'">'+ object["showname"] +':</label><select class="form-control userProfileElement" id="'+ object["fieldname"] +'" name="'+ object["fieldname"] +'">'+ optionString +'</select>';
+            
+        }else if(object.hasOwnProperty("sizeArr")) {
+//            $("#UI_ELEMENT_TEST").append("<p>object had property sizeArr, object[sizeArr].length: "+ object["sizeArr"].length +"</p>"); // TEST
+//            $("#UI_ELEMENT_TEST").append("<p>object had property sizeArr, object[sizeArr][clothessize].length: "+ object["sizeArr"]["clothessize"].length +"</p>"); // TEST
+            //add a "pick size" option
+            optionString += "<option value=\"\">Vælg størrelse</option>";
+            //iterate through the options and create options based on them
+            for(var g = 0; g < object["sizeArr"]["clothessize"].length; g++) {
+//                $("#UI_ELEMENT_TEST").append("<p>iterating through sizeArr[clothessize], g===: "+ g +"</p>"); // TEST
                 var selected = "";
-                if(object["value"] === options[i]) {
+                //if the key(property) corresponds to the value of the value attribute (f.eks. 2991), this is the option that should be selected
+//                $("#UI_ELEMENT_TEST").append("<p>object[userSize][value]: "+ object["userSize"]["value"] +"</p>"); // TEST
+//                $("#UI_ELEMENT_TEST").append("<p>about to iterate through object[sizeArr][clothessiz]</p>"); // TEST
+//                for(var property in object["sizeArr"]["clothessize"]) {
+//                    $("#UI_ELEMENT_TEST").append("<p>"+ property +": "+ object["sizeArr"]["clothessize"][property] +"</p>"); // TEST
+//                };
+//                $("#UI_ELEMENT_TEST").append("<p>object[sizeArr][clothessize]["+ i +"][id]: "+ object["sizeArr"]["clothessize"][i]["id"] +"</p>"); // TEST
+//                $("#UI_ELEMENT_TEST").append("<p>object[sizeArr][clothessize]["+ i +"][name]: "+ object["sizeArr"]["clothessize"][i]["name"] +"</p>"); // TEST
+                if(object["userSize"]["value"] === object["sizeArr"]["clothessize"][g]["id"]) {
                     selected = "selected=\"selected\"";
                 };
-                if(i > 0) {
-                    optionString += "<option "+ selected +" value="+ options[i] +">"+ options[i] +"</option>";
-                }else {
-                    optionString += "<option value=\"\">"+ options[i] +"</option>";
-                };
+                //add the option to the optionString, the key/property will be the value of the option and the value(from the key/value pair; f.eks. "medium") will be shown to the user
+                optionString += "<option "+ selected +" value=\""+ object["sizeArr"]["clothessize"][g]["id"] +"\">"+ object["sizeArr"]["clothessize"][g]["name"] +"</option>";
             };
-        }else if(object["ftype"] === "GENDER") {
-            var male = "selected=\"selected\"";
-            var female = "";
-            //if the initial value is K, set male to "" and female to selected, making the gender evaluate as female instead of male
-            if(object["value"] === "K") {
-                male = "";
-                female = "selected=\"selected\"";
-            };
-            optionString += "<option "+ male +" value=\"M\">Mand</option> <option "+ female +" value=\"K\">Kvinde</option>";
-        }//else if(object["ftype"] === "SIZE") {
-//            //iterate through the options
-//            for(var property in object["selectvalues"]) {
-//                var selected = "";
-//                //if the key(property) corresponds to the value of the value attribute (f.eks. 2991), this is the option that should be selected
-//                if(object["value"] === property) {
-//                    selected = "selected=\"selected\"";
-//                };
-//                //add the option to the optionString, the key/property will be the value of the option and the value(from the key/value pair; f.eks. "medium") will be shown to the user
-//                optionString += "<option "+ selected +" value=\""+ property +"\">"+ object["selectvalues"][property] +"</option>";
-//            };
-//        };
-        
-        //returns the formatted form.
-        return '<label for="'+ object["fieldname"] +'">'+ object["showname"] +':</label><select class="form-control userProfileElement" id="'+ object["fieldname"] +'" name="'+ object["fieldname"] +'">'+ optionString +'</select>';
+            
+            //returns the formatted form
+            return '<label for="'+ object["userSize"]["fieldname"] +'">'+ object["userSize"]["showname"] +':</label><select class="form-control userProfileElement" id="'+ object["userSize"]["fieldname"] +'" name="'+ object["userSize"]["fieldname"] +'">'+ optionString +'</select>';
+//            return '';
+        };
     };
     
-    //a method to evaluate and if necessary notify users if a required fields are left empty
+    //a method to evaluate and if necessary notify users if required fields are left empty
     function isRequiredFieldEmpty(event) {
         //prevent the default(synchronous) POST
         event.preventDefault();
@@ -1262,10 +1306,10 @@ $(document).ready(function(){
                                 //timeout is there to make sure the previous modal, from ajaxWatch has time to "un-animate", as it seems that if I dont do that, the "remove this modal view when a modal view becomes hidden" triggers from the other window being removed...
                                 setTimeout(function() {
                                     showModalViewAccept("Fejl", "Bruger Profilen blev ikke opdateret, dette kan være fordi du har forsøgt at gemme den uden at foretage en ændring.");
-                                }, 100);
+                                }, 10);
                             };
                         });
-                    }, 100);
+                    }, 10);
                 }else {
                     
                     //clean up
@@ -1277,7 +1321,7 @@ $(document).ready(function(){
                     
                     setTimeout(function() {
                         showModalViewAccept("Ingen ændring", "Der er ingen ændringer foretaget i din Brugerprofil og der er derfor ingen grund til at opdatere den.");
-                    }, 100);
+                    }, 10);
                 };
             }else {
                 //clean up
@@ -1290,7 +1334,7 @@ $(document).ready(function(){
                 //timeout is there to make sure the previous modal, from ajaxWatch has time to "un-animate", as it seems that if I dont do that, the "remove this modal view when a modal view becomes hidden" triggers from the other window being removed...
                 setTimeout(function() {
                     showModalViewAccept("Manglende netværksforbindelse", "Der er ingen netværksforbindelse og det er derfor ikke muligt at opdatere din profil.");
-                }, 100);
+                }, 10);
             };
         };
     };
@@ -1410,6 +1454,8 @@ $(document).ready(function(){
         myShiftsAJAXObj.done(function(data) {
             saveToStorage("savedBookedShifts", JSON.stringify(data));
         }).done(function() {
+            //tells the system that the list has been updated, so that it wont update again when we navigate to the page, if we hadn't been there before
+            myShiftsFirstUpdate = false;
             //Looks at the status of the other ajax queries, if they're done or if we were on this page when we started the update, evaluate what to update, then do so.
             if(possibleShiftsDone && userProfileDone || whereAmI === 1) {
                 //evaluates what to update, then does so.
@@ -1427,6 +1473,9 @@ $(document).ready(function(){
         possibleShiftsAJAXObj.done(function(data) {
             saveToStorage("savedPossibleShifts", JSON.stringify(data));
         }).done(function() {
+            //tells the system that the list has been updated, so that it wont update again when we navigate to the page, if we hadn't been there before
+            possibleShiftsFirstUpdate = false;
+            //Looks at the status of the other ajax queries, if they're done or if we were on this page when we started the update, evaluate what to update, then do so.
             if(myShiftsDone && userProfileDone || whereAmI === 2) {
                 updateAllListsMenuHandlerUpdateEvaluator(whereAmI);
             }else {
@@ -1434,6 +1483,7 @@ $(document).ready(function(){
                 possibleShiftsDone = true;
             };
         });
+        //this conditionla is only enter if whereAmI === 3, which means the checks to see if the others are done before updating isn't needed.
         if(!userProfileDone) {
 //           //tells userProfileAJAXObj where to POST to
 //            var urlUserProfile = "https://"+ domain +"/ajax/app_userprofile";
@@ -1443,13 +1493,13 @@ $(document).ready(function(){
 //                //saveToStorage("savedUserProfile", JSON.stringify(data));
 //            }).done(function(data) {
             //Looks at the status of the other ajax queries, if they're done or if we were on this page when we started the update, evaluate what to update, then do so.
-                if(possibleShiftsDone && myShiftsDone || whereAmI === 3) {
-                    //evaluates what to update, then does so.
+//                if(possibleShiftsDone && myShiftsDone || whereAmI === 3) {
+//                    //evaluates what to update, then does so.
                     updateAllListsMenuHandlerUpdateEvaluator(whereAmI);
-                }else {
-                    //tells the method that userProfile is done updating
-                    userProfileDone = true;
-                };
+//                }else {
+//                    //tells the method that userProfile is done updating
+//                    userProfileDone = true;
+//                };
 //            });
         };
     };
@@ -1690,6 +1740,7 @@ $(document).ready(function(){
                     <h4 class="modal-title" id="myModalLabel">'+ title +'</h4>\
                   </div>\
                   <div class="modal-body">\
+                    <div id="modalAlert" ></div>\
                     <p>'+ argObj["data"]["msg"] +'</p>\
                     '+ argObj["form"] +'\
                     <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Nej</button>\
@@ -1735,10 +1786,12 @@ $(document).ready(function(){
             $(".modalYesBtn").on("click", postNoThanks);
         };
         
-        //makes the "yes" button close the modal window
-        $(".modalYesBtn").on("click", function() {
-            $("#myModal").modal("hide");
-        });
+        //makes the "yes" button close the modal window, unless whereAreWe === 2, as we then want it to stay open unless
+        if(whereAreWe !== 2) {
+            $(".modalYesBtn").on("click", function() {
+                $("#myModal").modal("hide");
+            });
+        }
         
         //adds listener that cleans up after the modal when the window is closed, this is needed to not have several windows at once
         /*$("#myModal").on("hidden.bs.modal", function() {
@@ -1831,20 +1884,20 @@ $(document).ready(function(){
 
                             //calls deleteShiftFromLocalStorage, which takes an id(what to delete) and a saveLocation(where to delete it from AND the context of the call, fx unbookShift)
                             deleteShiftFromLocalStorage(theId, "savedPossibleShifts");
-                        }, 100);
+                        }, 10);
                     }else { //notify user of failure
                         setTimeout(function() {
                             showModalViewAccept("Fejl", "Det var ikke muligt at afvise vagten.");
-                        }, 100);
+                        }, 10);
                     };
                 });
             }else {
                 //notify user of missing conenction
                 setTimeout(function() {
                     showModalViewAccept("Ingen internet forbindelse", "Der er ingen forbindelse til internettet, det er derfor ikke muligt af afvise vagten.<br>Opret forbindelse til internettet og prøv igen.");
-                }, 100);
+                }, 10);
             };
-        }, 100);
+        }, 10);
     };
     
     //unbooks a shift, may be called from the modal windows opened through both Details and showMyShifts
@@ -1871,20 +1924,20 @@ $(document).ready(function(){
                             //calls deleteShiftFromLocalStorage, which takes an id(what to delete) and a saveLocation(where to delete it from AND the context of the call, fx unbookShift)
                             //deleteShiftFromLocalStorage(theId, "savedBookedShifts");
                             updateAllListsMenuHandler();
-                        }, 100);
+                        }, 10);
                     }else { //notify user of failure
                         setTimeout(function() {
                             showModalViewAccept("Fejl", "Det var ikke muligt at afmelde dig vagten.");
-                        }, 100);
+                        }, 10);
                     };
                 });
             }else {
                 //notify user of missing conenction
                 setTimeout(function() {
                     showModalViewAccept("Ingen internet forbindelse", "Der er ingen forbindelse til internettet, det er derfor ikke muligt af afmelde dig vagten.<br>Opret forbindelse til internettet og prøv igen.");
-                }, 100);
+                }, 10);
             };
-        }, 100);
+        }, 10);
     };
     
     //makes an ajaxCall that does the actual booking of the shift, may be called from the modal windows opened through both Details and showPossibleShifts
@@ -1893,82 +1946,105 @@ $(document).ready(function(){
         
         //takes the button that opened this window, then looks for it's closest container, which is its shift, then gets the shifts id which is equal to the one of its ids that we need in the JSON/server (it has two, shiftuid and id)
         var shiftId = $(context).closest(".shiftTarget").attr("id");
-        $("#UI_ELEMENT_TEST").append("<p>shiftId from bookShift: "+ shiftId +"</p>");
+//        $("#UI_ELEMENT_TEST").append("<p>shiftId from bookShift: "+ shiftId +"</p>");
         //get the form from the modal window
         var form = $(context).closest(".shiftTarget").serializeArray();
         
-        var formString = $(context).closest(".shiftTarget").serialize();
+        //will be either true of false, is used later in the function, to know if the form was filled correctly and thus how to proceed
+        var formFilled = validateRolePickerForm(form);
+        //$("#UI_ELEMENT_TEST").append("<p>formFilled.toString: "+ formFilled.toString() +"</p>");
+//        var formString = $(context).closest(".shiftTarget").serialize(); // TEST
         //$("#UI_ELEMENT_TEST").append("<p>form from bookShift: "+ form +"</p>");
 //        //the name of the shiftTarget/form is the actual unhashed id of the shift, we need it to delete it locally, which we no longer do, we instead update from server
 //        var realShiftId = $(context).closest(".shiftTarget").attr("name");
         //$("#UI_ELEMENT_TEST").append("<p>realId from bookShift: "+ realShiftId +"</p>");
         
-        //this is called to make sure a potential modal window starts closing, the timeouts further down in the code are there to give the different modals opened time to close
-        modalW.empty();
-        setTimeout(function() {
-            if(checkConnection()) {
-                
-                var pswHash = getFromStorage("pswHash");
-                var userId = getFromStorage("userId");
-                
-                //connect shiftuid from the form and the role picked...
-                var sobjects = argObj["data"]["shifts"];
-                $("#UI_ELEMENT_TEST").append('<p>sobjects.length: '+ sobjects.length +'</p>');
-                for(var i = 0; i < sobjects.length; i++) {
-                    $("#UI_ELEMENT_TEST").append('<p>formToString: '+ formString +'</p>');
-                    $("#UI_ELEMENT_TEST").append('<p>form[i]: '+ form[i] +'</p>');
-                    for(var prop in form[i]) {
-                        $("#UI_ELEMENT_TEST").append('<p>for each in form[i]: '+ prop +': '+ form[i][prop] +'</p>');
-                    };
-                    delete sobjects[i]["roles"];
-                    sobjects[i].roleid = form[i]["value"];
-                    $("#UI_ELEMENT_TEST").append('<p>sobjects[i][roleid]'+ sobjects[i]["roleid"] +'</p>');
-                };
-                
-                //what to post, it's the id of the shift in question
-                var toPost = {pswhash:pswHash, userid:userId, shifts:sobjects};
-//                var toPost = "shiftuid="+ shiftId +"&pswhash="+ pswhash+"&userid="+ userid +"&"+ form; //also add the serialized form contained in the var "form"
-                //create the url, to post to
-                var url = "https://"+ getFromStorage("domain") +"/ajax/app_takethatshift";
-                
-                //take a shift
-                var ajaxCall = postAJAXCall(url, toPost);
-//                var ajaxCall = $.ajax({
-//                    type: "POST",
-//                    url: url,
-//                    dataType: "JSON",
-//                    data: toPost,
-//                    success: function(data) {
-//                        return data;
-//                    },
-//                    error: function() {
-//                        $(body).append("<p>Something went wrong in postAJAXCall</p>"+"<p>status: "+ error.status + "; readyState: " + error.readyState +"; statusText: "+ error.statusText +"; responseText:"+ error.responseText +";</p>");
-//                    }
-//                });
-                
-                ajaxCall.done(function(data) {
-                    if(data["succes"]) {
-                    setTimeout(function() {
-                            showModalViewAccept("Succes", "Du er nu tilmeldt vagten");
+        if(formFilled) {
+            //this is called to make sure a potential modal window starts closing, the timeouts further down in the code are there to give the different modals opened time to close
+            modalW.empty();
+            setTimeout(function() {
+                if(checkConnection()) {
 
-                            //calls deleteShiftFromLocalStorage, which takes an id(what to delete) and a saveLocation(where to delete it from AND the context of the call, fx unbookShift)
-                            //deleteShiftFromLocalStorage(realShiftId, "savedPossibleShifts");
-                            updateAllListsMenuHandler();
-                        }, 100);
-                    }else { //notify user of failure
-                    setTimeout(function() {
-                            showModalViewAccept("Fejl", "Det var ikke muligt at tilmelde dig vagten.");
-                        }, 100);
+                    var pswHash = getFromStorage("pswHash");
+                    var userId = getFromStorage("userId");
+
+                    //connect shiftuid from the form and the role picked...
+                    var sobjects = argObj["data"]["shifts"];
+    //                $("#UI_ELEMENT_TEST").append('<p>sobjects.length: '+ sobjects.length +'</p>');
+                    for(var i = 0; i < sobjects.length; i++) {
+    //                    $("#UI_ELEMENT_TEST").append('<p>formToString: '+ formString +'</p>');
+    //                    $("#UI_ELEMENT_TEST").append('<p>form[i]: '+ form[i] +'</p>');
+    //                    for(var prop in form[i]) {
+    //                        $("#UI_ELEMENT_TEST").append('<p>for each in form[i]: '+ prop +': '+ form[i][prop] +'</p>');
+    //                    };
+                        delete sobjects[i]["roles"];
+                        sobjects[i].roleid = form[i]["value"];
+    //                    $("#UI_ELEMENT_TEST").append('<p>sobjects[i][roleid]'+ sobjects[i]["roleid"] +'</p>');
                     };
-                });
-            }else {
-                //notify user of missing conenction
-                setTimeout(function() {
-                    showModalViewAccept("Ingen internet forbindelse", "Der er ingen forbindelse til internettet, det er derfor ikke muligt af tilmelde dig vagten.<br>Opret forbindelse til internettet og prøv igen.");
-                }, 100);
+
+                    //what to post, it's the id of the shift in question
+                    var toPost = {pswhash:pswHash, userid:userId, shifts:sobjects};
+    //                var toPost = "shiftuid="+ shiftId +"&pswhash="+ pswhash+"&userid="+ userid +"&"+ form; //also add the serialized form contained in the var "form"
+                    //create the url, to post to
+                    var url = "https://"+ getFromStorage("domain") +"/ajax/app_takethatshift";
+
+                    //take a shift
+                    var ajaxCall = postAJAXCall(url, toPost);
+    //                var ajaxCall = $.ajax({
+    //                    type: "POST",
+    //                    url: url,
+    //                    dataType: "JSON",
+    //                    data: toPost,
+    //                    success: function(data) {
+    //                        return data;
+    //                    },
+    //                    error: function() {
+    //                        $(body).append("<p>Something went wrong in postAJAXCall</p>"+"<p>status: "+ error.status + "; readyState: " + error.readyState +"; statusText: "+ error.statusText +"; responseText:"+ error.responseText +";</p>");
+    //                    }
+    //                });
+
+                    ajaxCall.done(function(data) {
+                        if(data["succes"]) {
+                        setTimeout(function() {
+                                showModalViewAccept("Succes", "Du er nu tilmeldt vagten");
+
+                                //calls deleteShiftFromLocalStorage, which takes an id(what to delete) and a saveLocation(where to delete it from AND the context of the call, fx unbookShift)
+                                //deleteShiftFromLocalStorage(realShiftId, "savedPossibleShifts");
+                                updateAllListsMenuHandler();
+                            }, 10);
+                        }else { //notify user of failure
+                        setTimeout(function() {
+                                showModalViewAccept("Fejl", "Det var ikke muligt at tilmelde dig vagten.");
+                            }, 10);
+                        };
+                    });
+                }else {
+                    //notify user of missing connection
+                    setTimeout(function() {
+                        showModalViewAccept("Ingen internet forbindelse", "Der er ingen forbindelse til internettet, det er derfor ikke muligt af tilmelde dig vagten.<br>Opret forbindelse til internettet og prøv igen.");
+                    }, 10);
+                };
+            }, 10);
+        }else { //notify user that form wasn't filled out correctly
+            setTimeout(function() {
+                $("#modalAlert").html('<p class="text-danger">Husk at vælge rolle</p>');
+            }, 10);
+        };
+    };
+    //validate if a correct role is picked, essentially we will check that the value of "roleid" !== 0, takes an array/object
+    function validateRolePickerForm(form) {
+        for(var i = 0; i < form.length; i++) {
+            var object = form[i];
+            //the form will have properties that aren't called value, so to make sure it wont fail, only check value ===, if the property value is present and only where it is value...
+            if(object.hasOwnProperty("value")) {
+                if(object["value"] === "0") {
+                    //a role wasn't picked correctly, so return false, so that the validater in the calling class knows.
+                    return false;
+                };
             };
-        }, 100);
-        
+        };
+        //if everything was filled out correctly, we will parse the loop w/o entering the innermost conditional and simply return true here.
+        return true;
     };
     //a function which is called when people try to book a shift
     function getRolesBookShift() {
@@ -1999,33 +2075,33 @@ $(document).ready(function(){
                 ajaxCall.done(function(data) {
                     //in these functions we open the modal with the form in it... when okay is pressed in that window: submit;
 //                    $("#UI_ELEMENT_TEST").append('<p>ajaxDataAsString: '+ data +'</p>'); // TEST
-                    $("#UI_ELEMENT_TEST").append('<p>done reached...</p>');
+//                    $("#UI_ELEMENT_TEST").append('<p>done reached...</p>');
                     if(data["succes"]) {
-                        $("#UI_ELEMENT_TEST").append('<p>succes reached...</p>');
+//                        $("#UI_ELEMENT_TEST").append('<p>succes reached...</p>');
                         //only really used to pass to the argObj, to pass on and let the modal know that we're trying to book a shift...
                         var shiftuid = data["shifts"][0]["shiftuid"];
-                        $("#UI_ELEMENT_TEST").append('<p>data[shifts][0][shiftuid]: '+ shiftuid +'</p>');
+//                        $("#UI_ELEMENT_TEST").append('<p>data[shifts][0][shiftuid]: '+ shiftuid +'</p>');
                         //create the start of the form, we do it before we enter the for loop, that iterates through all the shifts and adds them to the form.
                         var rolePickForm = '<form id="'+ data["shifts"][0]["shiftuid"] +'" name="'+ shiftId +'" class="form-group shiftTarget" role="form" method="post" action="">';
-                        $("#UI_ELEMENT_TEST").append('<p>first add to the form: '+ rolePickForm +'</p>');
+//                        $("#UI_ELEMENT_TEST").append('<p>first add to the form: '+ rolePickForm +'</p>');
                         //iterate through all the shifts you're about to take
-                        $("#UI_ELEMENT_TEST").append('<p>data[shifts].length: '+ data["shifts"].length +'</p>');
+//                        $("#UI_ELEMENT_TEST").append('<p>data[shifts].length: '+ data["shifts"].length +'</p>');
                         for(var i = 0; i < data["shifts"].length; i++) {
-                            $("#UI_ELEMENT_TEST").append('<p>iterate thorugh the shifts</p>');
+//                            $("#UI_ELEMENT_TEST").append('<p>iterate thorugh the shifts</p>');
                             var sdata = data["shifts"][i];
-                            $("#UI_ELEMENT_TEST").append('<p>sdata set to data[shifts][i], trying to for each sdata</p>');
-                            for(var prop in sdata) {
-                                $("#UI_ELEMENT_TEST").append('<p>'+ prop +': '+ sdata[prop] +'</p>');
-                            };
+//                            $("#UI_ELEMENT_TEST").append('<p>sdata set to data[shifts][i], trying to for each sdata</p>');
+//                            for(var prop in sdata) {
+//                                $("#UI_ELEMENT_TEST").append('<p>'+ prop +': '+ sdata[prop] +'</p>');
+//                            };
                             //create the form string we'll be submitting
                             //if there are roles, make an appropriate select input
                             if(sdata.hasOwnProperty("roles")) {
-                                $("#UI_ELEMENT_TEST").append('<p>sdata[roles].length: '+ sdata["roles"].length +'</p>');
-                                $("#UI_ELEMENT_TEST").append("<p>roles was bigger than 0</p>");
+//                                $("#UI_ELEMENT_TEST").append('<p>sdata[roles].length: '+ sdata["roles"].length +'</p>');
+//                                $("#UI_ELEMENT_TEST").append("<p>roles was bigger than 0</p>");
                                 var optionsString = '';
                                 var object = sdata["roles"];
                                 //create the options for the select
-                                $("#UI_ELEMENT_TEST").append("<p>create optionsSting</p>");
+//                                $("#UI_ELEMENT_TEST").append("<p>create optionsSting</p>");
                                 if(object.length === 1) {
                                     for(var i = 0; i < object.length; i++) {
                                         optionsString += "<option selected=\"selected\" name="+ object[i]["roleid"] +" value="+ object[i]["roleid"] +">"+ object[i]["rolename"] +"</option>";
@@ -2036,51 +2112,54 @@ $(document).ready(function(){
                                         optionsString += "<option name="+ object[i]["roleid"] +" value="+ object[i]["roleid"] +">"+ object[i]["rolename"] +"</option>";
                                     };
                                 };
-                                $("#UI_ELEMENT_TEST").append("<p>optionsString created</p>");
+//                                $("#UI_ELEMENT_TEST").append("<p>optionsString created</p>");
                                 
                                 //add a label for the shift, telling us when the shift is held
                                 rolePickForm += '<p>Dato: '+ getDate(sdata["startdate"]) +' '+ sdata["starttime"].substring(0,5) +' - '+ sdata["endtime"].substring(0,5) +'</p>';
-                                $("#UI_ELEMENT_TEST").append("<p>date p was added</p>");
+//                                $("#UI_ELEMENT_TEST").append("<p>date p was added</p>");
                                 //create the select, with the created options
                                 rolePickForm += '<select class="form-control userProfileElement" name="roleid">'+ optionsString +'</select>';
                                 
-                                $("#UI_ELEMENT_TEST").append("<p>optionsString and select added to rolePickForm var</p>");
+//                                $("#UI_ELEMENT_TEST").append("<p>optionsString and select added to rolePickForm var</p>");
                                 
                             //if there are no roles property in the shift
                             }else {
-                                $("#UI_ELEMENT_TEST").append("<p>roles was 0 or less</p>");
+//                                $("#UI_ELEMENT_TEST").append("<p>roles was 0 or less</p>");
                                 //rolePickForm += '<p>Dato: '+ getDate(sdata["startdate"]) +' '+ sdata["starttime"].substring(0,5) +' - '+ sdata["endtime"].substring(0,5) +'</p>';
                                 rolePickForm += '<div><label for="'+ sdata["shiftuid"] +'">Dato:</label><input id="'+sdata["shiftuid"]+ '" type="TEXTFIELD" name="'+ sdata["shiftuid"] +'" class="form-control" value="'+ getDate(sdata["startdate"]) +' '+ sdata["starttime"].substring(0,5) +' - '+ sdata["endtime"].substring(0,5) +'"></div>';
-                                $("#UI_ELEMENT_TEST").append('<p>no roles, dato add: '+ rolePickForm +'</p>');
+//                                $("#UI_ELEMENT_TEST").append('<p>no roles, dato add: '+ rolePickForm +'</p>');
                             };
                         };
                         
                         //append a submit btn to the form and close it
                         rolePickForm += '<button type="submit" class="btn modalYesBtn btn-success btn-lg pull-right bookBtn" id="submitRolePickerForm">Tag Vagt</button> </form>';
-                        $("#UI_ELEMENT_TEST").append("<p>button added to rolePickForm and form closed</p>");
-                        $("#UI_ELEMENT_TEST").append("<p>"+ rolePickForm +"</p>");
+//                        $("#UI_ELEMENT_TEST").append("<p>button added to rolePickForm and form closed</p>");
+//                        $("#UI_ELEMENT_TEST").append("<p>"+ rolePickForm +"</p>");
                         
                         //what to pass on to the next function (ie. the modal that allows you to pick roles and accept the shift).
                         var argObj = {form:rolePickForm, id:shiftuid, data:data};
                         
                         //opens the modal and parses it the string with the form and the shiftuid...
                         setTimeout(function() {
-                            $("#UI_ELEMENT_TEST").append("<p>trying to open showModalView</p>");
+//                            $("#UI_ELEMENT_TEST").append("<p>trying to open showModalView</p>");
                             showModalView(argObj);
                         }, 10);
                         
                     }else { //if succes isn't true, it should be false and if so, there are no more free slots/spaces for the shift
                         //notify user that last slot was just filled... display data["MSG"] in content of modal
                         //$("#UI_ELEMENT_TEST").append("<p>fail</p>");
+                        setTimeout(function() {
+                            showModalViewAccept("Fejl ved tilmeldings check", data["msg"]);
+                        }, 10);
                     };
                 });
             }else {
                 //notify user of missing connection
                 setTimeout(function() {
                     showModalViewAccept("Ingen internet forbindelse", "Der er ingen forbindelse til internettet, det er derfor ikke muligt af tilmelde dig vagten.<br>Opret forbindelse til internettet og prøv igen.");
-                }, 100);
+                }, 10);
             };
-        }, 100);
+        }, 10);
         
     };
     
