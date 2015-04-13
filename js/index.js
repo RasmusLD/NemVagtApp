@@ -55,7 +55,51 @@ $(document).ready(function(){
     };
     
     function onBackKeyDown() {
-        navigator.app.backHistory();
+        
+        modalW.empty();
+        
+        setTimeout(function() {
+            $(modalW).append('<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">\
+              <div class="modal-dialog">\
+                <div class="modal-content">\
+                  <div class="modal-header">\
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\
+                    <h4 class="modal-title" id="myModalLabel">Luk NemVagt?</h4>\
+                  </div>\
+                  <div class="modal-body">\
+                    Er du sikker på at du ønsker at lukke NemVagt app\'en?\
+                  </div>\
+                  <div class="modal-footer">\
+                    <button type="button" class="btn btn-default btn-lg pull-left" data-dismiss="modal">Nej</button>\
+                    <button type="button" class="btn modalYesBtn btn-default btn-lg pull-right">Ja</button>\
+                  </div>\
+                </div>\
+              </div>\
+            </div>');
+        
+        //defines the setup changes of the modal, show===true so the modal is shown
+        var options = {show: true};
+        //applies the changes defined in var options
+        $("#myModal").modal(options);
+        //sets the title of the modal, so people know where they are
+        //$(".modal-title").html(title); is done directly in the html
+        
+        $(".modalYesBtn").on("click", function() {
+            navigator.app.exitApp();
+        });
+        
+        $(".modalYesBtn").on("click", function() {
+            $("#myModal").modal("hide");
+        });
+        
+        $("#myModal").on("hidden.bs.modal", function() {
+            modalW.empty();
+        });
+        
+        }, 10);
+        
+        //navigator.app.backHistory(); //should work, if there was actually any entries in the app's backHistory, but there never will be, because we only have one page...
+        
         //doesn't work...
 //        if(device.app.canGoBack()) {
 //            device.app.goBack();
@@ -1203,8 +1247,12 @@ $(document).ready(function(){
             if(object["required"] === "1") {
                 var valueOfObject = $("#"+ object["fieldname"]).val();
                 if(valueOfObject === "" || valueOfObject === null || valueOfObject === undefined) {
+                    var theHelpText = "";
+                    if(object["helptext"] !== "") {
+                        theHelpText = "Hjælp til udfyldning:<br>"+ object["helptext"] +"<br>";
+                    };
                     //if something that should be filled out isn't, notify user and display helptext (only tells of/displays help for, the first instance of incorrectly filled form element)
-                    showModalViewAccept("Manglende udfyldning", "Feltet \""+ object["showname"] +"\" skal være udfyldt.<br>Hjælp til udfyldning:<br>"+ object["helptext"] +"<br><br>Felter der skal være udfyldt og ikke er det, er nu highlighted");
+                    showModalViewAccept("Manglende udfyldning", "Feltet \""+ object["showname"] +"\" skal være udfyldt.<br>"+ theHelpText +"<br>Felter der skal være udfyldt og ikke er det, er nu highlighted");
                     //highlights all incorrectly filled form elements, making it easy for the user to find them...
                     $("#"+ object["fieldname"]).addClass("myHighlight");
                     //removes the highlight once the user manipulates the form element
@@ -1566,7 +1614,26 @@ $(document).ready(function(){
         $("#lCont").append('<img src="img/NemVagt-Logo.png" class="img-responsive" style="margin-top:1vh; width:32vmin;" alt="NemVagt" >');
     };
     
-    //is passed a date in the YYYY-MM-DD format and returns the weekdays name in danish, is needed to show the name of days when displaying shifts
+    //is passed a date in the YYYY-MM-DD format and returns the abbreviation of the month name in danish
+    function getMonth(data) {
+        var aMonth = new Date(data).getMonth();
+        var months = {
+            0: "jan",
+            1: "feb",
+            2: "mar",
+            3: "apr",
+            4: "maj",
+            5: "jun",
+            6: "jul",
+            7: "aug",
+            8: "sep",
+            9: "okt",
+            10: "nov",
+            11: "dec"
+        };
+        return months[aMonth];
+    };
+    //is passed a date in the YYYY-MM-DD format and returns the weekdays name in danish, is needed to show the name of days
     function getWeekday(date) {
         var aDay = new Date(date).getDay();
         var weekdays = {
@@ -1806,7 +1873,10 @@ $(document).ready(function(){
     };
     //is used to create a notification modal, which is easy to close and doesn't close on its own, people simply press on "ok" or the backdrop
     function showModalViewAccept(title, content) {
-        $(modalW).append('<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">\
+        
+        var notiModal = $("#notificationModalCont");
+        
+        $(notiModal).append('<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">\
           <div class="modal-dialog">\
             <div class="modal-content">\
               <div class="modal-header">\
@@ -1817,7 +1887,7 @@ $(document).ready(function(){
                 '+ content +'\
               </div>\
               <div class="modal-footer">\
-                <button id="modalOkayBtn" type="button" class="btn btn-default btn-lg">Okay</button>\
+                <button id="modalOkayBtn" type="button" class="btn btn-default btn-lg">OK</button>\
               </div>\
             </div>\
           </div>\
@@ -1833,7 +1903,7 @@ $(document).ready(function(){
         });
         //cleans up after the modal when it closes
         $("#myModal").on("hidden.bs.modal", function() {
-            modalW.empty();
+            notiModal.empty();
         });
     };
     
@@ -2093,6 +2163,8 @@ $(document).ready(function(){
 //                            for(var prop in sdata) {
 //                                $("#UI_ELEMENT_TEST").append('<p>'+ prop +': '+ sdata[prop] +'</p>');
 //                            };
+                            //create a var which contains the rolePickForm, which we'll submit regardless of whether or not there are roles
+                            var dataVar = '<div><label for="'+ sdata["shiftuid"] +'">Dato:</label><input readonly="readonly" id="'+sdata["shiftuid"]+ '" type="TEXTFIELD" name="'+ sdata["shiftuid"] +'" class="userProfileElement form-control" value="'+ getWeekday(sdata["startdate"]) +' '+ parseInt(getDate(sdata["startdate"]).substring(0,2), 10) +'. '+ getMonth(sdata["startdate"]) +' '+ getDate(sdata["startdate"]).substring(6, 10) +', fra kl: '+ sdata["starttime"].substring(0,5) +' - '+ sdata["endtime"].substring(0,5) +'"></div>';
                             //create the form string we'll be submitting
                             //if there are roles, make an appropriate select input
                             if(sdata.hasOwnProperty("roles")) {
@@ -2115,7 +2187,8 @@ $(document).ready(function(){
 //                                $("#UI_ELEMENT_TEST").append("<p>optionsString created</p>");
                                 
                                 //add a label for the shift, telling us when the shift is held
-                                rolePickForm += '<p>Dato: '+ getDate(sdata["startdate"]) +' '+ sdata["starttime"].substring(0,5) +' - '+ sdata["endtime"].substring(0,5) +'</p>';
+                                //rolePickForm += '<p>Dato: '+ getDate(sdata["startdate"]) +' '+ sdata["starttime"].substring(0,5) +' - '+ sdata["endtime"].substring(0,5) +'</p>';
+                                rolePickForm += dataVar;
 //                                $("#UI_ELEMENT_TEST").append("<p>date p was added</p>");
                                 //create the select, with the created options
                                 rolePickForm += '<select class="form-control userProfileElement" name="roleid">'+ optionsString +'</select>';
@@ -2126,13 +2199,20 @@ $(document).ready(function(){
                             }else {
 //                                $("#UI_ELEMENT_TEST").append("<p>roles was 0 or less</p>");
                                 //rolePickForm += '<p>Dato: '+ getDate(sdata["startdate"]) +' '+ sdata["starttime"].substring(0,5) +' - '+ sdata["endtime"].substring(0,5) +'</p>';
-                                rolePickForm += '<div><label for="'+ sdata["shiftuid"] +'">Dato:</label><input id="'+sdata["shiftuid"]+ '" type="TEXTFIELD" name="'+ sdata["shiftuid"] +'" class="form-control" value="'+ getDate(sdata["startdate"]) +' '+ sdata["starttime"].substring(0,5) +' - '+ sdata["endtime"].substring(0,5) +'"></div>';
+                                rolePickForm += dataVar;
 //                                $("#UI_ELEMENT_TEST").append('<p>no roles, dato add: '+ rolePickForm +'</p>');
                             };
                         };
+                        //make it so the submitBtn reflects whether or not there are one or more shifts
+                        var submitBtnText;
+                        if(data["shifts"].length > 1) {
+                            submitBtnText = "Tag vagter";
+                        }else {
+                            submitBtnText = "Tag vagt";
+                        };
                         
                         //append a submit btn to the form and close it
-                        rolePickForm += '<button type="submit" class="btn modalYesBtn btn-success btn-lg pull-right bookBtn" id="submitRolePickerForm">Tag Vagt</button> </form>';
+                        rolePickForm += '<button type="submit" class="btn modalYesBtn btn-success btn-lg pull-right bookBtn" id="submitRolePickerForm">'+ submitBtnText +'</button> </form>';
 //                        $("#UI_ELEMENT_TEST").append("<p>button added to rolePickForm and form closed</p>");
 //                        $("#UI_ELEMENT_TEST").append("<p>"+ rolePickForm +"</p>");
                         
