@@ -354,21 +354,21 @@ $(document).ready(function(){
         $(body).empty();
         
         $(body).append('<h1 class="page-header">NemVagt Login</h1>');
-        //the submit btn should be set to .disabled, unless all required fields are filled with data.
+        //the submit btn could be set to .disabled, unless all required fields are filled with data.
         $(body).append('<form id=loginForm role="form" method="post" action="" >\
     <label for="domain">Forenings Domæne</label>\
 <div class="input-group form-group">\
     <span class="input-group-addon">'+ 'https://' +'</span>\
-    <input value="mobiludvikling" type="url" name="domain" class="form-control" placeholder="festival">\
+    <input value="" type="url" name="domain" class="form-control" placeholder="adresse">\
     <span class="input-group-addon">'+ '.nemvagt.dk' +'</span>\
 </div>\
 <div class="form-group">\
     <label for="email">Din E-mail</label>\
-    <input value="rasmus@nemvagt.dk" type="email" class="form-control" id="email" name="usr" placeholder="navn@dinEmail.com">\
+    <input value="" type="email" class="form-control" id="email" name="usr" placeholder="navn@dinEmail.com">\
 </div>\
 <div class="form-group">\
     <label for="password">Password</label>\
-    <input value="FedPraktik5440" type="password" id="password" name="psw" class="form-control" placeholder="Dit password">\
+    <input value="" type="password" id="password" name="psw" class="form-control" placeholder="Dit password">\
 </div>\
 <input type="submit" id="loginBtn" value="Login" class="btn btn-success btn-lg" >\
 </form>');
