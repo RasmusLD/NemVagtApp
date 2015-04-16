@@ -296,26 +296,32 @@ $(document).ready(function(){
     
     
     //object to save the autoupdate of the myShifts to, autoupdateMyShifts is added to the variable at the end of the populateMyShifts method if it is still undefined
-    var jsonUpdateMyShiftsObj;
+    var jsonUpdateMyShiftsObj = false;
     function autoupdateMyShifts() {
         setInterval(function() {
             if(checkConnection()) {
                 var url = "https://"+ getFromStorage("domain") +"/ajax/app_myshifts";
-                var infoArr = {userid:getFromStorage("userId")}; //what to post, once I I need to POST a pswHash, do it here.
+                var infoArr = {userid:getFromStorage("userId")}; //what to post, isn't really needed except that we need to pass something into parameter placement of infoArr, since we need to set global to false...
                 var ajaxReq = postAJAXCall(url, infoArr, false); //false sets the global option to false, meaning the request will be invisible to the ajaxStart/ajaxStop.
-                ajaxReq.done(saveToStorange("savedBookedShifts", JSON.stringify(this)));
+                ajaxReq.done(function(data) {
+                    //$("#UI_ELEMENT_TEST").append("<p>data to save: "+ JSON.stringify(data) +"</p>");
+                    saveToStorage("savedBookedShifts", JSON.stringify(data));
+                });
             };
         }, 150000);
     };
     //object to save the autoupdate of the possibleShifts to, autoupdatepossibleShifts is added to the variable at the end of the populateMyShifts method if it is still undefined
-    var jsonUpdatePossibleShiftsObj;
+    var jsonUpdatePossibleShiftsObj = false;
     function autoupdatePossibleShifts() {
         setInterval(function() {
             if(checkConnection()) {
                 var url = "https://"+ getFromStorage("domain") +"/ajax/app_myshiftplan";
-                var infoArr = {userid:getFromStorage("userId")}; //what to post, isn't really needed except that we need to pass Something into parameter placement of infoArr, since we need to set global to false...
+                var infoArr = {userid:getFromStorage("userId")}; //what to post, isn't really needed except that we need to pass something into parameter placement of infoArr, since we need to set global to false...
                 var ajaxReq = postAJAXCall(url, infoArr, false); //false sets the global option to false, meaning the request will be invisible to the ajaxStart/ajaxStop.
-                ajaxReq.done(saveToStorange("savedPossibleShifts", JSON.stringify(this)));
+                ajaxReq.done(function(data) {
+                    //$("#UI_ELEMENT_TEST").append("<p>data to save: "+ JSON.stringify(data) +"</p>");
+                    saveToStorage("savedPossibleShifts", JSON.stringify(data));
+                });
             };
         }, 150000);
     };
@@ -344,7 +350,7 @@ $(document).ready(function(){
             
         }else {
             //cleans localStorage, when no pswHash was found, to make sure there is no "old dirt"...
-            localStorage.clear();
+            cleanStorage();
             showLogin();
         };
     };
@@ -353,58 +359,61 @@ $(document).ready(function(){
     function showLogin() {
         $(body).empty();
         
-        $(body).append('<h1 class="page-header">NemVagt Login</h1>');
-        //the submit btn could be set to .disabled, unless all required fields are filled with data.
-        $(body).append('<form id=loginForm role="form" method="post" action="" >\
-    <label for="domain">Forenings Domæne</label>\
-<div class="input-group form-group">\
-    <span class="input-group-addon">'+ 'https://' +'</span>\
-    <input value="" type="url" name="domain" class="form-control" placeholder="adresse">\
-    <span class="input-group-addon">'+ '.nemvagt.dk' +'</span>\
-</div>\
-<div class="form-group">\
-    <label for="email">Din E-mail</label>\
-    <input value="" type="email" class="form-control" id="email" name="usr" placeholder="navn@dinEmail.com">\
-</div>\
-<div class="form-group">\
-    <label for="password">Password</label>\
-    <input value="" type="password" id="password" name="psw" class="form-control" placeholder="Dit password">\
-</div>\
-<input type="submit" id="loginBtn" value="Login" class="btn btn-success btn-lg" >\
-</form>');
-        
-        //we need this to override and handle the onclick event for the login form
-        $("#loginBtn").on("click", function(event) {
-            event.preventDefault();
-            
-            //only try to login if we have an internet connection, notify user if there is no connection
-            if(checkConnection()) {
-                var form = $("#loginForm");
-                var email = $('input[name=usr]').val();
-                var domain = $('input[name=domain]').val() +".nemvagt.dk"; //this will be changed when we find a solution for differing domains
-                var returnedData;
-                if($('input[name=domain]').val() !== "") {
-                    $.ajax({ //this function has it's own AJAX call because it wasn't worth the time to standardize it and loginEvaluator expects dataType: "text" instead of JSON...
-                    type: form.attr("method"),
-                    url: "https://"+ domain + "/ajax/login",
-                    dataType: "text",
-                    data: form.serialize() + "&remember=1",
-                    success: function(data) {
-                        returnedData = data;
-                    },
-                    error: function() {
-                        $(body).append("<p>Something went wrong in AjaxCall from showLogin()</p> <br>"+"<p>status: "+ error.status + "; readyState: " + error.readyState +"; statusText: "+ error.statusText +"; responseText:"+ error.responseText +";</p>");
-                    }
-                    }).done(function() {
-                        loginEvaluater(returnedData, email, domain);
-                    });
+        setTimeout(function() {
+            $(body).append('<h1 class="page-header">NemVagt Login</h1>');
+            //the submit btn could be set to .disabled, unless all required fields are filled with data.
+            $(body).append('<form id=loginForm role="form" method="post" action="" >\
+        <label for="domain">Forenings Domæne</label>\
+    <div class="input-group form-group">\
+        <span class="input-group-addon">'+ 'https://' +'</span>\
+        <input value="" type="url" name="domain" class="form-control" placeholder="adresse">\
+        <span class="input-group-addon">'+ '.nemvagt.dk' +'</span>\
+    </div>\
+    <div class="form-group">\
+        <label for="email">Din E-mail</label>\
+        <input value="" type="email" class="form-control" id="email" name="usr" placeholder="navn@dinEmail.com">\
+    </div>\
+    <div class="form-group">\
+        <label for="password">Password</label>\
+        <input value="" type="password" id="password" name="psw" class="form-control" placeholder="Dit password">\
+    </div>\
+    <input type="submit" id="loginBtn" value="Login" class="btn btn-success btn-lg" >\
+    </form>');
+
+            //we need this to override and handle the onclick event for the login form
+            $("#loginBtn").on("click", function(event) {
+                event.preventDefault();
+
+                //only try to login if we have an internet connection, notify user if there is no connection
+                if(checkConnection()) {
+                    var form = $("#loginForm");
+                    var email = $('input[name=usr]').val();
+                    var domain = $('input[name=domain]').val() +".nemvagt.dk"; //this will be changed when we find a solution for differing domains
+                    if($('input[name=domain]').val() !== "") {
+                        var ajaxObj = $.ajax({ //this function has it's own AJAX call because it wasn't worth the time to standardize it and loginEvaluator expects dataType: "text" instead of JSON...
+                        type: form.attr("method"),
+                        url: "https://"+ domain + "/ajax/login",
+                        dataType: "text",
+                        data: form.serialize() + "&remember=1"
+                        });
+                        ajaxObj.done(function(data) {
+                            setTimeout(function() {
+                                loginEvaluater(data, email, domain);
+                            }, 10);
+                        });
+                        ajaxObj.fail(function(data) {
+                            setTimeout(function() {
+                                showModalViewAccept("Fejl", "<p>Der opstod en fejl i forbindelse med kommunikation med server:<br>+ status: "+ data.status + "; readyState: " + data.readyState +"; statusText: "+ data.statusText +"; responseText:"+ data.responseText +" +</p>");
+                            }, 10);
+                        });
+                    }else {
+                        showModalViewAccept("Manglende udfyldning", "<p>Husk at udfylde \"Forenings domæne\"</p>");
+                    };
                 }else {
-                    showModalViewAccept("Manglende udfyldning", "<p>Husk at udfylde \"Forenings domæne\"</p>");
+                    showModalViewAccept("Ingen internet forbindelse", "<p>Der er ingen forbindelse til internettet og du har ikke et gemt login på telefonen,<br>Opret forbindelse til internettet for at logge ind.</p>");
                 };
-            }else {
-                showModalViewAccept("Ingen internet forbindelse", "<p>Der er ingen forbindelse til internettet og du har ikke et gemt login på telefonen,<br>Opret forbindelse til internettet for at logge ind.</p>");
-            };
-        });
+            });
+        }, 10);
     };
     
     //this method evaluates/handles login attempts
@@ -412,16 +421,21 @@ $(document).ready(function(){
     function loginEvaluater(userInfo, email, domain) {
         //simply eval whether the server accepted the login data, then either have the user remain on the login screen (but append a message that tells them their input was wrong)
         //OR send them to "Mine vagter".
-        if(email === $.parseJSON(userInfo).email && email !== undefined && $.parseJSON(userInfo).email !== undefined) {
-            saveToStorage("pswHash" ,$.parseJSON(userInfo).pswhash);
-            saveToStorage("email", $.parseJSON(userInfo).email);
-            saveToStorage("userId", $.parseJSON(userInfo).id);
-            saveToStorage("domain", domain);
-            
-            showMenu();
-            showMyShifts();
+        if($.parseJSON(userInfo).hasOwnProperty("email")) {
+            if(email === $.parseJSON(userInfo).email && email !== undefined && $.parseJSON(userInfo).email !== undefined) {
+                saveToStorage("pswHash" ,$.parseJSON(userInfo).pswhash);
+                saveToStorage("email", $.parseJSON(userInfo).email);
+                saveToStorage("userId", $.parseJSON(userInfo).id);
+                saveToStorage("domain", domain);
+
+                showMenu();
+                showMyShifts();
+            }else {
+                cleanStorage();
+                showModalViewAccept("Forkert udfyldning", "<p>Noget var udfyldt forkert!</p>");
+            };
         }else {
-            localStorage.clear();
+            cleanStorage();
             showModalViewAccept("Forkert udfyldning", "<p>Noget var udfyldt forkert!</p>");
         };
     };
@@ -429,30 +443,33 @@ $(document).ready(function(){
     //shows the "Mine vagter" page
     function showMyShifts() {
         $(body).empty();
-        if(checkConnection()) {
-            //actually show shifts here, we need to get the shifts from the server and then create a method that finds out how many shifts are there, what data they contain, then populate.
-            //when creating shifts, dynamically add an event listener to every shift here... this is already done further down in the code...
-            if(myShiftsFirstUpdate === true) { //checks to see if this is the first time we've opened "myShifts" this time we're using the program, if it is, we'll get JSON from the server
-                //sets myShiftsFirstUpdate to false, so that we will no longer update from internet whenever we navigate to page...
-                myShiftsFirstUpdate = false;
-                //tells us what to POST
-                var toPost = {userid:getFromStorage("userId")};
-                //tells us where to POST to
-                var url = "https://"+ getFromStorage("domain") +"/ajax/app_myshifts";
-                //get the shifts that the person has already voluntered for
-                var ajaxCall = postAJAXCall(url, toPost);
-                ajaxCall.done(function(data) {
-                    populateMyShifts(ajaxSuccesEvaluator("savedBookedShifts", "Mine vagter", data));
-                });
-            }else { //we already have a pretty recent version of the JSON, so get JSON from localStorage, as this is much faster than the internet.
-                //retrieves the booked shifts
-                populateMyShifts(JSON.parse(getFromStorage("savedBookedShifts")));
-                //we used to use this, but the ajaxSuccesEvaluator will notify that the data is being collected from memory, which it shouldn't...
-                //populateMyShifts(ajaxSuccesEvaluator("savedBookedShifts", "Mine vagter"));
+        
+        setTimeout(function() {
+            if(checkConnection()) {
+                //actually show shifts here, we need to get the shifts from the server and then create a method that finds out how many shifts are there, what data they contain, then populate.
+                //when creating shifts, dynamically add an event listener to every shift here... this is already done further down in the code...
+                if(myShiftsFirstUpdate === true) { //checks to see if this is the first time we've opened "myShifts" this time we're using the program, if it is, we'll get JSON from the server
+                    //sets myShiftsFirstUpdate to false, so that we will no longer update from internet whenever we navigate to page...
+                    myShiftsFirstUpdate = false;
+                    //tells us what to POST
+                    var toPost = {userid:getFromStorage("userId")};
+                    //tells us where to POST to
+                    var url = "https://"+ getFromStorage("domain") +"/ajax/app_myshifts";
+                    //get the shifts that the person has already voluntered for
+                    var ajaxCall = postAJAXCall(url, toPost);
+                    ajaxCall.done(function(data) {
+                        populateMyShifts(ajaxSuccesEvaluator("savedBookedShifts", "Mine vagter", data));
+                    });
+                }else { //we already have a pretty recent version of the JSON, so get JSON from localStorage, as this is much faster than the internet.
+                    //retrieves the booked shifts
+                    populateMyShifts(JSON.parse(getFromStorage("savedBookedShifts")));
+                    //we used to use this, but the ajaxSuccesEvaluator will notify that the data is being collected from memory, which it shouldn't...
+                    //populateMyShifts(ajaxSuccesEvaluator("savedBookedShifts", "Mine vagter"));
+                };
+            }else { //this is reached if the device is offline
+                populateMyShifts(ajaxSuccesEvaluator("savedBookedShifts", "Mine vagter"));
             };
-        }else { //this is reached if the device is offline
-            populateMyShifts(ajaxSuccesEvaluator("savedBookedShifts", "Mine vagter"));
-        };
+        }, 10);
     };
     //is used twice by showMyShifts to actually populate the DOM, the parameter is a JSON array with shifts...
     function populateMyShifts(myBookedShifts) {
@@ -513,7 +530,7 @@ $(document).ready(function(){
         $(".unBookBtn").on("click", showModalView);
         
         //starts an autoupdate timer for the myShifts JSON.
-        if(jsonUpdateMyShiftsObj === undefined) {
+        if(jsonUpdateMyShiftsObj === false) {
             jsonUpdateMyShiftsObj = autoupdateMyShifts();
         };
     };
@@ -521,30 +538,32 @@ $(document).ready(function(){
     //shows showPossibleShifts
     function showPossibleShifts() {
         $(body).empty();
-        if(checkConnection()) {
-            //actually show possible shifts here shifts here, we need to get the shifts from the server and then create a method that finds out how many shifts are there, what data they contain, then populate.
-            //when creating shifts, dynamically add an event listener to every shift here... this is already done further down in the code...
-            if(possibleShiftsFirstUpdate === true) { //checks to see if this is the first time we've opened "myShifts" this time we're using the program, if it is, we'll get JSON from the server
-                //sets possibleShiftsFirstUpdate to false, so that we will no longer update from internet whenever we navigate to page...
-                possibleShiftsFirstUpdate = false;
-                //tells us what to POST, strictly speaking not needed, as postAJAXCall automatically adds userid and pswhash...
-                var toPost = {userid:getFromStorage("userId")};
-                //tells us where to POST to
-                var url = "https://"+ getFromStorage("domain") +"/ajax/app_myshiftplan";
-                //get the shifts that the person can volunteer for
-                var ajaxCall = postAJAXCall(url, toPost);
-                ajaxCall.done(function(data) {
-                    populatePossibleShifts(ajaxSuccesEvaluator("savedPossibleShifts", "Ledige vagter", data));
-                });
-            }else { //we already have a pretty recent version of the JSON, so get JSON from localStorage, as this is much faster than the internet.
-                //retrieves the possible shifts
-                populatePossibleShifts(JSON.parse(getFromStorage("savedPossibleShifts")));
-                //we used to use this, but the ajaxSuccesEvaluator will notify that the data is being collected from memory, which it shouldn't...
-                //populateMyShifts(ajaxSuccesEvaluator("savedPossibleShifts", "Ledige vagter"));
+        setTimeout(function() {
+            if(checkConnection()) {
+                //actually show possible shifts here shifts here, we need to get the shifts from the server and then create a method that finds out how many shifts are there, what data they contain, then populate.
+                //when creating shifts, dynamically add an event listener to every shift here... this is already done further down in the code...
+                if(possibleShiftsFirstUpdate === true) { //checks to see if this is the first time we've opened "myShifts" this time we're using the program, if it is, we'll get JSON from the server
+                    //sets possibleShiftsFirstUpdate to false, so that we will no longer update from internet whenever we navigate to page...
+                    possibleShiftsFirstUpdate = false;
+                    //tells us what to POST, strictly speaking not needed, as postAJAXCall automatically adds userid and pswhash...
+                    var toPost = {userid:getFromStorage("userId")};
+                    //tells us where to POST to
+                    var url = "https://"+ getFromStorage("domain") +"/ajax/app_myshiftplan";
+                    //get the shifts that the person can volunteer for
+                    var ajaxCall = postAJAXCall(url, toPost);
+                    ajaxCall.done(function(data) {
+                        populatePossibleShifts(ajaxSuccesEvaluator("savedPossibleShifts", "Ledige vagter", data));
+                    });
+                }else { //we already have a pretty recent version of the JSON, so get JSON from localStorage, as this is much faster than the internet.
+                    //retrieves the possible shifts
+                    populatePossibleShifts(JSON.parse(getFromStorage("savedPossibleShifts")));
+                    //we used to use this, but the ajaxSuccesEvaluator will notify that the data is being collected from memory, which it shouldn't...
+                    //populateMyShifts(ajaxSuccesEvaluator("savedPossibleShifts", "Ledige vagter"));
+                };
+            }else { //this is reached if the device is offline
+                populatePossibleShifts(ajaxSuccesEvaluator("savedPossibleShifts", "Ledige vagter"));
             };
-        }else { //this is reached if the device is offline
-            populatePossibleShifts(ajaxSuccesEvaluator("savedPossibleShifts", "Ledige vagter"));
-        };
+        }, 10);
     };
     //is used by showPossibleShifts to actually populate the DOM
     function populatePossibleShifts(possibleShifts) {
@@ -653,7 +672,7 @@ $(document).ready(function(){
         $(".bookBtn").on("click", getRolesBookShift);
         
         //starts an autoupdate timer for the possibleShifts JSON.
-        if(jsonUpdatePossibleShiftsObj === undefined) {
+        if(jsonUpdatePossibleShiftsObj === false) {
             jsonUpdatePossibleShiftsObj = autoupdatePossibleShifts();
         };
     };
@@ -880,22 +899,23 @@ $(document).ready(function(){
     //shows the "Brugerprofil" page
     function showUserProfile() {
         $(body).empty();
-        if(checkConnection()) {
-            //the url to POST to, so we can get our UserProfile JSON
-            var url = "https://"+ getFromStorage("domain") +"/ajax/app_userprofile";
-            //the object containing the data/authenticator to POST, so we are allowed to retrieve the JSON
-            var toPost = {userid:getFromStorage("userId")};
-            //make the AJAX call and save it to the var, so we can call .done on it
-            var userProfileObj = postAJAXCall(url, toPost);
+        
+        setTimeout(function() {
+            if(checkConnection()) {
+                //the url to POST to, so we can get our UserProfile JSON
+                var url = "https://"+ getFromStorage("domain") +"/ajax/app_userprofile";
+                //the object containing the data/authenticator to POST, so we are allowed to retrieve the JSON
+                var toPost = {userid:getFromStorage("userId")};
+                //make the AJAX call and save it to the var, so we can call .done on it
+                var userProfileObj = postAJAXCall(url, toPost);
 
-            userProfileObj.done(function(data) {
-                populateUserProfile(ajaxSuccesEvaluator("savedUserProfile", "Bruger Profilen", data));
-            });
-        }else { //this is reached if the device is offline
-            populateUserProfile(ajaxSuccesEvaluator("savedUserProfile", "Bruger Profilen"));
-        };
-        
-        
+                userProfileObj.done(function(data) {
+                    populateUserProfile(ajaxSuccesEvaluator("savedUserProfile", "Bruger Profilen", data));
+                });
+            }else { //this is reached if the device is offline
+                populateUserProfile(ajaxSuccesEvaluator("savedUserProfile", "Bruger Profilen"));
+            };
+        }, 10);
     };
     function populateUserProfile(data) {
         //a title so people know where they are
@@ -1332,11 +1352,11 @@ $(document).ready(function(){
     //if we get the data locally, we notify the user.
     //Requires a string location where we want to save the data, a string telling us where we are and the data from the ajax call.
     function ajaxSuccesEvaluator(saveLocation, whereAreWe, data) {
-        if(data !== undefined && data !== "") { //if succcess was reached in the postAJAXCall function, "data" is returned...
+        if(data !== undefined && data !== "" && data !== null) { //if succcess was reached in the postAJAXCall function, "data" is returned...
             //save the data to local storage, so it can be reused w/o having to make the AJAX call again
             saveToStorage(saveLocation , JSON.stringify(data));
             return data;
-        }else { //if no connection/data === undefined
+        }else { //if no connection/data === undefined or null or ""
             //if we fail to get JSON, get it locally
             
             //retrieves the UserProfile from localStorage
@@ -1555,6 +1575,8 @@ $(document).ready(function(){
         
         infoArr.userid = getFromStorage("userId");
         
+        infoArr.user = getFromStorage("email");
+        
         return $.ajax({
             type: "POST",
             global: isGlobal,
@@ -1619,10 +1641,6 @@ $(document).ready(function(){
     function cleanStorage() {
         if(supportsLocalStorage()!==false) {
             localStorage.clear();
-            //reset variable to true, so the system will correctly update the list of shifts
-            myShiftsFirstUpdate = true;
-            //reset variable to true, so the system will correctly update the list of shifts
-            possibleShiftsFirstUpdate = true;
         }else {
             //do nothing or maybe tell user that local storage is unavailable...
         };
@@ -1631,8 +1649,19 @@ $(document).ready(function(){
     //This method is needed to log out, so that people can log in with a different account...
     function logOut() {
         cleanStorage();
+        
+         //reset variable to true, so the system will correctly update the list of shifts
+        myShiftsFirstUpdate = true;
+        //reset variable to true, so the system will correctly update the list of shifts
+        possibleShiftsFirstUpdate = true;
+        //delete the autoupdateObj for possibleShifts
+        jsonUpdatePossibleShiftsObj = false;
+        //delete the autoupdateObj for myshifts
+        jsonUpdateMyShiftsObj = false;
+        
         $(menu).empty();
         $(body).empty();
+        
         showLogin();
     };
     
@@ -1903,7 +1932,8 @@ $(document).ready(function(){
         event.preventDefault();
         
         //takes the button that opened this window, then looks for it's closest container, which is its shift, then gets the shifts id which is equal to the one of its ids that we need in the JSON/server (it has two, shiftuid and id)
-        var shiftId = $(context).closest(".shiftTarget").attr("id");
+        //this is actually no longer needed here, as we simply return the object we were sent...
+//        var shiftId = $(context).closest(".shiftTarget").attr("id");
 //        $("#UI_ELEMENT_TEST").append("<p>shiftId from bookShift: "+ shiftId +"</p>");
         //get the form from the modal window
         var form = $(context).closest(".shiftTarget").serializeArray();
@@ -1935,13 +1965,16 @@ $(document).ready(function(){
     //                    for(var prop in form[i]) {
     //                        $("#UI_ELEMENT_TEST").append('<p>for each in form[i]: '+ prop +': '+ form[i][prop] +'</p>');
     //                    };
-                        delete sobjects[i]["roles"];
-                        sobjects[i].roleid = form[i]["value"];
+                        if(sobjects[i].hasOwnProperty("roles")) {
+                            delete sobjects[i]["roles"];
+                            sobjects[i].roleid = form[i]["value"];
+                        };
     //                    $("#UI_ELEMENT_TEST").append('<p>sobjects[i][roleid]'+ sobjects[i]["roleid"] +'</p>');
                     };
 
                     //what to post, it's the id of the shift in question
                     var toPost = {pswhash:pswHash, userid:userId, shifts:sobjects};
+                    
     //                var toPost = "shiftuid="+ shiftId +"&pswhash="+ pswhash+"&userid="+ userid +"&"+ form; //also add the serialized form contained in the var "form"
                     //create the url, to post to
                     var url = "https://"+ getFromStorage("domain") +"/ajax/app_takethatshift";
