@@ -52,14 +52,16 @@
     outline: none !important;
 }
 .margBotBtn {
-    margin-bottom: 2vmin;
+    //doesn't apply a style anymore, had to change it so that we apply it directly to be backwards compatible. It was left here and in the .js file to be able to find where it was easily...
+    //margin-bottom: 2vmin;
 }
 .myHighlight {
   border-color: #FF0000;
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(255, 0, 0, 0.6);
 }
 .userProfileElement {
-    margin-bottom: 5vmin;
+    //doesn't apply a style anymore, had to change it so that we apply it directly to be backwards compatible. It was left here and in the .js file to be able to find where it was easily...
+    //margin-bottom: 5vmin;
 }
 .shift {
     border-radius: 5px;

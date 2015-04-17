@@ -50,8 +50,41 @@ function phonegapReady() {
 $(document).ready(function(){
     
     //we're listening for iPhone because windows phones have a backBtn but don't support device.platform...
-    if(device.platform !== "iPhone") {
+    if(!isiPhone) {
         document.addEventListener("backbutton", onBackKeyDown, false);
+    };
+    
+    //used above to know if we need to handle a backBtn, but also to determine how to style certain elements... this is done because certain older windows and apple phone will have trouble with styling compatability...
+    function isiPhone() {
+        if(device.platform === "iPhone") {
+            return true;
+        };
+        return false;
+    };
+    
+    //gives us the size of the display, used on non-iPhone devices for some relative styling
+    var sizeHelper = 0;
+    function getSize() {
+        if($(window).width() < $(window).height()) {
+            sizeHelper = $(window).width()/100;
+            //$("#UI_ELEMENT_TEST").append("<p>window.width"+ sizeHelper +"</p>");
+        }else {
+            sizeHelper = $(window).height()/100;
+            //$("#UI_ELEMENT_TEST").append("<p>window.height"+ sizeHelper +"</p>");
+        };
+    };
+    
+    //
+    function relativeSize(defaultStyling, calcSize) {
+        if(isiPhone()) {
+            //$("#UI_ELEMENT_TEST").append("<p>isiPhone: "+ isiPhone().toString() +"</p>");
+            return defaultStyling;
+        }else {
+            var calc = sizeHelper*calcSize;
+            //$("#UI_ELEMENT_TEST").append("<p>isiPhone: "+ isiPhone().toString() +"</p>");
+            //$("#UI_ELEMENT_TEST").append("<p>calc: "+ calc +"</p>");
+            return calc+"px";
+        };
     };
     
     function onBackKeyDown() {
@@ -129,6 +162,9 @@ $(document).ready(function(){
     
     //this must be the first function, so that the JS instantiates properly
     $(function runOnLoad(){
+        
+        //we need this for some relative styling on non iPhones...
+        getSize();
         
         //needed to show the NemVagt logo on top of all screens
         showLogo();
@@ -497,21 +533,21 @@ $(document).ready(function(){
             //adds a button to unbook the shift to the shift, if the option is provided
             var unbookBtn = '';
             if(object["allowdelete"] === true) {
-                unbookBtn = '<button class="btn btn-danger pull-right margBotBtn unBookBtn" style="margin-right: -1vmin;">Afmeld vagt</button>'; 
+                unbookBtn = '<button class="btn btn-danger pull-right margBotBtn unBookBtn" style="margin-bottom: '+ relativeSize('2vmin', 2) +'; margin-right: '+ relativeSize('-1vmin', -1) +';">Afmeld vagt</button>'; 
                 //a listener is added after it has been appended to body
             };
             
             //gives the shift a color type, if it has one
             var shiftColor = '';
             if(object["color"] !== null && object["color"] !== undefined) {
-                shiftColor = '<div style="clear: both; margin-left: -20vmin; heigth: 5px; width: 150%; background-color:'+ object["color"] +';"><br></div>';
+                shiftColor = '<div style="clear: both; margin-left: '+ relativeSize('-10vmin', -10) +'; heigth: 5px; width: '+ relativeSize('150%', 100) +'; background-color:'+ object["color"] +';"><br></div>';
             };
             
-            $(body).append('<div id="'+ object["id"] +'" class="container shiftTarget shift" style="overflow: hidden; border: solid black 1px; margin-bottom: 5vmin;">\
+            $(body).append('<div id="'+ object["id"] +'" class="container shiftTarget shift" style="overflow: hidden; border: solid black 1px; margin-bottom: '+ relativeSize('5vmin', 5) +';">\
                 '+ shiftColor +'\
                 <div>\
                     '+ title +'\
-                    <button style="margin-bottom: 1vmin; margin-right: -1vmin; margin-top: 3vmin;" type="button" class="btn bookedDetailsBtn btn-default readMoreBtn pull-right">Vis mere</button>\
+                    <button style="margin-bottom: '+ relativeSize('1vmin', 1) +'; margin-right: '+ relativeSize('-1vmin', -1) +'; margin-top: '+ relativeSize('3vmin', 3) +';" type="button" class="btn bookedDetailsBtn btn-default readMoreBtn pull-right">Vis mere</button>\
                     <h4 style="clear:left;" class="pull-left">'+ getWeekday(object["startdate"]) +' '+ getDate(object["startdate"]) +' <!--'+
                         'Kl: '+ object["starttime"].substring(0,5) +' til '+ object["endtime"].substring(0,5)  +'--></h4>\
                 </div>\
@@ -621,30 +657,30 @@ $(document).ready(function(){
                 //adds a button to book the shift, to the shift
                 var bookBtn = '';
                 if(freeSpaces > 0) {
-                    bookBtn = '<button class="btn btn-success pull-right margBotBtn bookBtn" style="margin-right: -1vmin;">Tag vagt</button>';
+                    bookBtn = '<button class="btn btn-success pull-right margBotBtn bookBtn" style="margin-bottom: '+ relativeSize('2vmin', 2) +'; margin-right: '+ relativeSize('-1vmin', -1) +';">Tag vagt</button>';
                 };
                 //a listener is added after it has been appended to body
                 
                 //adds a button to show details for the shift, only do so if there is any notes...
                 var readMoreBtn = '';
                 if(object["shiftnotes"] !== '' && object["shiftnotes"] !== null && object["shiftnotes"] !== undefined) {
-                    readMoreBtn = '<button style="margin-bottom: 1vmin; margin-right: -1vmin; margin-top: 3vmin;" type="button" class="btn btn-default readMoreBtn pull-right">Vis mere</button>';
+                    readMoreBtn = '<button style="margin-bottom: 1vmin'+ relativeSize('1vmin', 1) +'; margin-right: '+ relativeSize('-1vmin', -1) +'; margin-top: '+ relativeSize('3vmin', 3) +';" type="button" class="btn btn-default readMoreBtn pull-right">Vis mere</button>';
                 };
                 //a listener is added after it has been appended to body
                 
                 //if people can remove the shift from their list of shifts, give them a button to do so...
                 var allowNoThanks = '';
                 if(object["allownothanks"]) {
-                    allowNoThanks = '<button type="button" class="btn btn-default margBotBtn noThanksBtn pull-left">Afvis</button>';
+                    allowNoThanks = '<button type="button" class="btn btn-default margBotBtn noThanksBtn pull-left" style="margin-bottom: '+ relativeSize('2vmin', 2) +'";>Afvis</button>';
                 };
                 
                 //gives the shift a color type, if it has one
                 var shiftColor = '';
                 if(object["color"] !== null && object["color"] !== undefined) {
-                    shiftColor = '<div style="clear: both; margin-left: -20vmin; heigth: 5px; width: 150%; background-color:'+ object["color"] +';"><br></div>';
+                    shiftColor = '<div style="clear: both; margin-left: '+ relativeSize('-10vmin', -10) +'; heigth: 5px; width: 150%; background-color:'+ object["color"] +';"><br></div>';
                 };
                 
-                $(body).append('<div id="'+ object["id"] +'" class="container shiftTarget shift" style="overflow: hidden; border: solid black 1px; margin-bottom: 5vmin;">\
+                $(body).append('<div id="'+ object["id"] +'" class="container shiftTarget shift" style="overflow: hidden; border: solid black 1px; margin-bottom: '+ relativeSize('5vmin', 5) +';">\
                 '+ shiftColor +'\
                     <div>\
                         '+ title +'\
@@ -716,7 +752,7 @@ $(document).ready(function(){
                     title = "<p>"+ "Titel" +": "+ object["title"] +"</p>";
                 };
                 if(object["notes"] !== undefined && object["notes"] !== "" && object["notes"] !== null) { //if notes exist and aren't null or "", var notes = notes from JSON
-                    notes = "<label for=\"notesField\">"+ "Noter fra administrator" +":</label> <div id=\"notesField\" class=\"shift\" style=\"padding:2vmin; margin-bottom:3vmin; border:solid black 1px\"><p>"+ object["notes"] +"</p></div>";
+                    notes = "<label for=\"notesField\">"+ "Noter fra administrator" +":</label> <div id=\"notesField\" class=\"shift\" style=\"padding:"+ relativeSize('2vmin', 2) +"; margin-bottom:"+ relativeSize('3vmin', 3) +"; border:solid black 1px\"><p>"+ object["notes"] +"</p></div>";
                 };
                 if(object["startdate"] !== undefined && object["startdate"] !== "" && object["startdate"] !== null) { //if startdate exists, is not null or "", var date = a formatted startdate
                     date = "<p>"+ "Dato" +": "+ getWeekday(object["startdate"]) +" "+ getDate(object["startdate"]) +"</p>";
@@ -738,7 +774,7 @@ $(document).ready(function(){
                 };
                 //gives the shift a color & type, if it has one
                 if(object["color"] !== undefined && object["color"] !== null && object["label"] !== undefined && object["label"] !== null) {
-                    shiftColor = '<p>Vagt type: '+ object["label"] +'</p><div style="clear: both; margin-top: -2vmin; heigth: 5px; width: 100%; border-radius: 5px; background-color:'+ object["color"] +';"><p><br></p></div>';
+                    shiftColor = '<p>Vagt type: '+ object["label"] +'</p><div style="clear: both; margin-top: '+ relativeSize('-2vmin', -2) +'; heigth: 5px; width: 100%; border-radius: 5px; background-color:'+ object["color"] +';"><p><br></p></div>';
                 };
                 
                 //appends the title of the shift to the body, that way, the user knows where they are... if the title is ==="" it outputs "vagten" instead...
@@ -751,11 +787,11 @@ $(document).ready(function(){
                 //creates a bookBtn
                 var unBookBtn = '';
                 if(allowDelete === true) {
-                    unBookBtn = '<button class="btn btn-danger unBookBtn pull-right margBotBtn" type="button">Afmeld vagt</button>';
+                    unBookBtn = '<button class="btn btn-danger unBookBtn pull-right margBotBtn" style="margin-bottom: '+ relativeSize('2vmin', 2) +'" type="button">Afmeld vagt</button>';
                 };
                 
                 //adds a back button to the page, so that people can easily get back. OBS would be nice to navigate to the shift they were just viewing, but I'm not sure how to do this...
-                var backBtn = '<button class="btn btn-default backBtn pull-left margBotBtn">Tilbage</button>';
+                var backBtn = '<button class="btn btn-default backBtn pull-left margBotBtn" style="margin-bottom: '+ relativeSize('2vmin', 2) +'">Tilbage</button>';
                 
                 //add the individual parts of the JSON to the append body, so that it can be viewed. Done this way to be easily modifiable...
                 $(body).append('<div id="'+ object["id"] +'" class="shiftTarget">'+ shiftColor+title+date+startTime+endTime+city+address+roles+notes+backBtn+unBookBtn +'</div>'); //wrap div .container and gove it object["id"] as id, important for book/unbook to work
@@ -834,11 +870,11 @@ $(document).ready(function(){
                 };
                 //if notes aren't null or "", var notes = notes from JSON
                 if(object["shiftnotes"] !== undefined && object["shiftnotes"] !== "" && object["shiftnotes"] !== null) {
-                    notes = "<label for=\"notesField\">"+ "Noter fra den vagtskema anvarlige" +":</label> <div id=\"notesField\" class=\"shift\" style=\"padding:2vmin; margin-bottom:3vmin; border:solid black 1px\"><p>"+ object["shiftnotes"] +"</p></div>";
+                    notes = "<label for=\"notesField\">"+ "Noter fra den vagtskema anvarlige" +":</label> <div id=\"notesField\" class=\"shift\" style=\"padding:"+ relativeSize('2vmin', 2) +"; margin-bottom:"+ relativeSize('3vmin', 3) +"; border:solid black 1px\"><p>"+ object["shiftnotes"] +"</p></div>";
                 };
                 //gives the shift a color & type, if it has one
                 if(object["color"] !== undefined && object["color"] !== null && object["label"] !== undefined && object["label"] !== null) {
-                    shiftColor = '<p>Vagt type: '+ object["label"] +'</p><div style="clear: both; margin-top: -2vmin; heigth: 5px; width: 100%; border-radius: 5px; background-color:'+ object["color"] +';"><p><br></p></div>';
+                    shiftColor = '<p>Vagt type: '+ object["label"] +'</p><div style="clear: both; margin-top: '+ relativeSize('-2vmin', -2) +'; heigth: 5px; width: 100%; border-radius: 5px; background-color:'+ object["color"] +';"><p><br></p></div>';
                 };
                 //gives the shift a day/date
                 //if startDate is not null or undefined, var date = a formatted startdate
@@ -866,17 +902,17 @@ $(document).ready(function(){
                 //makes sure whether or not you can take the shift, if you can, then show a bookBtn
                 var bookBtn = '';
                 if(freeSpaces > 0) { //button should also submit info from your choice of roles, if present...
-                    bookBtn = '<button class="btn bookBtn btn-success pull-right margBotBtn" type="button">Tag vagt</button>';
+                    bookBtn = '<button class="btn bookBtn btn-success pull-right margBotBtn" type="button" style="margin-bottom: '+ relativeSize('2vmin', 2) +'">Tag vagt</button>';
                 };
                 
                 //if people can remove the shift from their list of shifts, give them a button to do so...
                 var allowNoThanks = '';
                 if(object["allownothanks"]) {
-                    allowNoThanks = '<button style="margin-left:2vmin;" type="button" class="btn btn-default noThanksBtn pull-left">Afvis</button>';
+                    allowNoThanks = '<button style="margin-left:'+ relativeSize('2vmin', 2) +';" type="button" class="btn btn-default noThanksBtn pull-left">Afvis</button>';
                 };
                 
                 //adds a back button to the page, so that people can easily get back. OBS would be nice to navigate to the shift they were just viewing, but I'm not sure how to do this...
-                var backBtn = '<button class="btn backBtn btn-default pull-left margBotBtn">Tilbage</button>';
+                var backBtn = '<button class="btn backBtn btn-default pull-left margBotBtn" style="margin-bottom: '+ relativeSize('2vmin', 2) +'">Tilbage</button>';
                 
                 //add the individual parts of the JSON to the append body, so that it can be viewed. Done this way to be easily modifiable...
                 $(body).append('<div id="'+ object["id"] +'" class="shiftTarget">'+ shiftColor+title+date+shiftStartTime+shiftEndTime+freeSpacesFormatted+notes+backBtn+allowNoThanks+bookBtn +'</div>');
@@ -1033,7 +1069,7 @@ $(document).ready(function(){
         };
         
         //returns the formatted form.
-        return '<div class="userProfileElement"><label for="'+ object["fieldname"] +'">'+ object["showname"] +':</label><input id="'+ object["fieldname"] +'" type="'+ type +'" name="'+ object["fieldname"] +'" class="form-control" value="'+ object["value"] +'"></div>';
+        return '<div class="userProfileElement" style="margin-bottom: '+ relativeSize('5vmin', 5) +'"><label for="'+ object["fieldname"] +'">'+ object["showname"] +':</label><input id="'+ object["fieldname"] +'" type="'+ type +'" name="'+ object["fieldname"] +'" class="form-control" value="'+ object["value"] +'"></div>';
         //return '<div class="input-group userProfileElement input-group-md"><label for="'+ object["fieldname"] +'">'+ object["showname"] +':</label><input id="'+ object["fieldname"] +'" type="'+ type +'" name="'+ object["fieldname"] +'" class="form-control" value="'+ object["value"] +'"></div>';
     };
     //used to format data for textareas in populateUserProfile, returns a html formatted string, requires the JSON object
@@ -1044,7 +1080,7 @@ $(document).ready(function(){
             value = "";
         }
         //returns the formatted form.
-        return '<div class="userProfileElement"><label for="'+ object["fieldname"] +'">'+ object["showname"] +':</label><textarea id="'+ object["fieldname"] +'" name="'+ object["fieldname"] +'" class="form-control" rows="5" >'+ value +'</textarea></div>';
+        return '<div class="userProfileElement" style="margin-bottom: '+ relativeSize('5vmin', 5) +'"><label for="'+ object["fieldname"] +'">'+ object["showname"] +':</label><textarea id="'+ object["fieldname"] +'" name="'+ object["fieldname"] +'" class="form-control" rows="5" >'+ value +'</textarea></div>';
     };
     //used to format data for checkboxes in populateUserProfile, returns a html formatted string, requires the JSON object
     function createCheckBoxes(object) {
@@ -1056,7 +1092,7 @@ $(document).ready(function(){
         //makes a toggle button, to replace the visual representation of the checkbox
         var toggleBtn = createToggleButton(checked);
         //returns the formatted form.
-        return '<div class="checkbox userProfileElement"><label hidden><input hidden type="checkbox" '+ checked +' id="'+ object["fieldname"] +'" name="'+ object["fieldname"] +'" value="1">'+ object["showname"] +'</label> '+ toggleBtn +' <label>'+ object["showname"] +'</label></div>';
+        return '<div class="checkbox userProfileElement" style="margin-bottom: '+ relativeSize('5vmin', 5) +'"><label hidden><input hidden type="checkbox" '+ checked +' id="'+ object["fieldname"] +'" name="'+ object["fieldname"] +'" value="1">'+ object["showname"] +'</label> '+ toggleBtn +' <label>'+ object["showname"] +'</label></div>';
     };
     //used by createCheckBoxes to make toggleButtons, to show instead of checkboxes
     function createToggleButton(checked) {
@@ -1101,7 +1137,7 @@ $(document).ready(function(){
             };
             
             //returns the formatted form
-            return '<label for="'+ object["fieldname"] +'">'+ object["showname"] +':</label><select class="form-control userProfileElement" id="'+ object["fieldname"] +'" name="'+ object["fieldname"] +'">'+ optionString +'</select>';
+            return '<label for="'+ object["fieldname"] +'">'+ object["showname"] +':</label><select class="form-control userProfileElement" style="margin-bottom: '+ relativeSize('5vmin', 5) +'" id="'+ object["fieldname"] +'" name="'+ object["fieldname"] +'">'+ optionString +'</select>';
             
         }else if(object.hasOwnProperty("sizeArr")) {
 //            $("#UI_ELEMENT_TEST").append("<p>object had property sizeArr, object[sizeArr].length: "+ object["sizeArr"].length +"</p>"); // TEST
@@ -1128,7 +1164,7 @@ $(document).ready(function(){
             };
             
             //returns the formatted form
-            return '<label for="'+ object["userSize"]["fieldname"] +'">'+ object["userSize"]["showname"] +':</label><select class="form-control userProfileElement" id="'+ object["userSize"]["fieldname"] +'" name="'+ object["userSize"]["fieldname"] +'">'+ optionString +'</select>';
+            return '<label for="'+ object["userSize"]["fieldname"] +'">'+ object["userSize"]["showname"] +':</label><select class="form-control userProfileElement" style="margin-bottom: '+ relativeSize('5vmin', 5) +'" id="'+ object["userSize"]["fieldname"] +'" name="'+ object["userSize"]["fieldname"] +'">'+ optionString +'</select>';
 //            return '';
         };
     };
@@ -1519,7 +1555,7 @@ $(document).ready(function(){
     //needed so show the NemVagt logo
     function showLogo() {
         //inserts the "NemVagt" logo in top of all pages.
-        $("#lCont").append('<img src="img/NemVagt-Logo.png" class="img-responsive" style="margin-top:1vh; width:32vmin;" alt="NemVagt" >');
+        $("#lCont").append('<img src="img/NemVagt-Logo.png" class="img-responsive" style="margin-top:'+ relativeSize('1vh', 1) +'; width:'+ relativeSize('32vmin', 32) +';" alt="NemVagt" >');
     };
     
     //is passed a date in the YYYY-MM-DD format and returns the abbreviation of the month name in danish
@@ -2085,7 +2121,7 @@ $(document).ready(function(){
 //                                $("#UI_ELEMENT_TEST").append('<p>'+ prop +': '+ sdata[prop] +'</p>');
 //                            };
                             //create a var which contains the rolePickForm, which we'll submit regardless of whether or not there are roles
-                            var dataVar = '<div><label for="'+ sdata["shiftuid"] +'">Dato:</label><input readonly="readonly" id="'+sdata["shiftuid"]+ '" type="TEXTFIELD" name="'+ sdata["shiftuid"] +'" class="userProfileElement form-control" value="'+ getWeekday(sdata["startdate"]) +' '+ parseInt(getDate(sdata["startdate"]).substring(0,2), 10) +'. '+ getMonth(sdata["startdate"]) +' '+ getDate(sdata["startdate"]).substring(6, 10) +', fra kl: '+ sdata["starttime"].substring(0,5) +' - '+ sdata["endtime"].substring(0,5) +'"></div>';
+                            var dataVar = '<div><label for="'+ sdata["shiftuid"] +'">Dato:</label><input readonly="readonly" id="'+sdata["shiftuid"]+ '" type="TEXTFIELD" name="'+ sdata["shiftuid"] +'" class="userProfileElement form-control" style="margin-bottom: '+ relativeSize('5vmin', 5) +'" value="'+ getWeekday(sdata["startdate"]) +' '+ parseInt(getDate(sdata["startdate"]).substring(0,2), 10) +'. '+ getMonth(sdata["startdate"]) +' '+ getDate(sdata["startdate"]).substring(6, 10) +', fra kl: '+ sdata["starttime"].substring(0,5) +' - '+ sdata["endtime"].substring(0,5) +'"></div>';
                             //create the form string we'll be submitting
                             //if there are roles, make an appropriate select input
                             if(sdata.hasOwnProperty("roles")) {
@@ -2112,7 +2148,7 @@ $(document).ready(function(){
                                 rolePickForm += dataVar;
 //                                $("#UI_ELEMENT_TEST").append("<p>date p was added</p>");
                                 //create the select, with the created options
-                                rolePickForm += '<select class="form-control userProfileElement" name="roleid">'+ optionsString +'</select>';
+                                rolePickForm += '<select class="form-control userProfileElement" style="margin-bottom: '+ relativeSize('5vmin', 5) +'" name="roleid">'+ optionsString +'</select>';
                                 
 //                                $("#UI_ELEMENT_TEST").append("<p>optionsString and select added to rolePickForm var</p>");
                                 
