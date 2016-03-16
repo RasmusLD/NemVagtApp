@@ -38,6 +38,7 @@ var app = {
     },
     // Update DOM on a Received Event
     receivedEvent: function() {
+        //timeout set to allow users to see the splash screen
         setTimeout(function() {
             phonegapReady();
         }, 3000);
@@ -48,11 +49,6 @@ var app = {
 function phonegapReady() {
 
 $(document).ready(function(){
-    
-    //we're listening for iPhone because windows phones have a backBtn but don't support device.platform...
-    if(!isiPhone) {
-        document.addEventListener("backbutton", onBackKeyDown, false);
-    };
     
     //used above to know if we need to handle a backBtn, but also to determine how to style certain elements... this is done because certain older windows and apple phone will have trouble with styling compatability...
     function isiPhone() {
@@ -160,7 +156,7 @@ $(document).ready(function(){
 //    //sets the format of returned value
 //    var destinationType;
     
-    //this must be the first function, so that the JS instantiates properly
+    //this must be the first function to run, so that the JS instantiates properly
     $(function runOnLoad(){
         
         //we need this for some relative styling on non iPhones...
@@ -168,6 +164,15 @@ $(document).ready(function(){
         
         //needed to show the NemVagt logo on top of all screens
         showLogo();
+        
+        //is used to listen for the "pause" event...
+        document.addEventListener("pause", onPause, false);
+        
+        //we're listening for iPhone because windows phones have a backBtn but don't support device.platform...
+        if(!isiPhone) {
+            document.addEventListener("backbutton", onBackKeyDown, false);
+        };
+        
         //instantiates var menu, that will need to be on every page.
         menu = $("#mCont");
         //instantiates var body, that will be used on every page.
@@ -189,6 +194,11 @@ $(document).ready(function(){
         hasSavedLogin();
         
     });
+    
+    //closes the app on pause, is used to circumvent our state problem
+    function onPause() {
+        navigator.app.exitApp();
+    };
     
     //camera & photo functionality
     /*//Called when a photo is successfully retrieved

@@ -1,4 +1,4 @@
-<widget xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0" id="dk.nemvagt.app2" version="1.0.1">
+<widget xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0" id="dk.nemvagt.app2" version="1.0.2">
   
 <name>NemVagt</name>
   
@@ -12,7 +12,7 @@
   
 <preference name="orientation" value="default"/>
   
-<preference name="target-device" value="universal"/>
+<preference name="target-device" value="handset"/>
   
 <preference name="fullscreen" value="true"/>
   
