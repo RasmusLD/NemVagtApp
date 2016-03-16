@@ -2012,10 +2012,12 @@ $(document).ready(function(){
     //                        $("#UI_ELEMENT_TEST").append('<p>for each in form[i]: '+ prop +': '+ form[i][prop] +'</p>');
     //                    };
                         if(sobjects[i].hasOwnProperty("roles")) {
+							$("#UI_ELEMENT_TEST").append('<p>pre-delete sobjects[i][roleid]'+ sobjects[i]["roleid"] +'</p>');
                             delete sobjects[i]["roles"];
-                            sobjects[i].roleid = form[i]["value"];
+                            sobjects[i].roleid = form[i]["value"]; //HER ER FEJLEN MARK SNAKKEDE OM?
+							$("#UI_ELEMENT_TEST").append('<p>post-delete sobjects[i][roleid]'+ sobjects[i]["roleid"] +'</p>');
                         };
-    //                    $("#UI_ELEMENT_TEST").append('<p>sobjects[i][roleid]'+ sobjects[i]["roleid"] +'</p>');
+                        
                     };
 
                     //what to post, it's the id of the shift in question
@@ -2144,11 +2146,13 @@ $(document).ready(function(){
                                 if(object.length === 1) {
                                     for(var i = 0; i < object.length; i++) {
                                         optionsString += "<option selected=\"selected\" name="+ object[i]["roleid"] +" value="+ object[i]["roleid"] +">"+ object[i]["rolename"] +"</option>";
+										$("#UI_ELEMENT_TEST").append("<p>"+ object[i]["roleid"] +"</p>"); //FEJLEN MARK SNAKKEDE OM?
                                     };
                                 }else {
                                     optionsString += "<option selected=\"selected\" name=\"standard\" value=\"0\">Vælg en rolle</option>";
                                     for(var i = 0; i < object.length; i++) {
                                         optionsString += "<option name="+ object[i]["roleid"] +" value="+ object[i]["roleid"] +">"+ object[i]["rolename"] +"</option>";
+										$("#UI_ELEMENT_TEST").append("<p>"+ object[i]["roleid"] +"</p>"); //FEJLEN MARK SNAKKEDE OM?
                                     };
                                 };
 //                                $("#UI_ELEMENT_TEST").append("<p>optionsString created</p>");

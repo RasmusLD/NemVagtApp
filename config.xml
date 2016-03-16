@@ -112,4 +112,6 @@
 
 <access origin="*"/>
 
+<allow-navigation href="*" />
+
 </widget>
