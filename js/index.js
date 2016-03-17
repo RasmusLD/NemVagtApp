@@ -2014,7 +2014,7 @@ $(document).ready(function(){
                         if(sobjects[i].hasOwnProperty("roles")) {
 							$("#UI_ELEMENT_TEST").append('<p>pre-delete sobjects[i][roleid]'+ sobjects[i]["roleid"] +'</p>');
                             delete sobjects[i]["roles"];
-                            sobjects[i].roleid = form[i]["value"]; //HER ER FEJLEN MARK SNAKKEDE OM?
+                            sobjects[i].roleid = form[i]["value"]; //HER ER FEJLEN MARK SNAKKEDE OM? TROR DET ER HER, jeg sætter den til i, hvilket nok ikke er rigtigt... jeg skal nok sætte den til "form.roleid" eller noget
 							$("#UI_ELEMENT_TEST").append('<p>post-delete sobjects[i][roleid]'+ sobjects[i]["roleid"] +'</p>');
                         };
                         
