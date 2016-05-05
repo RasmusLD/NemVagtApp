@@ -110,6 +110,10 @@
  
 <gap:plugin name="org.apache.cordova.network-information" /> 
 
+<gap:plugin name="cordova-plugin-whitelist" version="1.0.0" source="npm" />
+
 <access origin="*"/>
+
+<allow-navigation href="*" />
 
 </widget>

@@ -1983,7 +1983,8 @@ $(document).ready(function(){
 //        $("#UI_ELEMENT_TEST").append("<p>shiftId from bookShift: "+ shiftId +"</p>");
         //get the form from the modal window
         var form = $(context).closest(".shiftTarget").serializeArray();
-        
+        //$("#UI_ELEMENT_TEST").append(JSON.stringify(form));
+		
         //will be either true of false, is used later in the function, to know if the form was filled correctly and thus how to proceed
         var formFilled = validateRolePickerForm(form);
         //$("#UI_ELEMENT_TEST").append("<p>formFilled.toString: "+ formFilled.toString() +"</p>");
@@ -2004,7 +2005,6 @@ $(document).ready(function(){
 
                     //connect shiftuid from the form and the role picked...
                     var sobjects = argObj["data"]["shifts"];
-    //                $("#UI_ELEMENT_TEST").append('<p>sobjects.length: '+ sobjects.length +'</p>');
                     for(var i = 0; i < sobjects.length; i++) {
     //                    $("#UI_ELEMENT_TEST").append('<p>formToString: '+ formString +'</p>');
     //                    $("#UI_ELEMENT_TEST").append('<p>form[i]: '+ form[i] +'</p>');
@@ -2012,12 +2012,11 @@ $(document).ready(function(){
     //                        $("#UI_ELEMENT_TEST").append('<p>for each in form[i]: '+ prop +': '+ form[i][prop] +'</p>');
     //                    };
                         if(sobjects[i].hasOwnProperty("roles")) {
-							$("#UI_ELEMENT_TEST").append('<p>pre-delete sobjects[i][roleid]'+ sobjects[i]["roleid"] +'</p>');
+							//$("#UI_ELEMENT_TEST").append('<p>pre-delete sobjects[i][roleid]'+ sobjects[i]["roles"] +'</p>');
                             delete sobjects[i]["roles"];
-                            sobjects[i].roleid = form[i]["value"]; //HER ER FEJLEN MARK SNAKKEDE OM? TROR DET ER HER, jeg sætter den til i, hvilket nok ikke er rigtigt... jeg skal nok sætte den til "form.roleid" eller noget
-							$("#UI_ELEMENT_TEST").append('<p>post-delete sobjects[i][roleid]'+ sobjects[i]["roleid"] +'</p>');
+                            sobjects[i].roleid = form[1]["value"]; //HER ER FEJLEN MARK SNAKKEDE OM? TROR DET ER HER, jeg sætter den til i, hvilket nok ikke er rigtigt... jeg skal nok sætte den til "form.roleid" eller noget
+							//$("#UI_ELEMENT_TEST").append('<p>post-delete sobjects[i][roleid]'+ sobjects[i]["roleid"] +'</p>');
                         };
-                        
                     };
 
                     //what to post, it's the id of the shift in question
@@ -2146,13 +2145,13 @@ $(document).ready(function(){
                                 if(object.length === 1) {
                                     for(var i = 0; i < object.length; i++) {
                                         optionsString += "<option selected=\"selected\" name="+ object[i]["roleid"] +" value="+ object[i]["roleid"] +">"+ object[i]["rolename"] +"</option>";
-										$("#UI_ELEMENT_TEST").append("<p>"+ object[i]["roleid"] +"</p>"); //FEJLEN MARK SNAKKEDE OM?
+										//$("#UI_ELEMENT_TEST").append("<p>"+ object[i]["roleid"] +"</p>"); //FEJLEN MARK SNAKKEDE OM?
                                     };
                                 }else {
                                     optionsString += "<option selected=\"selected\" name=\"standard\" value=\"0\">Vælg en rolle</option>";
                                     for(var i = 0; i < object.length; i++) {
                                         optionsString += "<option name="+ object[i]["roleid"] +" value="+ object[i]["roleid"] +">"+ object[i]["rolename"] +"</option>";
-										$("#UI_ELEMENT_TEST").append("<p>"+ object[i]["roleid"] +"</p>"); //FEJLEN MARK SNAKKEDE OM?
+										//$("#UI_ELEMENT_TEST").append("<p>"+ object[i]["roleid"] +"</p>"); //FEJLEN MARK SNAKKEDE OM?
                                     };
                                 };
 //                                $("#UI_ELEMENT_TEST").append("<p>optionsString created</p>");
